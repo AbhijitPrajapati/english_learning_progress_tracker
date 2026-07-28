@@ -15,3 +15,4 @@ class SessionCreationResponse(BaseModel):
     user_id: UUID
     created_at: datetime
     transcript: str
+    error_ids: list[UUID]

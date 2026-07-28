@@ -16,3 +16,9 @@ class UserRepository:
 
     async def get(self, user_id: UUID) -> User | None:
         return await self.session.get(User, user_id)
+
+    # probably should raise something if not found
+    async def delete(self, user_id: UUID) -> None:
+        user = await self.session.get(User, user_id)
+        await self.session.delete(user)
+        await self.session.flush()
