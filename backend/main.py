@@ -5,7 +5,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from .config import BackendConfig
-from .database import PostgresAdapter
+from .database import SessionManager
 from .transcription import WhisperAdapter
 
 logging.basicConfig(
@@ -20,8 +20,8 @@ async def lifespan(app: FastAPI):
     Application lifespan for managing dependencies
     """
     config = BackendConfig()  # type: ignore
-    app.state.whisper = WhisperAdapter(config.whisper)
-    app.state.database = PostgresAdapter(config.postgres)
+    app.state.transcriber = WhisperAdapter(config.whisper)
+    app.state.session_manager = SessionManager(config.postgres)
     yield
 
 

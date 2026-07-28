@@ -1,9 +1,5 @@
 from pydantic import BaseModel
 
 
-class PostgresConfig(BaseModel):
-    user: str
-    password: str
-    host: str
-    port: int
-    db: str
+class DatabaseConfig(BaseModel):
+    url: str

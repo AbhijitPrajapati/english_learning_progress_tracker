@@ -9,3 +9,6 @@ dependencies = [
     "psycopg>=3.3.4",
     "sqlalchemy>=2.0.51",
 ]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.File"]

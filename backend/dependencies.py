@@ -1,12 +1,8 @@
 from fastapi import Request
 
-from .database import PostgresAdapter
 from .transcription import WhisperAdapter
 
 
-# def postgres(request: Request) -> PostgresAdapter:
-#     session = request.app.state.postgres.session()
-
-
-def whisper(request: Request) -> WhisperAdapter:
-    return request.app.state.whisper
+# TODO: Should the transcription adapter be a direct dependency of the app, or should it be a dependency of services?
+def transcriber(request: Request) -> WhisperAdapter:
+    return request.app.state.transcriber
