@@ -11,7 +11,7 @@ class PostgresAdapter:
 
     def __init__(self, config: PostgresConfig) -> None:
         self.engine = create_engine(
-            f"postgresql+psycopg2://{config.user}:{config.password}@{config.host}/{config.db}"
+            f"postgresql+psycopg2://{config.user}:{config.password}@{config.host}:{config.port}/{config.db}"
         )
         self.SessionLocal = sessionmaker(
             bind=self.engine, autocommit=False, autoflush=False

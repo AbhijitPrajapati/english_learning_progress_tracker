@@ -1,0 +1,34 @@
+services:
+  backend:
+    build: ./backend
+    container_name: backend
+    ports:
+      - "8000:8000"
+    environment:
+      POSTGRES__USER: ${POSTGRES_USER}
+      POSTGRES__PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES__HOST: postgres
+      POSTGRES__PORT: 5432
+      POSTGRES__DB: ${POSTGRES_DB}
+      WHISPER__MODEL: ${WHISPER_MODEL}
+      WHISPER__DEVICE: ${WHISPER_DEVICE}
+    depends_on:
+      - db
+    volumes:
+      - .:/backend
+
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
