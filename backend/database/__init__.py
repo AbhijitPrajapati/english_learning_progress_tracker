@@ -1,5 +1,4 @@
-import repositories
-
+from . import repositories
 from .config import DatabaseConfig
 from .session import SessionManager
 

@@ -1,6 +1,6 @@
-import enum
 import uuid
 
+# from backend.something import ErrorCategory
 from sqlalchemy import Enum, ForeignKey, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -8,11 +8,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database.base import Base
 
 from .session import Session
-
-
-class ErrorCategory(enum.Enum):
-    ABC = "test_category"
-    DEF = "another_test_category"
 
 
 class Error(Base):
@@ -32,4 +27,4 @@ class Error(Base):
 
     explanation: Mapped[str] = mapped_column(Text, nullable=False)
 
-    session: Mapped["Session"] = relationship(back_populates="errors")
+    session: Mapped[Session] = relationship(back_populates="errors")

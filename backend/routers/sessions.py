@@ -1,8 +1,10 @@
 import logging
 
-from backend.dependencies import WhisperAdapter, transcriber
+from backend.dependencies import SessionService, session_service
 from backend.schemas.sessions import SessionCreationRequest, SessionCreationResponse
 from fastapi import APIRouter, Depends, File, UploadFile
+
+from domain.sessions import Session
 
 logger = logging.getLogger(__name__)
 
@@ -10,10 +12,12 @@ router = APIRouter(prefix="/sessions")
 
 
 @router.post("/", response_model=SessionCreationResponse)
-def upload_session(
+async def upload_session(
     request: SessionCreationRequest,
     audio_file: UploadFile = File(...),
-    transcriber: WhisperAdapter = Depends(transcriber),
+    session_service: SessionService = Depends(session_service),
 ) -> SessionCreationResponse:
-    # TODO: This should call a service layer shouldnt it?
-    transcript: str = transcriber.transcribe(audio_file.file)
+    session: Session = await session_service.create_session(
+        request.user_id, audio_file.file
+    )
+    return SessionCreationResponse.model_validate(session)

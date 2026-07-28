@@ -21,7 +21,7 @@ class SessionManager:
         )
 
     @asynccontextmanager
-    async def session(self) -> AsyncGenerator[AsyncSession, None]:
+    async def session(self) -> AsyncGenerator[AsyncSession]:
         async with self.session_maker() as session:
             try:
                 yield session
