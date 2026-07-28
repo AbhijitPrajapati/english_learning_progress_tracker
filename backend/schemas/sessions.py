@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class SessionCreationRequest(BaseModel):
@@ -9,6 +9,8 @@ class SessionCreationRequest(BaseModel):
 
 
 class SessionCreationResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True, extra="ignore")
+
     id: UUID
     user_id: UUID
     created_at: datetime

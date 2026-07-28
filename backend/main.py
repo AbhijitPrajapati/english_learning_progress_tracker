@@ -4,18 +4,13 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from .config import BackendConfig
+from core.config import config
+
+from .api.routers import sessions_router
 from .database import SessionManager
-from .routers import sessions_router
 from .transcription import WhisperAdapter
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-)
 logger = logging.getLogger(__name__)
-
-
-config = BackendConfig()  # type: ignore
 
 
 @asynccontextmanager

@@ -1,9 +1,8 @@
+# from services.session import SessionService
+from backend.repositories import SessionRepository
+from backend.services import SessionService
+from backend.transcription import WhisperAdapter
 from fastapi import Depends, Request
-
-from database.repositories import SessionRepository
-from services.session import SessionService
-
-from .transcription import WhisperAdapter
 
 
 def transcriber(request: Request) -> WhisperAdapter:

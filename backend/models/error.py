@@ -1,11 +1,11 @@
 import uuid
 
-# from backend.something import ErrorCategory
+from backend.models.base import Base
 from sqlalchemy import Enum, ForeignKey, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from database.base import Base
+from schemas.errors import ErrorCategory
 
 from .session import Session
 
