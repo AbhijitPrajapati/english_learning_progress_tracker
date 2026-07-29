@@ -8,6 +8,10 @@ class NewUser(BaseModel):
     password_hash: str
 
 
+class UpdateUser(BaseModel):
+    email: Email
+
+
 class NewSample(BaseModel):
     user_id: UserId
     transcript: str

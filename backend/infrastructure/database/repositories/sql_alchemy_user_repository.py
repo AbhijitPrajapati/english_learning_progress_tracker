@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.common.repositories.user_repository import NewUser, UserRepository
+from backend.application.common.repositories.models import UpdateUser
 from domain.user import User
 from domain.value_objects import Email, UserId
 from infrastructure.database.models import User as ORMUser
@@ -50,3 +51,16 @@ class SQLAlchemyUserRepository(UserRepository):
         orm_user = await self.session.get(ORMUser, user_id)
         await self.session.delete(orm_user)
         await self.session.flush()
+
+    async def update(self, user_id: UserId, update_user: UpdateUser) -> User | None:
+        orm_user = await self.session.get(ORMUser, user_id)
+        if orm_user is None:
+            return None
+        orm_user.email = update_user.email
+        await self.session.commit()
+        return User(
+            id=orm_user.id,
+            email=orm_user.email,
+            password_hash=orm_user.password_hash,
+            created_at=orm_user.created_at,
+        )

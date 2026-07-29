@@ -2,7 +2,7 @@ from typing import Protocol
 
 from domain.value_objects import MistakeCategory, UserId
 
-from .models import Distribution, TimeBucket, Timeframe, MistakeTimeSeries
+from .models import Distribution, MistakeTimeSeries, TimeBucket, Timeframe
 
 
 class MistakeAnalyticsAccessor(Protocol):

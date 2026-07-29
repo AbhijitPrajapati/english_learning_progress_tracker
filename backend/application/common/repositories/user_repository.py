@@ -3,7 +3,7 @@ from typing import Protocol
 from domain.user import User
 from domain.value_objects import Email, UserId
 
-from .models import NewUser
+from .models import NewUser, UpdateUser
 
 
 class UserRepository(Protocol):
@@ -11,3 +11,4 @@ class UserRepository(Protocol):
     async def get(self, user_id: UserId) -> User | None: ...
     async def get_by_email(self, email: Email) -> User | None: ...
     async def delete(self, user_id: UserId) -> None: ...
+    async def update(self, user_id: UserId, update_user: UpdateUser) -> User | None: ...

@@ -1,8 +1,10 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from application.common.repositories.models import NewMistake
 from backend.application.common.repositories.mistake_repository import MistakeRepository
 from backend.domain.mistake import Mistake
+from backend.domain.value_objects import SampleId
 from domain.value_objects import MistakeId
 from infrastructure.database.models import Mistake as ORMMistake
 
@@ -37,3 +39,19 @@ class SQLAlchemyMistakeRepository(MistakeRepository):
             correction=orm_mistake.original_text,
             explanation=orm_mistake.explanation,
         )
+
+    async def list(self, sample_id: SampleId, limit: int, offset: int) -> list[Mistake]:
+        stmt = (
+            (
+                select(ORMMistake)
+                .where(ORMMistake.sample_id == sample_id)
+                .order_by(ORMMistake.id.desc())
+            )
+            .offset(offset)
+            .limit(limit)
+        )
+        result = await self.session.execute(stmt)
+        return [
+            Mistake.model_validate(row, extra="ignore")
+            for row in result.scalars().all()
+        ]
