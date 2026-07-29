@@ -1,36 +1,49 @@
-# from services.session import SessionService
-from backend.grammar_analysis import LLMAdapter
-from backend.repositories import ErrorRepository, SessionRepository
-from backend.services import SessionService
-from backend.transcription import WhisperAdapter
-from fastapi import Depends, Request
+from collections.abc import AsyncGenerator
+
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from application.sessions.process_session import ProcessSession
+from infrastructure.container import InfrastructureContainer
+from infrastructure.database.unit_of_work import SqlAlchemyUnitOfWork
+from infrastructure.grammar_analysis import LLMGrammarAnalysisAdapter
+from infrastructure.transcription import WhisperTranscriptionAdapter
+
+container = InfrastructureContainer()
 
 
-def transcriber(request: Request) -> WhisperAdapter:
-    return request.app.state.transcriber
+def get_container() -> InfrastructureContainer:
+    return container
 
 
-async def session_repository(request: Request) -> SessionRepository:
-    with request.app.state.session_manager.session() as session:
-        return SessionRepository(session)
+def get_transcriber(
+    container: InfrastructureContainer = Depends(get_container),
+) -> WhisperTranscriptionAdapter:
+    return container.transcriber
 
 
-async def error_repository(request: Request) -> ErrorRepository:
-    with request.app.state.session_manager.session() as session:
-        return ErrorRepository(session)
+def get_grammar_analyzer(
+    container: InfrastructureContainer = Depends(get_container),
+) -> LLMGrammarAnalysisAdapter:
+    return container.grammar_analyzer
 
 
-def grammar_analyzer(request: Request) -> WhisperAdapter:
-    return request.app.state.grammar_analyzer
+async def get_session(
+    container: InfrastructureContainer = Depends(get_container),
+) -> AsyncGenerator[AsyncSession]:
+    async with container.session_factory() as session:
+        yield session
 
 
-def session_service(
-    request: Request,
-    transcriber: WhisperAdapter = Depends(transcriber),
-    grammar_analyzer: LLMAdapter = Depends(grammar_analyzer),
-    session_repository: SessionRepository = Depends(session_repository),
-    error_repository: ErrorRepository = Depends(error_repository),
-) -> SessionService:
-    return SessionService(
-        transcriber, grammar_analyzer, session_repository, error_repository
+def get_uow(session: AsyncSession = Depends(get_session)) -> SqlAlchemyUnitOfWork:
+    return SqlAlchemyUnitOfWork(session)
+
+
+def get_process_session(
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+    transcriber: WhisperTranscriptionAdapter = Depends(get_transcriber),
+    grammar_analyzer: LLMGrammarAnalysisAdapter = Depends(get_grammar_analyzer),
+):
+    return ProcessSession(
+        uow=uow, transcriber=transcriber, grammar_analyzer=grammar_analyzer
     )
