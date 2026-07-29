@@ -1,11 +1,17 @@
 from fastapi import APIRouter, Depends
 
-from api.dependencies.application import RetrieveDistribution, get_retrieve_distribution
+from api.dependencies.application import (
+    RetrieveDistribution,
+    RetrieveTimeSeries,
+    get_retrieve_distribution,
+    get_retrieve_time_series,
+)
 from api.dependencies.auth import get_current_user
 from api.schemas.analytics import (
     DistributionRequest,
     DistributionResponse,
-    MistakeFrequency,
+    TimeSeriesRequest,
+    TimeSeriesResponse,
 )
 from application.analytics.models import Timeframe
 from domain.user import User
@@ -19,14 +25,19 @@ async def get_distribution(
     retrieve_distribution: RetrieveDistribution = Depends(get_retrieve_distribution),
     current_user: User = Depends(get_current_user),
 ) -> DistributionResponse:
-    timeframe: Timeframe = Timeframe(
-        start=request.timeframe.start, end=request.timeframe.end
-    )
+    timeframe = Timeframe.model_validate(request.timeframe)
     distribution = await retrieve_distribution.execute(current_user.id, timeframe)
-    mistake_freq = [
-        MistakeFrequency.model_validate(freq)
-        for freq in distribution.mistake_frequencies
-    ]
-    return DistributionResponse(
-        total_samples=distribution.total_samples, mistake_frequencies=mistake_freq
+    return DistributionResponse.model_validate(distribution)
+
+
+@router.post("/time-series", response_model=TimeSeriesResponse)
+async def get_time_series(
+    request: TimeSeriesRequest,
+    retrieve_time_series: RetrieveTimeSeries = Depends(get_retrieve_time_series),
+    current_user: User = Depends(get_current_user),
+) -> TimeSeriesResponse:
+    timeframe = Timeframe.model_validate(request.timeframe)
+    time_series = await retrieve_time_series.execute(
+        current_user.id, timeframe, request.mistake_category
     )
+    return TimeSeriesResponse.model_validate(time_series)

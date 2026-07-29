@@ -2,6 +2,7 @@ from fastapi import Depends
 
 from application.analytics.accessor import MistakeAnalyticsAccessor
 from application.analytics.retrieve_distribution import RetrieveDistribution
+from application.analytics.retrieve_time_series import RetrieveTimeSeries
 from application.common.unit_of_work import UnitOfWork
 from application.samples.grammar_analysis import GrammarAnalysisAdapter
 from application.samples.process_sample import ProcessSample
@@ -44,3 +45,11 @@ async def get_retrieve_distribution(
     ),
 ) -> RetrieveDistribution:
     return RetrieveDistribution(mistake_analytics_accessor)
+
+
+async def get_retrieve_time_series(
+    mistake_analytics_accessor: MistakeAnalyticsAccessor = Depends(
+        get_mistake_analytics_accessor
+    ),
+) -> RetrieveTimeSeries:
+    return RetrieveTimeSeries(mistake_analytics_accessor)

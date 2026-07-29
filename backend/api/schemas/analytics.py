@@ -23,3 +23,18 @@ class MistakeFrequency(BaseModel):
 class DistributionResponse(BaseModel):
     total_samples: int
     mistake_frequencies: list[MistakeFrequency]
+
+
+class TimeSeriesRequest(BaseModel):
+    timeframe: Timeframe
+    mistake_category: MistakeCategory
+
+
+class TimeSeriesPoint(BaseModel):
+    time: datetime
+    opportunities: int
+    occurances: int
+
+
+class TimeSeriesResponse(BaseModel):
+    points: list[TimeSeriesPoint]

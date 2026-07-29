@@ -1,11 +1,18 @@
 from typing import Protocol
 
-from domain.value_objects import UserId
+from domain.value_objects import MistakeCategory, UserId
 
-from .models import Distribution, Timeframe
+from .models import Distribution, TimeBucket, Timeframe, MistakeTimeSeries
 
 
 class MistakeAnalyticsAccessor(Protocol):
     async def distribution(
         self, user_id: UserId, timeframe: Timeframe
     ) -> Distribution: ...
+    async def time_series(
+        self,
+        user_id: UserId,
+        timeframe: Timeframe,
+        mistake_category: MistakeCategory,
+        bucket: TimeBucket,
+    ) -> MistakeTimeSeries: ...
