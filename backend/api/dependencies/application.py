@@ -1,5 +1,7 @@
 from fastapi import Depends
 
+from application.analytics.accessor import MistakeAnalyticsAccessor
+from application.analytics.retrieve_distribution import RetrieveDistribution
 from application.common.unit_of_work import UnitOfWork
 from application.samples.grammar_analysis import GrammarAnalysisAdapter
 from application.samples.process_sample import ProcessSample
@@ -8,7 +10,7 @@ from application.users.authenticate_user import AuthenticateUser
 from application.users.password_hasher import PasswordHasher
 from application.users.register_user import RegisterUser
 
-from .database import get_uow
+from .database import get_mistake_analytics_accessor, get_uow
 from .infrastructure import get_grammar_analyzer, get_password_hasher, get_transcriber
 
 
@@ -34,3 +36,11 @@ async def get_register_user(
     password_hasher: PasswordHasher = Depends(get_password_hasher),
 ) -> RegisterUser:
     return RegisterUser(uow, password_hasher)
+
+
+async def get_retrieve_distribution(
+    mistake_analytics_accessor: MistakeAnalyticsAccessor = Depends(
+        get_mistake_analytics_accessor
+    ),
+) -> RetrieveDistribution:
+    return RetrieveDistribution(mistake_analytics_accessor)

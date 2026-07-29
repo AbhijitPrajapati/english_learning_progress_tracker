@@ -12,7 +12,7 @@ from .user import User
 
 
 class Sample(Base):
-    __tablename__ = "sessions"
+    __tablename__ = "samples"
 
     id: Mapped[SampleId] = mapped_column(
         ValueObjectUUIDType(SampleId), primary_key=True
@@ -28,8 +28,8 @@ class Sample(Base):
 
     transcript: Mapped[str] = mapped_column(Text, nullable=False)
 
-    user: Mapped[User] = relationship(back_populates="sessions")
+    user: Mapped[User] = relationship(back_populates="samples")
 
-    errors: Mapped[list[Mistake]] = relationship(
-        back_populates="session", cascade="all, delete-orphan"
+    mistakes: Mapped[list[Mistake]] = relationship(
+        back_populates="sample", cascade="all, delete-orphan"
     )

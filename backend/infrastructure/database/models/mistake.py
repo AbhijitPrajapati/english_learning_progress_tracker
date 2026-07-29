@@ -9,7 +9,7 @@ from .sample import Sample
 
 
 class Mistake(Base):
-    __tablename__ = "errors"
+    __tablename__ = "mistakes"
 
     id: Mapped[MistakeId] = mapped_column(
         ValueObjectUUIDType(MistakeId), primary_key=True
@@ -32,4 +32,4 @@ class Mistake(Base):
 
     explanation: Mapped[str] = mapped_column(Text, nullable=False)
 
-    session: Mapped[Sample] = relationship(back_populates="errors")
+    sample: Mapped[Sample] = relationship(back_populates="mistakes")
