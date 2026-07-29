@@ -1,4 +1,4 @@
-from backend.api.schemas.samples import DetectedMistake, SampleCreationResponse
+from backend.api.schemas.samples import SampleCreationResponse, SampleMistakes
 from fastapi import APIRouter, Depends, File, UploadFile
 
 from api.dependencies.application import ProcessSample, get_process_sample
@@ -15,10 +15,9 @@ async def upload_sample(
     current_user: User = Depends(get_current_user),
 ) -> SampleCreationResponse:
     result = await process_sample.execute(current_user.id, file.file)
-    mistakes = [DetectedMistake.model_validate(m) for m in result.mistakes]
     return SampleCreationResponse(
         id=result.sample_id.value,
         created_at=result.created_at,
         transcript=result.transcript,
-        detected_mistakes=mistakes,
+        detected_mistakes=SampleMistakes.model_validate(result.mistakes),
     )

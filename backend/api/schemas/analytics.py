@@ -14,12 +14,12 @@ class DistributionRequest(BaseModel):
     timeframe: Timeframe
 
 
-class MistakeCount(BaseModel):
+class MistakeFrequency(BaseModel):
     category: MistakeCategory
-    count: int
+    occurances: int
+    opportunities: int
 
 
 class DistributionResponse(BaseModel):
-    total_mistakes: int
     total_samples: int
-    mistakes_counts: list[MistakeCount]
+    mistake_frequencies: list[MistakeFrequency]

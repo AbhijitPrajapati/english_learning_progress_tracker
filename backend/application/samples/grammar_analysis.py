@@ -12,5 +12,16 @@ class DetectedMistake(BaseModel):
     explanation: str
 
 
+class MistakeOverview(BaseModel):
+    category: MistakeCategory
+    opportunities: int
+    occurances: int
+
+
+class GrammarAnalysisOutput(BaseModel):
+    overview: list[MistakeOverview]
+    mistakes: list[DetectedMistake]
+
+
 class GrammarAnalysisAdapter(Protocol):
-    def analyze(self, text: str) -> list[DetectedMistake]: ...
+    def analyze(self, text: str) -> GrammarAnalysisOutput: ...

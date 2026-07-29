@@ -46,7 +46,6 @@ class SQLAlchemyUserRepository(UserRepository):
             created_at=orm_user.created_at,
         )
 
-    # probably should raise something if not found
     async def delete(self, user_id: UserId) -> None:
         orm_user = await self.session.get(ORMUser, user_id)
         await self.session.delete(orm_user)

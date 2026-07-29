@@ -3,6 +3,8 @@ import logging
 from application.samples.grammar_analysis import (
     DetectedMistake,
     GrammarAnalysisAdapter,
+    GrammarAnalysisOutput,
+    MistakeOverview,
 )
 from domain.value_objects import MistakeCategory
 
@@ -21,13 +23,14 @@ class LLMGrammarAnalysisAdapter(GrammarAnalysisAdapter):
         assert self.setting == "test"
         logger.info("Initialized dummy llm")
 
-    def analyze(self, text: str) -> list[DetectedMistake]:
+    def analyze(self, text: str) -> GrammarAnalysisOutput:
         try:
             pass
         except Exception as e:
             logger.exception("LLM inference failed")
             raise GrammarAnalysisError() from e
-        return [
+
+        mistakes = [
             DetectedMistake(
                 category=MistakeCategory.ABC,
                 original_text="abc error test",
@@ -41,3 +44,12 @@ class LLMGrammarAnalysisAdapter(GrammarAnalysisAdapter):
                 explanation="def explanation",
             ),
         ]
+        overview = [
+            MistakeOverview(
+                category=MistakeCategory.ABC, opportunities=10, occurances=1
+            ),
+            MistakeOverview(
+                category=MistakeCategory.DEF, opportunities=5, occurances=1
+            ),
+        ]
+        return GrammarAnalysisOutput(mistakes=mistakes, overview=overview)

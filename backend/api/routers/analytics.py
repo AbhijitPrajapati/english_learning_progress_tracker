@@ -5,7 +5,7 @@ from api.dependencies.auth import get_current_user
 from api.schemas.analytics import (
     DistributionRequest,
     DistributionResponse,
-    MistakeCount,
+    MistakeFrequency,
 )
 from application.analytics.models import Timeframe
 from domain.user import User
@@ -23,12 +23,10 @@ async def get_distribution(
         start=request.timeframe.start, end=request.timeframe.end
     )
     distribution = await retrieve_distribution.execute(current_user.id, timeframe)
-    mistake_counts = [
-        MistakeCount(category=count.category, count=count.count)
-        for count in distribution.mistake_counts
+    mistake_freq = [
+        MistakeFrequency.model_validate(freq)
+        for freq in distribution.mistake_frequencies
     ]
     return DistributionResponse(
-        total_samples=distribution.total_samples,
-        total_mistakes=distribution.total_mistakes,
-        mistakes_counts=mistake_counts,
+        total_samples=distribution.total_samples, mistake_frequencies=mistake_freq
     )

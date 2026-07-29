@@ -19,3 +19,10 @@ class NewMistake(BaseModel):
     original_text: str
     correction: str
     explanation: str
+
+
+class NewMetric(BaseModel):
+    sample_id: SampleId
+    category: MistakeCategory
+    opportunities: int
+    occurances: int

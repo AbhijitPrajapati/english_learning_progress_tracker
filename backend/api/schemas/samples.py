@@ -17,8 +17,19 @@ class DetectedMistake(BaseModel):
     explanation: str
 
 
+class MistakeOverview(BaseModel):
+    category: MistakeCategory
+    opportunities: int
+    occurances: int
+
+
+class SampleMistakes(BaseModel):
+    overview: list[MistakeOverview]
+    mistakes: list[DetectedMistake]
+
+
 class SampleCreationResponse(BaseModel):
     id: UUID
     created_at: datetime
     transcript: str
-    detected_mistakes: list[DetectedMistake]
+    detected_mistakes: SampleMistakes

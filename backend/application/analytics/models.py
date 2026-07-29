@@ -10,12 +10,12 @@ class Timeframe(BaseModel):
     end: datetime | None
 
 
-class MistakeCount(BaseModel):
+class MistakeFrequency(BaseModel):
     category: MistakeCategory
-    count: int
+    opportunities: int
+    occurances: int
 
 
 class Distribution(BaseModel):
-    mistake_counts: list[MistakeCount]
-    total_mistakes: int
+    mistake_frequencies: list[MistakeFrequency]
     total_samples: int

@@ -7,6 +7,7 @@ from domain.value_objects import SampleId, UserId
 from infrastructure.database.types.value_object_uuid import ValueObjectUUIDType
 
 from .base import Base
+from .metric import Metric
 from .mistake import Mistake
 from .user import User
 
@@ -32,4 +33,8 @@ class Sample(Base):
 
     mistakes: Mapped[list[Mistake]] = relationship(
         back_populates="sample", cascade="all, delete-orphan"
+    )
+
+    metrics: Mapped[list[Metric]] = relationship(
+        back_populates="samples", cascade="all, delete-orphan"
     )
