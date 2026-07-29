@@ -1,6 +1,5 @@
-from .metric import Metric
-from .mistake import Mistake
+from .mistake_frequency import MistakeFrequency
 from .sample import Sample
 from .user import User
 
-__all__ = ["Metric", "Mistake", "Sample", "User"]
+__all__ = ["MistakeFrequency", "Sample", "User"]

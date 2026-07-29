@@ -5,8 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.common.unit_of_work import UnitOfWork
 
-from .repositories.sql_alchemy_metric_repository import SQLAlchemyMetricRepository
-from .repositories.sql_alchemy_mistake_repository import SQLAlchemyMistakeRepository
 from .repositories.sql_alchemy_sample_repository import SQLAlchemySampleRepository
 from .repositories.sql_alchemy_user_repository import SQLAlchemyUserRepository
 
@@ -19,8 +17,6 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
 
         self.users = SQLAlchemyUserRepository(session)
         self.samples = SQLAlchemySampleRepository(session)
-        self.mistakes = SQLAlchemyMistakeRepository(session)
-        self.metrics = SQLAlchemyMetricRepository(session)
 
     async def commit(self) -> None:
         await self.session.commit()

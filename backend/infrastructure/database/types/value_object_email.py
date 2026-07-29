@@ -27,3 +27,4 @@ class ValueObjectEmailType(TypeDecorator):
             return None
 
         return Email(value=value)
+

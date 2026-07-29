@@ -1,16 +1,15 @@
 from sqlalchemy import Enum, ForeignKey, Integer, PrimaryKeyConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from domain.mistake import MistakeCategory
-from domain.sample import SampleId
+from domain.sample import MistakeCategory, SampleId
 from infrastructure.database.types.value_object_uuid import ValueObjectUUIDType
 
 from .base import Base
 from .sample import Sample
 
 
-class Metric(Base):
-    __tablename__ = "metrics"
+class MistakeFrequency(Base):
+    __tablename__ = "mistake_frequencies"
 
     sample_id: Mapped[SampleId] = mapped_column(
         ValueObjectUUIDType(SampleId), ForeignKey("sessions.id"), nullable=False
@@ -24,6 +23,6 @@ class Metric(Base):
 
     occurances: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    sample: Mapped[Sample] = relationship(back_populates="metrics")
+    sample: Mapped[Sample] = relationship(back_populates="mistake_frequencies")
 
     __table_args__ = (PrimaryKeyConstraint("sample_id", "category"),)

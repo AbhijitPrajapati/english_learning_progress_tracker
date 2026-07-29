@@ -3,13 +3,13 @@ from datetime import datetime
 from sqlalchemy import DateTime, ForeignKey, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from domain.sample import SampleId
+from domain.sample import Analysis, SampleId
 from domain.user import UserId
+from infrastructure.database.types.value_object_analysis import ValueObjectAnalysisType
 from infrastructure.database.types.value_object_uuid import ValueObjectUUIDType
 
 from .base import Base
-from .metric import Metric
-from .mistake import Mistake
+from .mistake_frequency import MistakeFrequency
 from .user import User
 
 
@@ -30,12 +30,10 @@ class Sample(Base):
 
     transcript: Mapped[str] = mapped_column(Text, nullable=False)
 
+    analysis: Mapped[Analysis] = mapped_column(ValueObjectAnalysisType)
+
     user: Mapped[User] = relationship(back_populates="samples")
 
-    mistakes: Mapped[list[Mistake]] = relationship(
-        back_populates="sample", cascade="all, delete-orphan"
-    )
-
-    metrics: Mapped[list[Metric]] = relationship(
+    metrics: Mapped[list[MistakeFrequency]] = relationship(
         back_populates="samples", cascade="all, delete-orphan"
     )

@@ -2,7 +2,9 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from domain.mistake import MistakeCategory
+from domain.sample import MistakeCategory
+
+from .analysis import MistakeFrequency
 
 
 class Timeframe(BaseModel):
@@ -12,12 +14,6 @@ class Timeframe(BaseModel):
 
 class DistributionRequest(BaseModel):
     timeframe: Timeframe
-
-
-class MistakeFrequency(BaseModel):
-    category: MistakeCategory
-    occurances: int
-    opportunities: int
 
 
 class DistributionResponse(BaseModel):

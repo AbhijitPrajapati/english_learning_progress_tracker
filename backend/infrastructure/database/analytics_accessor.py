@@ -10,10 +10,11 @@ from backend.application.analytics.models import (
     Timeframe,
     TimeSeriesPoint,
 )
-from domain.mistake import MistakeCategory
+from domain.sample import MistakeCategory
 from domain.user import UserId
 
-from .models import Metric, Sample
+from .models import MistakeFrequency as FrequencyORM
+from .models import Sample
 
 
 class SQLAlchemyMistakeAnalyticsAccessor(MistakeAnalyticsAccessor):
@@ -29,7 +30,7 @@ class SQLAlchemyMistakeAnalyticsAccessor(MistakeAnalyticsAccessor):
             filters.append(Sample.created_at >= timeframe.start)
         if timeframe.end is not None:
             filters.append(Sample.created_at <= timeframe.end)
-        return stmt.join(Metric.sample).where(and_(*filters))
+        return stmt.join(FrequencyORM.sample).where(and_(*filters))
 
     async def distribution(self, user_id: UserId, timeframe: Timeframe) -> Distribution:
 
@@ -40,13 +41,13 @@ class SQLAlchemyMistakeAnalyticsAccessor(MistakeAnalyticsAccessor):
 
         category_counts_stmt = self.filter_by_user_id_and_timeframe(
             select(
-                Metric.category.label("category"),
-                func.sum(Metric.occurances).label("occurances"),
-                func.sum(Metric.opportunities).label("opportunities"),
+                FrequencyORM.category.label("category"),
+                func.sum(FrequencyORM.occurances).label("occurances"),
+                func.sum(FrequencyORM.opportunities).label("opportunities"),
             ),
             user_id,
             timeframe,
-        ).group_by(Metric.category)
+        ).group_by(FrequencyORM.category)
         category_counts_result = await self.session.execute(category_counts_stmt)
         rows = category_counts_result.mappings().all()
 
@@ -69,9 +70,9 @@ class SQLAlchemyMistakeAnalyticsAccessor(MistakeAnalyticsAccessor):
             self.filter_by_user_id_and_timeframe(
                 select(
                     time_expr,
-                    func.sum(Metric.occurances).label("occurances"),
-                    func.sum(Metric.opportunities).label("opportunities"),
-                ).where(Metric.category == mistake_category),
+                    func.sum(FrequencyORM.occurances).label("occurances"),
+                    func.sum(FrequencyORM.opportunities).label("opportunities"),
+                ).where(FrequencyORM.category == mistake_category),
                 user_id,
                 timeframe,
             )

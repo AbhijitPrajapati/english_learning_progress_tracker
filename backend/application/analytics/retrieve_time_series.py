@@ -1,4 +1,4 @@
-from domain.mistake import MistakeCategory
+from domain.sample import MistakeCategory
 from domain.user import UserId
 
 from .accessor import MistakeAnalyticsAccessor

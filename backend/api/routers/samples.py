@@ -1,8 +1,9 @@
-from backend.api.schemas.samples import SampleCreationResponse, SampleMistakes
 from fastapi import APIRouter, Depends, File, UploadFile
 
 from api.dependencies.application import ProcessSample, get_process_sample
 from api.dependencies.auth import get_current_user
+from api.schemas.analysis import SampleAnalysis
+from api.schemas.samples import SampleCreationResponse
 from domain.user import User
 
 router = APIRouter(prefix="/samples")
@@ -19,5 +20,5 @@ async def upload_sample(
         id=result.sample_id.value,
         created_at=result.created_at,
         transcript=result.transcript,
-        detected_mistakes=SampleMistakes.model_validate(result.mistakes),
+        analysis=SampleAnalysis.model_validate(result.analysis),
     )

@@ -1,12 +1,7 @@
 import logging
 
-from application.samples.grammar_analysis import (
-    DetectedMistake,
-    GrammarAnalysisAdapter,
-    GrammarAnalysisOutput,
-    MistakeOverview,
-)
-from domain.mistake import MistakeCategory
+from application.samples.grammar_analysis import GrammarAnalysisAdapter
+from domain.sample import Analysis, Mistake, MistakeCategory, MistakeFrequency
 
 from .config.llm import LLMConfig
 
@@ -23,7 +18,7 @@ class LLMGrammarAnalysisAdapter(GrammarAnalysisAdapter):
         assert self.setting == "test"
         logger.info("Initialized dummy llm")
 
-    def analyze(self, text: str) -> GrammarAnalysisOutput:
+    def analyze(self, text: str) -> Analysis:
         try:
             pass
         except Exception as e:
@@ -31,25 +26,29 @@ class LLMGrammarAnalysisAdapter(GrammarAnalysisAdapter):
             raise GrammarAnalysisError() from e
 
         mistakes = [
-            DetectedMistake(
+            Mistake(
                 category=MistakeCategory.ABC,
                 original_text="abc error test",
                 correction="abc corrected",
                 explanation="abc explanation",
             ),
-            DetectedMistake(
+            Mistake(
                 category=MistakeCategory.DEF,
                 original_text="def error test",
                 correction="def corrected",
                 explanation="def explanation",
             ),
         ]
-        overview = [
-            MistakeOverview(
+        freq = [
+            MistakeFrequency(
                 category=MistakeCategory.ABC, opportunities=10, occurances=1
             ),
-            MistakeOverview(
+            MistakeFrequency(
                 category=MistakeCategory.DEF, opportunities=5, occurances=1
             ),
         ]
-        return GrammarAnalysisOutput(mistakes=mistakes, overview=overview)
+        return Analysis(
+            mistakes=mistakes,
+            frequencies=freq,
+            feedback="Dummy dumb feedback",
+        )

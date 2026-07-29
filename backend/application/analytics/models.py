@@ -3,7 +3,7 @@ from enum import StrEnum
 
 from pydantic import BaseModel
 
-from domain.mistake import MistakeCategory
+from domain.sample import MistakeFrequency
 
 
 class Timeframe(BaseModel):
@@ -15,12 +15,6 @@ class Timeframe(BaseModel):
         if self.start is None or self.end is None:
             return None
         return self.start - self.end
-
-
-class MistakeFrequency(BaseModel):
-    category: MistakeCategory
-    opportunities: int
-    occurances: int
 
 
 class Distribution(BaseModel):
