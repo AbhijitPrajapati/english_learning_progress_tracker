@@ -9,6 +9,10 @@ from domain.value_objects import UserId
 from .config.jwt import JwtConfig
 
 
+class InvalidToken(Exception):
+    pass
+
+
 class JwtTokenService(TokenService):
     def __init__(self, config: JwtConfig) -> None:
         self.secret = config.secret
@@ -25,5 +29,5 @@ class JwtTokenService(TokenService):
         try:
             payload = jwt.decode(token, self.secret, algorithms=[self.algorithm])
         except Exception as e:
-            raise NotImplementedError("Jwt infra error") from e
+            raise InvalidToken() from e
         return UserId(value=UUID(payload["sub"]))

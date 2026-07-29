@@ -1,10 +1,9 @@
-from pydantic import EmailStr
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.common.repositories.user_repository import NewUser, UserRepository
 from domain.user import User
-from domain.value_objects import UserId
+from domain.value_objects import Email, UserId
 from infrastructure.database.models import User as ORMUser
 
 
@@ -34,7 +33,7 @@ class SQLAlchemyUserRepository(UserRepository):
             created_at=orm_user.created_at,
         )
 
-    async def get_by_email(self, email: EmailStr) -> User | None:
+    async def get_by_email(self, email: Email) -> User | None:
         stmt = select(User).where(User.email == email)  # type: ignore
         result = await self.session.execute(stmt)
         orm_user = result.first()
@@ -49,6 +48,6 @@ class SQLAlchemyUserRepository(UserRepository):
 
     # probably should raise something if not found
     async def delete(self, user_id: UserId) -> None:
-        orm_user = await self.session.get(ORMUser, user_id.value)
+        orm_user = await self.session.get(ORMUser, user_id)
         await self.session.delete(orm_user)
         await self.session.flush()

@@ -1,7 +1,7 @@
 from enum import StrEnum
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class MistakeCategory(StrEnum):
@@ -11,6 +11,10 @@ class MistakeCategory(StrEnum):
 
 class UserId(BaseModel):
     value: UUID
+
+
+class Email(BaseModel):
+    value: EmailStr
 
 
 class SampleId(BaseModel):

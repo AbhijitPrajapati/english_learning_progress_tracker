@@ -1,22 +1,22 @@
 from datetime import datetime
 
 from sqlalchemy import DateTime, String, func
-from sqlalchemy.dialects.postgresql import CITEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from domain.value_objects import UserId
+from domain.value_objects import Email, UserId
+from infrastructure.database.types.value_object_email import ValueObjectEmailType
+from infrastructure.database.types.value_object_uuid import ValueObjectUUIDType
 
 from .base import Base
 from .sample import Sample
-from .value_object_uuid import ValueObjectUUIDType
 
 
 class User(Base):
     __tablename__ = "users"
 
     id: Mapped[UserId] = mapped_column(ValueObjectUUIDType(UserId), primary_key=True)
-    email: Mapped[str] = mapped_column(
-        CITEXT(320), unique=True, nullable=False, index=True
+    email: Mapped[Email] = mapped_column(
+        ValueObjectEmailType(), unique=True, nullable=False, index=True
     )
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(

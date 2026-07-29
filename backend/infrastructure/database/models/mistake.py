@@ -2,10 +2,10 @@ from sqlalchemy import Enum, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from domain.value_objects import MistakeCategory, MistakeId, SampleId
+from infrastructure.database.types.value_object_uuid import ValueObjectUUIDType
 
 from .base import Base
 from .sample import Sample
-from .value_object_uuid import ValueObjectUUIDType
 
 
 class Mistake(Base):

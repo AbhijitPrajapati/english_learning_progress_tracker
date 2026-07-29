@@ -26,7 +26,7 @@ class SQLAlchemyMistakeRepository(MistakeRepository):
         await self.session.flush()
 
     async def get(self, mistake_id: MistakeId) -> Mistake | None:
-        orm_mistake = await self.session.get(ORMMistake, mistake_id.value)
+        orm_mistake = await self.session.get(ORMMistake, mistake_id)
         if orm_mistake is None:
             return None
         return Mistake(

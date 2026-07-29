@@ -13,6 +13,9 @@ from api.schemas.auth import (
     RegisterRequest,
     RegisterResponse,
 )
+from application.errors.auth import InvalidCredentials
+from application.errors.users import EmailAlreadyRegistered, UserNotFound
+from domain.value_objects import Email
 
 router = APIRouter(prefix="/auth")
 
@@ -23,9 +26,14 @@ async def login(
     authenticate_user: AuthenticateUser = Depends(get_authenticate_user),
     token_service: TokenService = Depends(get_token_service),
 ) -> LoginResponse:
-    user = await authenticate_user.execute(request.email, password=request.password)
-    if user is None:
-        raise HTTPException(status_code=000, detail="Authentication failed")
+    try:
+        user = await authenticate_user.execute(
+            Email(value=request.email), password=request.password
+        )
+    except UserNotFound:
+        raise HTTPException(status_code=404, detail="User not found")
+    except InvalidCredentials:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
     token = token_service.issue(user.id)
     return LoginResponse(access_token=token, user_id=user.id.value)
 
@@ -35,9 +43,9 @@ async def register(
     request: RegisterRequest, register_user: RegisterUser = Depends(get_register_user)
 ) -> RegisterResponse:
     try:
-        user = await register_user.execute(request.email, request.password)
-    except Exception:  # noqa: BLE001
-        raise HTTPException(status_code=000, detail="user exists already")
+        user = await register_user.execute(Email(value=request.email), request.password)
+    except EmailAlreadyRegistered:
+        raise HTTPException(status_code=409, detail="Email already registered")
     return RegisterResponse(
-        id=user.id.value, email=user.email, created_at=user.created_at
+        id=user.id.value, email=user.email.value, created_at=user.created_at
     )

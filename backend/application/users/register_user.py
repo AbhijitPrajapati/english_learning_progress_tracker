@@ -1,8 +1,8 @@
-from pydantic import EmailStr
-
 from application.common.repositories.models import NewUser
 from application.common.unit_of_work import UnitOfWork
+from application.errors.users import EmailAlreadyRegistered
 from domain.user import User
+from domain.value_objects import Email
 
 from .password_hasher import PasswordHasher
 
@@ -12,10 +12,10 @@ class RegisterUser:
         self.uow = uow
         self.password_hasher = password_hasher
 
-    async def execute(self, email: EmailStr, password: str) -> User:
+    async def execute(self, email: Email, password: str) -> User:
         existing = await self.uow.users.get_by_email(email)
         if existing is not None:
-            raise NotImplementedError("User exists")
+            raise EmailAlreadyRegistered()
 
         hashed_password = self.password_hasher.hash(password)
         new_user = NewUser(email=email, password_hash=hashed_password)

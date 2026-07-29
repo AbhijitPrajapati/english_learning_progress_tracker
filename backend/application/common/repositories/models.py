@@ -1,10 +1,10 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
-from domain.value_objects import MistakeCategory, SampleId, UserId
+from domain.value_objects import Email, MistakeCategory, SampleId, UserId
 
 
 class NewUser(BaseModel):
-    email: EmailStr
+    email: Email
     password_hash: str
 
 

@@ -35,6 +35,6 @@ class SQLAlchemySampleRepository(SampleRepository):
 
     # probably should raise something when not found
     async def delete(self, sample_id: SampleId) -> None:
-        sample = await self.session.get(ORMSession, sample_id.value)
+        sample = await self.session.get(ORMSession, sample_id)
         await self.session.delete(sample)
         await self.session.flush()

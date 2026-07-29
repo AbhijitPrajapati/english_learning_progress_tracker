@@ -1,7 +1,8 @@
-from pydantic import EmailStr
-
 from application.common.unit_of_work import UnitOfWork
+from application.errors.auth import InvalidCredentials
+from application.errors.users import UserNotFound
 from domain.user import User
+from domain.value_objects import Email
 
 from .password_hasher import PasswordHasher
 
@@ -11,12 +12,12 @@ class AuthenticateUser:
         self.uow = uow
         self.password_hasher = password_hasher
 
-    async def execute(self, email: EmailStr, password: str) -> User:
+    async def execute(self, email: Email, password: str) -> User:
         user = await self.uow.users.get_by_email(email)
         if user is None:
-            raise NotImplementedError("User does not exist with this email")
+            raise UserNotFound()
 
         if not self.password_hasher.verify(password, user.password_hash):
-            raise NotImplementedError("Invalid credentials, password is wrong")
+            raise InvalidCredentials("Incorrect password")
 
         return user

@@ -4,11 +4,11 @@ from sqlalchemy import DateTime, ForeignKey, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from domain.value_objects import SampleId, UserId
+from infrastructure.database.types.value_object_uuid import ValueObjectUUIDType
 
 from .base import Base
 from .mistake import Mistake
 from .user import User
-from .value_object_uuid import ValueObjectUUIDType
 
 
 class Sample(Base):

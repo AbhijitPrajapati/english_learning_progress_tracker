@@ -1,9 +1,9 @@
-from .auth import JwtTokenService
 from .config.settings import InfrastructureSettings
 from .database.engine import create_engine
 from .database.session import create_session_factory
 from .grammar_analysis import LLMGrammarAnalysisAdapter
 from .password_hasher import PwdLibPasswordHasher
+from .token_service import JwtTokenService
 from .transcription import WhisperTranscriptionAdapter
 
 
