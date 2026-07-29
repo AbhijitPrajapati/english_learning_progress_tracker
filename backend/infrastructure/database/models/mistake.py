@@ -1,7 +1,8 @@
 from sqlalchemy import Enum, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from domain.value_objects import MistakeCategory, MistakeId, SampleId
+from domain.mistake import MistakeCategory, MistakeId
+from domain.sample import SampleId
 from infrastructure.database.types.value_object_uuid import ValueObjectUUIDType
 
 from .base import Base

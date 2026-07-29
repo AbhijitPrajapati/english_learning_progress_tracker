@@ -1,6 +1,7 @@
 from typing import Protocol
 
-from domain.value_objects import MistakeCategory, UserId
+from domain.mistake import MistakeCategory
+from domain.user import UserId
 
 from .models import Distribution, MistakeTimeSeries, TimeBucket, Timeframe
 

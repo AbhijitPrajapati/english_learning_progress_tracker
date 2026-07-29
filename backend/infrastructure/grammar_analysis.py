@@ -6,7 +6,7 @@ from application.samples.grammar_analysis import (
     GrammarAnalysisOutput,
     MistakeOverview,
 )
-from domain.value_objects import MistakeCategory
+from domain.mistake import MistakeCategory
 
 from .config.llm import LLMConfig
 

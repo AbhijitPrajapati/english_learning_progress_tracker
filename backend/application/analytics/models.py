@@ -3,7 +3,7 @@ from enum import StrEnum
 
 from pydantic import BaseModel
 
-from domain.value_objects import MistakeCategory
+from domain.mistake import MistakeCategory
 
 
 class Timeframe(BaseModel):

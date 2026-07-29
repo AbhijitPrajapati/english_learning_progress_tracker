@@ -2,7 +2,9 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from .value_objects import SampleId, UserId
+from domain.user import UserId
+
+from .value_objects import SampleId
 
 
 class Sample(BaseModel):

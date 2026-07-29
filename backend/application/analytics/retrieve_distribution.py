@@ -1,4 +1,4 @@
-from domain.value_objects import UserId
+from domain.user import UserId
 
 from .accessor import MistakeAnalyticsAccessor
 from .models import Distribution, Timeframe

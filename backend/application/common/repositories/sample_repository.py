@@ -1,7 +1,7 @@
 from typing import Protocol
 
-from backend.domain.sample import Sample
-from domain.value_objects import SampleId, UserId
+from domain.sample import Sample, SampleId
+from domain.user import UserId
 
 from .models import NewSample
 

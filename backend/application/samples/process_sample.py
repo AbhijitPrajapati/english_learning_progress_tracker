@@ -5,8 +5,8 @@ from pydantic import BaseModel
 
 from application.common.repositories.models import NewMetric, NewMistake, NewSample
 from application.common.unit_of_work import UnitOfWork
-from backend.domain.sample import Sample
-from domain.value_objects import SampleId, UserId
+from backend.domain.sample import Sample, SampleId
+from domain.user import UserId
 
 from .grammar_analysis import GrammarAnalysisAdapter, GrammarAnalysisOutput
 from .transcription import TranscriptionAdapter

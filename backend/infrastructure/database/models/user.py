@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import DateTime, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from domain.value_objects import Email, UserId
+from domain.user import Email, UserId
 from infrastructure.database.types.value_object_email import ValueObjectEmailType
 from infrastructure.database.types.value_object_uuid import ValueObjectUUIDType
 

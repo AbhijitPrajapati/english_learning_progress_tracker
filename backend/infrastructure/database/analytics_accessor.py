@@ -10,7 +10,8 @@ from backend.application.analytics.models import (
     Timeframe,
     TimeSeriesPoint,
 )
-from backend.domain.value_objects import MistakeCategory, UserId
+from domain.mistake import MistakeCategory
+from domain.user import UserId
 
 from .models import Metric, Sample
 

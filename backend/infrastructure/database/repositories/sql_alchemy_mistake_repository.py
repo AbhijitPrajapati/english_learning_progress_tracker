@@ -1,11 +1,11 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.common.repositories.models import NewMistake
 from backend.application.common.repositories.mistake_repository import MistakeRepository
 from backend.domain.mistake import Mistake
-from backend.domain.value_objects import SampleId
-from domain.value_objects import MistakeId
+from domain.mistake import MistakeId
+from domain.sample import SampleId
 from infrastructure.database.models import Mistake as ORMMistake
 
 

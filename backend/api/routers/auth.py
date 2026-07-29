@@ -15,7 +15,7 @@ from api.schemas.auth import (
 )
 from application.errors.auth import InvalidCredentials
 from application.errors.users import EmailAlreadyRegistered, UserNotFound
-from domain.value_objects import Email
+from domain.user import Email
 
 router = APIRouter(prefix="/auth")
 

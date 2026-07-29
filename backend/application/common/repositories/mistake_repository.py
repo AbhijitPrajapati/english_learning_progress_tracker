@@ -1,7 +1,7 @@
 from typing import Protocol
 
-from backend.domain.mistake import Mistake
-from domain.value_objects import MistakeId, SampleId
+from domain.mistake import Mistake, MistakeId
+from domain.sample import SampleId
 
 from .models import NewMistake
 

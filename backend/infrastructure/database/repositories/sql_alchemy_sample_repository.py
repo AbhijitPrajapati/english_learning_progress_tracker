@@ -4,8 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from application.common.repositories.models import NewSample
 from backend.application.common.repositories.sample_repository import SampleRepository
 from backend.domain.sample import Sample
-from backend.domain.value_objects import UserId
-from domain.value_objects import SampleId
+from domain.sample import SampleId
+from domain.user import UserId
 from infrastructure.database.models import Sample as ORMSample
 
 

@@ -1,4 +1,5 @@
-from domain.value_objects import MistakeCategory, UserId
+from domain.mistake import MistakeCategory
+from domain.user import UserId
 
 from .accessor import MistakeAnalyticsAccessor
 from .models import MistakeTimeSeries, TimeBucket, Timeframe

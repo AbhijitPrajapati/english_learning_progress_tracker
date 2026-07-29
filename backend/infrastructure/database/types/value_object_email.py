@@ -1,7 +1,7 @@
 from sqlalchemy.dialects.postgresql import CITEXT
 from sqlalchemy.types import TypeDecorator
 
-from domain.value_objects import Email
+from domain.user import Email
 
 
 class ValueObjectEmailType(TypeDecorator):

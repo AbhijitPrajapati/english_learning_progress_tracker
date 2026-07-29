@@ -3,7 +3,8 @@ from datetime import datetime
 from sqlalchemy import DateTime, ForeignKey, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from domain.value_objects import SampleId, UserId
+from domain.sample import SampleId
+from domain.user import UserId
 from infrastructure.database.types.value_object_uuid import ValueObjectUUIDType
 
 from .base import Base

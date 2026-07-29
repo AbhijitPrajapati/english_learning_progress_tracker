@@ -1,7 +1,6 @@
 from typing import Protocol
 
-from domain.user import User
-from domain.value_objects import Email, UserId
+from domain.user import Email, User, UserId
 
 from .models import NewUser, UpdateUser
 

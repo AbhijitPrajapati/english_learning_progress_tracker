@@ -1,6 +1,8 @@
 from pydantic import BaseModel, ConfigDict
 
-from .value_objects import MistakeCategory, MistakeId, SampleId
+from domain.sample import SampleId
+
+from .value_objects import MistakeCategory, MistakeId
 
 
 class Mistake(BaseModel):

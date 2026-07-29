@@ -3,8 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.common.repositories.user_repository import NewUser, UserRepository
 from backend.application.common.repositories.models import UpdateUser
-from domain.user import User
-from domain.value_objects import Email, UserId
+from domain.user import Email, User, UserId
 from infrastructure.database.models import User as ORMUser
 
 

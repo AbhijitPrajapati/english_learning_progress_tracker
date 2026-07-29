@@ -4,7 +4,7 @@ from uuid import UUID
 import jwt
 
 from application.users.token_service import TokenService
-from domain.value_objects import UserId
+from domain.user import UserId
 
 from .config.jwt import JwtConfig
 

@@ -1,8 +1,7 @@
 from application.common.repositories.models import NewUser
 from application.common.unit_of_work import UnitOfWork
 from application.errors.users import EmailAlreadyRegistered
-from domain.user import User
-from domain.value_objects import Email
+from domain.user import Email, User
 
 from .password_hasher import PasswordHasher
 

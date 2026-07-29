@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 
-from domain.value_objects import Email, MistakeCategory, SampleId, UserId
+from domain.mistake import MistakeCategory
+from domain.sample import SampleId
+from domain.user import Email, UserId
 
 
 class NewUser(BaseModel):

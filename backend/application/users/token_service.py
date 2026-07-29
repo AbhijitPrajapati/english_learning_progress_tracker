@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from domain.value_objects import UserId
+from domain.user import UserId
 
 
 class TokenService(Protocol):
