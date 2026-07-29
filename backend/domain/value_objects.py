@@ -4,7 +4,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
-class ErrorCategory(StrEnum):
+class MistakeCategory(StrEnum):
     ABC = "test abc error"
     DEF = "test def error"
 
@@ -13,9 +13,9 @@ class UserId(BaseModel):
     value: UUID
 
 
-class SessionId(BaseModel):
+class SampleId(BaseModel):
     value: UUID
 
 
-class ErrorId(BaseModel):
+class MistakeId(BaseModel):
     value: UUID

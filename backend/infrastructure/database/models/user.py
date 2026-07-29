@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from domain.value_objects import UserId
 
 from .base import Base
-from .session import Session
+from .sample import Sample
 from .value_object_uuid import ValueObjectUUIDType
 
 
@@ -23,6 +23,6 @@ class User(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
-    sessions: Mapped[list[Session]] = relationship(
+    samples: Mapped[list[Sample]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )

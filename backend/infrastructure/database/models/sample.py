@@ -3,19 +3,19 @@ from datetime import datetime
 from sqlalchemy import DateTime, ForeignKey, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from domain.value_objects import SessionId, UserId
+from domain.value_objects import SampleId, UserId
 
 from .base import Base
-from .error import Error
+from .mistake import Mistake
 from .user import User
 from .value_object_uuid import ValueObjectUUIDType
 
 
-class Session(Base):
+class Sample(Base):
     __tablename__ = "sessions"
 
-    id: Mapped[SessionId] = mapped_column(
-        ValueObjectUUIDType(SessionId), primary_key=True
+    id: Mapped[SampleId] = mapped_column(
+        ValueObjectUUIDType(SampleId), primary_key=True
     )
 
     user_id: Mapped[UserId] = mapped_column(
@@ -30,6 +30,6 @@ class Session(Base):
 
     user: Mapped[User] = relationship(back_populates="sessions")
 
-    errors: Mapped[list[Error]] = relationship(
+    errors: Mapped[list[Mistake]] = relationship(
         back_populates="session", cascade="all, delete-orphan"
     )

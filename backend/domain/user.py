@@ -13,7 +13,3 @@ class User(BaseModel):
     password_hash: str  # TODO: separate this into user credentials later
     created_at: datetime
 
-
-class CreateUser(BaseModel):
-    email: EmailStr
-    password_hash: str

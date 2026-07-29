@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from api.routers.sessions import router as sessions_router
+from backend.api.routers.samples import router as samples_router
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(sessions_router)
+app.include_router(samples_router)
 
 
 @app.exception_handler(Exception)

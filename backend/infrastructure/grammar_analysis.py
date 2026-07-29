@@ -1,6 +1,8 @@
-from application.sessions.grammar_analysis import GrammarAnalysisAdapter
-from domain.error import ErrorInfo
-from domain.value_objects import ErrorCategory
+from application.samples.grammar_analysis import (
+    DetectedMistake,
+    GrammarAnalysisAdapter,
+)
+from domain.value_objects import MistakeCategory
 
 from .config.llm import LLMConfig
 
@@ -10,17 +12,17 @@ class LLMGrammarAnalysisAdapter(GrammarAnalysisAdapter):
         self.setting = config.setting
         assert self.setting == "test"
 
-    def analyze(self, text: str) -> list[ErrorInfo]:
+    def analyze(self, text: str) -> list[DetectedMistake]:
 
         return [
-            ErrorInfo(
-                category=ErrorCategory.ABC,
+            DetectedMistake(
+                category=MistakeCategory.ABC,
                 original_text="abc error test",
                 correction="abc corrected",
                 explanation="abc explanation",
             ),
-            ErrorInfo(
-                category=ErrorCategory.DEF,
+            DetectedMistake(
+                category=MistakeCategory.DEF,
                 original_text="def error test",
                 correction="def corrected",
                 explanation="def explanation",
