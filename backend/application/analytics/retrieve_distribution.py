@@ -1,5 +1,5 @@
-from application.common.unit_of_work import UnitOfWork
-from domain.user import UserId
+from backend.application.ports.unit_of_work import UnitOfWork
+from backend.domain.user import UserId
 
 from .models import Distribution, Timeframe
 

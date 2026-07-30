@@ -3,7 +3,7 @@ from typing import Self
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from application.common.unit_of_work import UnitOfWork
+from backend.application.ports.unit_of_work import UnitOfWork
 
 from .repositories.sql_alchemy_analytics_projector import SQLAlchemyAnalyticsProjector
 from .repositories.sql_alchemy_speech_repository import SQLAlchemySpeechRepository

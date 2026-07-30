@@ -1,9 +1,8 @@
-from application.common.unit_of_work import UnitOfWork
-from application.errors.auth import InvalidCredentials
-from application.errors.users import UserNotFound
-from domain.user import Email, User
+from backend.application.ports.services import PasswordHasher
+from backend.application.ports.unit_of_work import UnitOfWork
+from backend.domain.user import Email, User
 
-from .password_hasher import PasswordHasher
+from .exceptions import InvalidCredentials, UserNotFound
 
 
 class AuthenticateUser:

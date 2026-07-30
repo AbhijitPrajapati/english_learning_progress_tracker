@@ -1,10 +1,9 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from application.common.repositories.user_repository import NewUser, UserRepository
-from backend.application.common.repositories.models import UpdateUser
-from domain.user import Email, User, UserId
-from infrastructure.database.models import User as ORMUser
+from backend.application.ports.repositories import NewUser, UpdateUser, UserRepository
+from backend.domain.user import Email, User, UserId
+from backend.infrastructure.database.models import User as ORMUser
 
 
 class SQLAlchemyUserRepository(UserRepository):

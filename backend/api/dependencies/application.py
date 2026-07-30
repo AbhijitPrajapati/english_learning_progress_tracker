@@ -1,13 +1,15 @@
 from fastapi import Depends
 
-from application.analytics.retrieve_distribution import RetrieveDistribution
-from application.analytics.retrieve_time_series import RetrieveTimeSeries
-from application.common.unit_of_work import UnitOfWork
-from application.speeches.grammar_analysis import GrammarAnalysisAdapter
-from application.speeches.transcription import TranscriptionAdapter
-from application.users.authenticate_user import AuthenticateUser
-from application.users.password_hasher import PasswordHasher
-from application.users.register_user import RegisterUser
+from backend.application.analytics.retrieve_distribution import RetrieveDistribution
+from backend.application.analytics.retrieve_time_series import RetrieveTimeSeries
+from backend.application.auth.authenticate_user import AuthenticateUser
+from backend.application.auth.register_user import RegisterUser
+from backend.application.ports.services import (
+    GrammarAnalysisAdapter,
+    PasswordHasher,
+    TranscriptionAdapter,
+)
+from backend.application.ports.unit_of_work import UnitOfWork
 from backend.application.speeches.process_speech import ProcessSpeech
 
 from .database import get_uow

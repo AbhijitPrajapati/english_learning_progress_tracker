@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from domain.speech import MistakeCategory
+from backend.domain.speech import MistakeCategory
 
 
 class DetectedMistake(BaseModel):

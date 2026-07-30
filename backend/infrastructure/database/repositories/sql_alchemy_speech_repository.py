@@ -1,13 +1,10 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from application.common.repositories.models import NewSpeech
-from backend.application.common.repositories.speech_repository import SpeechRepository
-from backend.domain.speech import Speech
-from domain.speech import SpeechId
-from domain.user import UserId
-from infrastructure.database.models import MistakeFrequency as ORMMistakeFrequency
-from infrastructure.database.models import Speech as ORMSpeech
+from backend.application.ports.repositories import NewSpeech, SpeechRepository
+from backend.domain.speech import Speech, SpeechId
+from backend.domain.user import UserId
+from backend.infrastructure.database.models import Speech as ORMSpeech
 
 
 class SQLAlchemySpeechRepository(SpeechRepository):
@@ -23,7 +20,6 @@ class SQLAlchemySpeechRepository(SpeechRepository):
         self.session.add(orm_sample)
         await self.session.flush()
 
-        
         await self.session.flush()
 
         return Speech(

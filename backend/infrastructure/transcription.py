@@ -3,8 +3,8 @@ from typing import BinaryIO
 
 from faster_whisper import WhisperModel
 
-from application.speeches.transcription import TranscriptionAdapter
-from infrastructure.config.whisper import WhisperConfig
+from backend.application.ports.services import TranscriptionAdapter
+from backend.infrastructure.config.whisper import WhisperConfig
 
 logger = logging.getLogger(__name__)
 

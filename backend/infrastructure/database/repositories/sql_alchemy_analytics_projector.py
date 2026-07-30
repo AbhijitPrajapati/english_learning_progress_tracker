@@ -9,15 +9,11 @@ from backend.application.analytics.models import (
     Timeframe,
     TimeSeriesPoint,
 )
-from backend.application.common.repositories.analytics_projector import (
-    AnalyticsProjector,
-)
-from backend.domain.speech.analysis import Analysis
-from backend.domain.speech.value_objects import SpeechId
-from domain.speech import MistakeCategory
-from domain.user import UserId
-from infrastructure.database.models import MistakeFrequency as FrequencyORM
-from infrastructure.database.models import Speech
+from backend.application.ports.repositories import AnalyticsProjector
+from backend.domain.speech import Analysis, MistakeCategory, SpeechId
+from backend.domain.user import UserId
+from backend.infrastructure.database.models import MistakeFrequency as FrequencyORM
+from backend.infrastructure.database.models import Speech
 
 
 class SQLAlchemyAnalyticsProjector(AnalyticsProjector):

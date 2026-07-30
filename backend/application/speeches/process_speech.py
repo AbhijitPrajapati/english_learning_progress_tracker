@@ -3,14 +3,14 @@ from typing import BinaryIO
 
 from pydantic import BaseModel
 
-from application.common.repositories.models import NewSpeech
-from application.common.unit_of_work import UnitOfWork
-from backend.domain.speech import Speech, SpeechId
-from domain.speech import Analysis
-from domain.user import UserId
-
-from .grammar_analysis import GrammarAnalysisAdapter
-from .transcription import TranscriptionAdapter
+from backend.application.ports.repositories import NewSpeech
+from backend.application.ports.services import (
+    GrammarAnalysisAdapter,
+    TranscriptionAdapter,
+)
+from backend.application.ports.unit_of_work import UnitOfWork
+from backend.domain.speech import Analysis, Speech, SpeechId
+from backend.domain.user import UserId
 
 
 class ProcessSpeechResult(BaseModel):

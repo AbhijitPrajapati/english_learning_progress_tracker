@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
-from infrastructure.config.postgres import PostgresConfig
+from backend.infrastructure.config.postgres import PostgresConfig
 
 
 def create_engine(config: PostgresConfig) -> AsyncEngine:

@@ -1,9 +1,9 @@
-from application.common.repositories.models import NewUser
-from application.common.unit_of_work import UnitOfWork
-from application.errors.users import EmailAlreadyRegistered
-from domain.user import Email, User
+from backend.application.ports.repositories import NewUser
+from backend.application.ports.services import PasswordHasher
+from backend.application.ports.unit_of_work import UnitOfWork
+from backend.domain.user import Email, User
 
-from .password_hasher import PasswordHasher
+from .exceptions import EmailAlreadyRegistered
 
 
 class RegisterUser:

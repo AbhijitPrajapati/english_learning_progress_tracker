@@ -1,8 +1,6 @@
 from typing import Protocol, Self
 
-from .repositories.analytics_projector import AnalyticsProjector
-from .repositories.speech_repository import SpeechRepository
-from .repositories.user_repository import UserRepository
+from .repositories import AnalyticsProjector, SpeechRepository, UserRepository
 
 
 class UnitOfWork(Protocol):

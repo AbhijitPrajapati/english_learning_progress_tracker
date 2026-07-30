@@ -1,6 +1,6 @@
-from application.common.unit_of_work import UnitOfWork
-from domain.speech import MistakeCategory
-from domain.user import UserId
+from backend.application.ports.unit_of_work import UnitOfWork
+from backend.domain.speech import MistakeCategory
+from backend.domain.user import UserId
 
 from .models import MistakeTimeSeries, TimeBucket, Timeframe
 

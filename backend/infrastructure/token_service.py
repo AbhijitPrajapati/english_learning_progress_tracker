@@ -3,8 +3,8 @@ from uuid import UUID
 
 import jwt
 
-from application.users.token_service import TokenService
-from domain.user import UserId
+from backend.application.ports.services import TokenService
+from backend.domain.user import UserId
 
 from .config.jwt import JwtConfig
 

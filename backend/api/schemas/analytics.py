@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from domain.speech import MistakeCategory
+from backend.domain.speech import MistakeCategory
 
 from .analysis import MistakeFrequency
 

@@ -3,9 +3,9 @@ from collections.abc import AsyncGenerator
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from application.common.unit_of_work import UnitOfWork
+from backend.application.ports.unit_of_work import UnitOfWork
+from backend.infrastructure.composition import InfrastructureComposition
 from backend.infrastructure.database.unit_of_work import SqlAlchemyUnitOfWork
-from infrastructure.composition import InfrastructureComposition
 
 from .composition import get_composition
 

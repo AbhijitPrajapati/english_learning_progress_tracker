@@ -1,7 +1,7 @@
 import logging
 
-from application.speeches.grammar_analysis import GrammarAnalysisAdapter
-from domain.speech import Analysis, Mistake, MistakeCategory, MistakeFrequency
+from backend.application.ports.services import GrammarAnalysisAdapter
+from backend.domain.speech import Analysis, Mistake, MistakeCategory, MistakeFrequency
 
 from .config.llm import LLMConfig
 

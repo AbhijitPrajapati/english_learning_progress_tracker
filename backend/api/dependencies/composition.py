@@ -1,4 +1,4 @@
-from infrastructure.composition import InfrastructureComposition
+from backend.infrastructure.composition import InfrastructureComposition
 
 composition = InfrastructureComposition()
 
