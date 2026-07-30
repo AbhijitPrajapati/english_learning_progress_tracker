@@ -3,24 +3,24 @@ from typing import BinaryIO
 
 from pydantic import BaseModel
 
-from application.common.repositories.models import NewSample
+from application.common.repositories.models import NewSpeech
 from application.common.unit_of_work import UnitOfWork
-from backend.domain.sample import Sample, SampleId
-from domain.sample import Analysis
+from backend.domain.speech import Speech, SpeechId
+from domain.speech import Analysis
 from domain.user import UserId
 
 from .grammar_analysis import GrammarAnalysisAdapter
 from .transcription import TranscriptionAdapter
 
 
-class ProcessSampleResult(BaseModel):
-    sample_id: SampleId
+class ProcessSpeechResult(BaseModel):
+    speech_id: SpeechId
     created_at: datetime
     transcript: str
     analysis: Analysis
 
 
-class ProcessSample:
+class ProcessSpeech:
     def __init__(
         self,
         uow: UnitOfWork,
@@ -33,17 +33,17 @@ class ProcessSample:
 
     async def execute(
         self, user_id: UserId, file_stream: BinaryIO
-    ) -> ProcessSampleResult:
+    ) -> ProcessSpeechResult:
         transcript: str = self.transcriber.transcribe(file_stream)
         analysis: Analysis = self.grammar_analyzer.analyze(transcript)
 
-        sample: Sample = await self.uow.samples.create(
-            NewSample(user_id=user_id, transcript=transcript, analysis=analysis)
+        speech: Speech = await self.uow.speeches.create(
+            NewSpeech(user_id=user_id, transcript=transcript, analysis=analysis)
         )
         await self.uow.commit()
-        return ProcessSampleResult(
-            sample_id=sample.id,
-            created_at=sample.created_at,
+        return ProcessSpeechResult(
+            speech_id=speech.id,
+            created_at=speech.created_at,
             transcript=transcript,
             analysis=analysis,
         )

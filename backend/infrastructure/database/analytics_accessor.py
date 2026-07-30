@@ -10,11 +10,11 @@ from backend.application.analytics.models import (
     Timeframe,
     TimeSeriesPoint,
 )
-from domain.sample import MistakeCategory
+from domain.speech import MistakeCategory
 from domain.user import UserId
 
 from .models import MistakeFrequency as FrequencyORM
-from .models import Sample
+from .models import Speech
 
 
 class SQLAlchemyMistakeAnalyticsAccessor(MistakeAnalyticsAccessor):
@@ -25,12 +25,12 @@ class SQLAlchemyMistakeAnalyticsAccessor(MistakeAnalyticsAccessor):
     def filter_by_user_id_and_timeframe(
         stmt: Select, user_id: UserId, timeframe: Timeframe
     ) -> Select:
-        filters = [Sample.user_id == user_id]
+        filters = [Speech.user_id == user_id]
         if timeframe.start is not None:
-            filters.append(Sample.created_at >= timeframe.start)
+            filters.append(Speech.created_at >= timeframe.start)
         if timeframe.end is not None:
-            filters.append(Sample.created_at <= timeframe.end)
-        return stmt.join(FrequencyORM.sample).where(and_(*filters))
+            filters.append(Speech.created_at <= timeframe.end)
+        return stmt.join(FrequencyORM.speech).where(and_(*filters))
 
     async def distribution(self, user_id: UserId, timeframe: Timeframe) -> Distribution:
 
@@ -64,7 +64,7 @@ class SQLAlchemyMistakeAnalyticsAccessor(MistakeAnalyticsAccessor):
         mistake_category: MistakeCategory,
         bucket: TimeBucket,
     ) -> MistakeTimeSeries:
-        time_expr = func.date_trunc(bucket.value, Sample.created_at).label("time")
+        time_expr = func.date_trunc(bucket.value, Speech.created_at).label("time")
 
         stmt = (
             self.filter_by_user_id_and_timeframe(

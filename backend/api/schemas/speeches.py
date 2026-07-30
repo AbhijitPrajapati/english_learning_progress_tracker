@@ -6,11 +6,11 @@ from pydantic import BaseModel
 from .analysis import SampleAnalysis
 
 
-class SampleCreationRequest(BaseModel):
+class SpeechCreationRequest(BaseModel):
     user_id: UUID
 
 
-class SampleCreationResponse(BaseModel):
+class SpeechCreationResponse(BaseModel):
     id: UUID
     created_at: datetime
     transcript: str

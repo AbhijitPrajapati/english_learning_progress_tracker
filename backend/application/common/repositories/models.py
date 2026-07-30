@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from domain.sample import Analysis
+from domain.speech import Analysis
 from domain.user import Email, UserId
 
 
@@ -13,7 +13,7 @@ class UpdateUser(BaseModel):
     email: Email
 
 
-class NewSample(BaseModel):
+class NewSpeech(BaseModel):
     user_id: UserId
     transcript: str
     analysis: Analysis

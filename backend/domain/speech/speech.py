@@ -5,13 +5,13 @@ from pydantic import BaseModel, ConfigDict
 from domain.user import UserId
 
 from .analysis import Analysis
-from .value_objects import SampleId
+from .value_objects import SpeechId
 
 
-class Sample(BaseModel):
+class Speech(BaseModel):
     model_config = ConfigDict(frozen=True)
 
-    id: SampleId
+    id: SpeechId
     user_id: UserId
     transcript: str
     analysis: Analysis

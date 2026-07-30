@@ -3,7 +3,7 @@ from enum import StrEnum
 
 from pydantic import BaseModel
 
-from domain.sample import MistakeFrequency
+from domain.speech import MistakeFrequency
 
 
 class Timeframe(BaseModel):

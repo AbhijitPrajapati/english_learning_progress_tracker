@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from domain.sample import Analysis
+from domain.speech import Analysis
 
 
 class GrammarAnalysisAdapter(Protocol):

@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.common.unit_of_work import UnitOfWork
 
-from .repositories.sql_alchemy_sample_repository import SQLAlchemySampleRepository
+from .repositories.sql_alchemy_speech_repository import SQLAlchemySpeechRepository
 from .repositories.sql_alchemy_user_repository import SQLAlchemyUserRepository
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
         self.session = session
 
         self.users = SQLAlchemyUserRepository(session)
-        self.samples = SQLAlchemySampleRepository(session)
+        self.speeches = SQLAlchemySpeechRepository(session)
 
     async def commit(self) -> None:
         await self.session.commit()

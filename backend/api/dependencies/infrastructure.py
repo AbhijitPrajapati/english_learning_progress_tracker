@@ -1,7 +1,7 @@
 from fastapi import Depends
 
-from application.samples.transcription import TranscriptionAdapter
-from backend.application.samples.grammar_analysis import GrammarAnalysisAdapter
+from application.speeches.transcription import TranscriptionAdapter
+from backend.application.speeches.grammar_analysis import GrammarAnalysisAdapter
 from backend.application.users.password_hasher import PasswordHasher
 from backend.application.users.token_service import TokenService
 from backend.infrastructure.composition import InfrastructureComposition

@@ -1,12 +1,12 @@
 from typing import Protocol, Self
 
-from .repositories.sample_repository import SampleRepository
+from .repositories.speech_repository import SpeechRepository
 from .repositories.user_repository import UserRepository
 
 
 class UnitOfWork(Protocol):
     users: UserRepository
-    samples: SampleRepository
+    speeches: SpeechRepository
 
     async def commit(self) -> None: ...
     async def rollback(self) -> None: ...

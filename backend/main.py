@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from backend.api.routers.samples import router as samples_router
+from backend.api.routers.speeches import router as samples_router
 
 logger = logging.getLogger(__name__)
 

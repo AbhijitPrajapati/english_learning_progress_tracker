@@ -1,5 +1,5 @@
 from .mistake_frequency import MistakeFrequency
-from .sample import Sample
+from .speech import Speech
 from .user import User
 
-__all__ = ["MistakeFrequency", "Sample", "User"]
+__all__ = ["MistakeFrequency", "Speech", "User"]

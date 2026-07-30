@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from domain.sample import MistakeCategory
+from domain.speech import MistakeCategory
 from domain.user import UserId
 
 from .models import Distribution, MistakeTimeSeries, TimeBucket, Timeframe

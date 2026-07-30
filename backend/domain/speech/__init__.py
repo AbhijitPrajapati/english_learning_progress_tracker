@@ -1,12 +1,12 @@
 from .analysis import Analysis, Mistake, MistakeFrequency
-from .sample import Sample
-from .value_objects import MistakeCategory, SampleId
+from .speech import Speech
+from .value_objects import MistakeCategory, SpeechId
 
 __all__ = [
     "Analysis",
     "Mistake",
     "MistakeCategory",
     "MistakeFrequency",
-    "Sample",
-    "SampleId",
+    "Speech",
+    "SpeechId",
 ]

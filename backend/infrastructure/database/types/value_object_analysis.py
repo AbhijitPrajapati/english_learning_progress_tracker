@@ -1,7 +1,7 @@
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.types import TypeDecorator
 
-from domain.sample import Analysis
+from domain.speech import Analysis
 
 
 class ValueObjectAnalysisType(TypeDecorator):

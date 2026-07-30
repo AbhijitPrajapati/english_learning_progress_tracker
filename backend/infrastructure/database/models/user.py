@@ -8,7 +8,7 @@ from infrastructure.database.types.value_object_email import ValueObjectEmailTyp
 from infrastructure.database.types.value_object_uuid import ValueObjectUUIDType
 
 from .base import Base
-from .sample import Sample
+from .speech import Speech
 
 
 class User(Base):
@@ -23,6 +23,6 @@ class User(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
-    samples: Mapped[list[Sample]] = relationship(
+    speeches: Mapped[list[Speech]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )

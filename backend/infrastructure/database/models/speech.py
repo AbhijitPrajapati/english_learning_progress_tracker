@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import DateTime, ForeignKey, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from domain.sample import Analysis, SampleId
+from domain.speech import Analysis, SpeechId
 from domain.user import UserId
 from infrastructure.database.types.value_object_analysis import ValueObjectAnalysisType
 from infrastructure.database.types.value_object_uuid import ValueObjectUUIDType
@@ -13,11 +13,11 @@ from .mistake_frequency import MistakeFrequency
 from .user import User
 
 
-class Sample(Base):
-    __tablename__ = "samples"
+class Speech(Base):
+    __tablename__ = "speeches"
 
-    id: Mapped[SampleId] = mapped_column(
-        ValueObjectUUIDType(SampleId), primary_key=True
+    id: Mapped[SpeechId] = mapped_column(
+        ValueObjectUUIDType(SpeechId), primary_key=True
     )
 
     user_id: Mapped[UserId] = mapped_column(
@@ -32,8 +32,8 @@ class Sample(Base):
 
     analysis: Mapped[Analysis] = mapped_column(ValueObjectAnalysisType)
 
-    user: Mapped[User] = relationship(back_populates="samples")
+    user: Mapped[User] = relationship(back_populates="speeches")
 
     metrics: Mapped[list[MistakeFrequency]] = relationship(
-        back_populates="samples", cascade="all, delete-orphan"
+        back_populates="speeches", cascade="all, delete-orphan"
     )
