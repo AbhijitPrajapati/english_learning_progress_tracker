@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.common.unit_of_work import UnitOfWork
 
+from .repositories.sql_alchemy_analytics_projector import SQLAlchemyAnalyticsProjector
 from .repositories.sql_alchemy_speech_repository import SQLAlchemySpeechRepository
 from .repositories.sql_alchemy_user_repository import SQLAlchemyUserRepository
 
@@ -17,6 +18,7 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
 
         self.users = SQLAlchemyUserRepository(session)
         self.speeches = SQLAlchemySpeechRepository(session)
+        self.analytics_projector = SQLAlchemyAnalyticsProjector(session)
 
     async def commit(self) -> None:
         await self.session.commit()

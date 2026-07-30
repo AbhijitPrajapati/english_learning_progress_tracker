@@ -1,7 +1,6 @@
 from sqlalchemy import Select, and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from application.analytics.accessor import MistakeAnalyticsAccessor
 from backend.application.analytics.models import (
     Distribution,
     MistakeFrequency,
@@ -10,14 +9,18 @@ from backend.application.analytics.models import (
     Timeframe,
     TimeSeriesPoint,
 )
+from backend.application.common.repositories.analytics_projector import (
+    AnalyticsProjector,
+)
+from backend.domain.speech.analysis import Analysis
+from backend.domain.speech.value_objects import SpeechId
 from domain.speech import MistakeCategory
 from domain.user import UserId
+from infrastructure.database.models import MistakeFrequency as FrequencyORM
+from infrastructure.database.models import Speech
 
-from .models import MistakeFrequency as FrequencyORM
-from .models import Speech
 
-
-class SQLAlchemyMistakeAnalyticsAccessor(MistakeAnalyticsAccessor):
+class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -83,3 +86,11 @@ class SQLAlchemyMistakeAnalyticsAccessor(MistakeAnalyticsAccessor):
         rows = result.mappings().all()
         points = [TimeSeriesPoint.model_validate(row) for row in rows]
         return MistakeTimeSeries(points=points)
+
+    async def add_analysis(self, speech_id: SpeechId, analysis: Analysis) -> None:
+        orm_freqs = [
+            FrequencyORM(speech_id=speech_id, **freq.model_dump())
+            for freq in analysis.frequencies
+        ]
+        self.session.add_all(orm_freqs)
+        await self.session.flush()

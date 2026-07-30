@@ -40,6 +40,7 @@ class ProcessSpeech:
         speech: Speech = await self.uow.speeches.create(
             NewSpeech(user_id=user_id, transcript=transcript, analysis=analysis)
         )
+        await self.uow.analytics_projector.add_analysis(speech.id, analysis)
         await self.uow.commit()
         return ProcessSpeechResult(
             speech_id=speech.id,

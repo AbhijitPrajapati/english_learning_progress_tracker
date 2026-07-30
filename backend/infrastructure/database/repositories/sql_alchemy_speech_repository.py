@@ -23,11 +23,7 @@ class SQLAlchemySpeechRepository(SpeechRepository):
         self.session.add(orm_sample)
         await self.session.flush()
 
-        orm_freqs = [
-            ORMMistakeFrequency(sample_id=orm_sample.id, **freq.model_dump())
-            for freq in sample.analysis.frequencies
-        ]
-        self.session.add_all(orm_freqs)
+        
         await self.session.flush()
 
         return Speech(

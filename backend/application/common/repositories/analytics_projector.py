@@ -1,12 +1,16 @@
 from typing import Protocol
 
-from domain.speech import MistakeCategory
+from application.analytics.models import (
+    Distribution,
+    MistakeTimeSeries,
+    TimeBucket,
+    Timeframe,
+)
+from domain.speech import Analysis, MistakeCategory, SpeechId
 from domain.user import UserId
 
-from .models import Distribution, MistakeTimeSeries, TimeBucket, Timeframe
 
-
-class MistakeAnalyticsAccessor(Protocol):
+class AnalyticsProjector(Protocol):
     async def distribution(
         self, user_id: UserId, timeframe: Timeframe
     ) -> Distribution: ...
@@ -17,3 +21,4 @@ class MistakeAnalyticsAccessor(Protocol):
         mistake_category: MistakeCategory,
         bucket: TimeBucket,
     ) -> MistakeTimeSeries: ...
+    async def add_analysis(self, speech_id: SpeechId, analysis: Analysis) -> None: ...
