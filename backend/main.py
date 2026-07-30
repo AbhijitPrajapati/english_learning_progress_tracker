@@ -4,24 +4,18 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from core.config import config
-
-from .api.routers import sessions_router
-from .database import SessionManager
-from .transcription import WhisperAdapter
+from backend.api.routers.speeches import router as samples_router
 
 logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.transcriber = WhisperAdapter(config.whisper)
-    app.state.session_manager = SessionManager(config.postgres)
     yield
 
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(sessions_router)
+app.include_router(samples_router)
 
 
 @app.exception_handler(Exception)
