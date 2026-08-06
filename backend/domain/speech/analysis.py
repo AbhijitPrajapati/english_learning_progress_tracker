@@ -10,10 +10,13 @@ class Mistake(BaseModel):
     explanation: str
 
 
-class MistakeFrequency(BaseModel):
-    category: MistakeCategory
+class Frequency(BaseModel):
     occurances: int
     opportunities: int
+
+
+class CategoryFrequency(Frequency):
+    category: MistakeCategory
 
 
 class Analysis(BaseModel):
@@ -21,5 +24,5 @@ class Analysis(BaseModel):
 
     schema_version: int = 1
     mistakes: list[Mistake]
-    frequencies: list[MistakeFrequency]
+    frequencies: list[CategoryFrequency]
     feedback: str

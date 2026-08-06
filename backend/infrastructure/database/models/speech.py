@@ -3,10 +3,12 @@ from datetime import datetime
 from sqlalchemy import DateTime, ForeignKey, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from domain.speech import Analysis, SpeechId
-from domain.user import UserId
-from infrastructure.database.types.value_object_analysis import ValueObjectAnalysisType
-from infrastructure.database.types.value_object_uuid import ValueObjectUUIDType
+from backend.domain.speech import Analysis, SpeechId
+from backend.domain.user import UserId
+from backend.infrastructure.database.types import ValueObjectUUIDType
+from backend.infrastructure.database.types.value_object_analysis import (
+    ValueObjectAnalysisType,
+)
 
 from .base import Base
 from .mistake_frequency import MistakeFrequency

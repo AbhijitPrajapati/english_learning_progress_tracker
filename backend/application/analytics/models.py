@@ -3,7 +3,7 @@ from enum import StrEnum
 
 from pydantic import BaseModel
 
-from domain.speech import MistakeFrequency
+from backend.domain.speech import CategoryFrequency, Frequency
 
 
 class Timeframe(BaseModel):
@@ -18,14 +18,12 @@ class Timeframe(BaseModel):
 
 
 class Distribution(BaseModel):
-    mistake_frequencies: list[MistakeFrequency]
-    total_samples: int
+    mistake_frequencies: list[CategoryFrequency]
+    total_speeches: int
 
 
-class TimeSeriesPoint(BaseModel):
+class TimeSeriesPoint(Frequency):
     time: datetime
-    opportunities: int
-    occurances: int
 
 
 class MistakeTimeSeries(BaseModel):
@@ -40,6 +38,9 @@ class TimeBucket(StrEnum):
 
     @classmethod
     def from_timeframe(cls, timeframe: Timeframe) -> TimeBucket:
+        """
+        Determine time series time bucket based on selected timeframe
+        """
         duration = timeframe.duration
         if duration is None:
             return TimeBucket.MONTH

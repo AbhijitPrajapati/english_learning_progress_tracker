@@ -1,18 +1,23 @@
 from fastapi import Depends
 
-from application.analytics.accessor import MistakeAnalyticsAccessor
-from application.analytics.retrieve_distribution import RetrieveDistribution
-from application.analytics.retrieve_time_series import RetrieveTimeSeries
-from application.common.unit_of_work import UnitOfWork
-from application.speeches.grammar_analysis import GrammarAnalysisAdapter
-from application.speeches.transcription import TranscriptionAdapter
-from application.users.authenticate_user import AuthenticateUser
-from application.users.password_hasher import PasswordHasher
-from application.users.register_user import RegisterUser
+from backend.application.analytics.retrieve_distribution import RetrieveDistribution
+from backend.application.analytics.retrieve_time_series import RetrieveTimeSeries
+from backend.application.auth.authenticate_user import AuthenticateUser
+from backend.application.auth.register_user import RegisterUser
+from backend.application.ports.services import (
+    GrammarAnalysisAdapter,
+    PasswordHasher,
+    TranscriptionAdapter,
+)
+from backend.application.ports.unit_of_work import UnitOfWork
 from backend.application.speeches.process_speech import ProcessSpeech
 
-from .database import get_mistake_analytics_accessor, get_uow
+from .database import get_uow
 from .infrastructure import get_grammar_analyzer, get_password_hasher, get_transcriber
+
+"""
+Application use-case dependencies
+"""
 
 
 async def get_process_speech(
@@ -40,16 +45,12 @@ async def get_register_user(
 
 
 async def get_retrieve_distribution(
-    mistake_analytics_accessor: MistakeAnalyticsAccessor = Depends(
-        get_mistake_analytics_accessor
-    ),
+    uow: UnitOfWork = Depends(get_uow),
 ) -> RetrieveDistribution:
-    return RetrieveDistribution(mistake_analytics_accessor)
+    return RetrieveDistribution(uow)
 
 
 async def get_retrieve_time_series(
-    mistake_analytics_accessor: MistakeAnalyticsAccessor = Depends(
-        get_mistake_analytics_accessor
-    ),
+    uow: UnitOfWork = Depends(get_uow),
 ) -> RetrieveTimeSeries:
-    return RetrieveTimeSeries(mistake_analytics_accessor)
+    return RetrieveTimeSeries(uow)

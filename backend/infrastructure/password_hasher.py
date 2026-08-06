@@ -1,6 +1,6 @@
 from pwdlib import PasswordHash
 
-from application.users.password_hasher import PasswordHasher
+from backend.application.ports.services import PasswordHasher
 
 
 class PwdLibPasswordHasher(PasswordHasher):

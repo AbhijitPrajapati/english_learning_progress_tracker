@@ -3,13 +3,9 @@ from collections.abc import AsyncGenerator
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from application.analytics.accessor import MistakeAnalyticsAccessor
-from application.common.unit_of_work import UnitOfWork
-from backend.infrastructure.database.unit_of_work import SqlAlchemyUnitOfWork
-from infrastructure.composition import InfrastructureComposition
-from infrastructure.database.analytics_accessor import (
-    SQLAlchemyMistakeAnalyticsAccessor,
-)
+from backend.application.ports.unit_of_work import UnitOfWork
+from backend.infrastructure.composition import InfrastructureComposition
+from backend.infrastructure.database import SqlAlchemyUnitOfWork
 
 from .composition import get_composition
 
@@ -26,9 +22,3 @@ async def get_uow(
 ) -> AsyncGenerator[UnitOfWork]:
     async with SqlAlchemyUnitOfWork(session) as uow:
         yield uow
-
-
-async def get_mistake_analytics_accessor(
-    session: AsyncSession = Depends(get_session),
-) -> MistakeAnalyticsAccessor:
-    return SQLAlchemyMistakeAnalyticsAccessor(session)

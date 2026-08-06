@@ -1,20 +1,19 @@
-from fastapi import APIRouter, Depends
-
-from api.dependencies.application import (
+from backend.api.dependencies.application import (
     RetrieveDistribution,
     RetrieveTimeSeries,
     get_retrieve_distribution,
     get_retrieve_time_series,
 )
-from api.dependencies.auth import get_current_user
-from api.schemas.analytics import (
+from backend.api.dependencies.auth import get_current_user
+from backend.api.schemas.analytics import (
     DistributionRequest,
     DistributionResponse,
     TimeSeriesRequest,
     TimeSeriesResponse,
 )
-from application.analytics.models import Timeframe
-from domain.user import User
+from backend.application.analytics.models import Timeframe
+from backend.domain.user import User
+from fastapi import APIRouter, Depends
 
 router = APIRouter(prefix="/analytics")
 

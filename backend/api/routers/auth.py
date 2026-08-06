@@ -1,21 +1,23 @@
-from fastapi import APIRouter, Depends, HTTPException
-
-from api.dependencies.application import (
+from backend.api.dependencies.application import (
     AuthenticateUser,
     RegisterUser,
     get_authenticate_user,
     get_register_user,
 )
-from api.dependencies.auth import TokenService, get_token_service
-from api.schemas.auth import (
+from backend.api.dependencies.auth import TokenService, get_token_service
+from backend.api.schemas.auth import (
     LoginRequest,
     LoginResponse,
     RegisterRequest,
     RegisterResponse,
 )
-from application.errors.auth import InvalidCredentials
-from application.errors.users import EmailAlreadyRegistered, UserNotFound
-from domain.user import Email
+from backend.application.auth.exceptions import (
+    EmailAlreadyRegistered,
+    InvalidCredentials,
+    UserNotFound,
+)
+from backend.domain.user import Email
+from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter(prefix="/auth")
 

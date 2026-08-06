@@ -1,9 +1,9 @@
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from application.common.unit_of_work import UnitOfWork
-from application.users.token_service import TokenService
-from domain.user import User
+from backend.application.ports.services import TokenService
+from backend.application.ports.unit_of_work import UnitOfWork
+from backend.domain.user import User
 
 from .database import get_uow
 from .infrastructure import get_token_service

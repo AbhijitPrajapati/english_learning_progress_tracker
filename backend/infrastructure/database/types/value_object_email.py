@@ -1,7 +1,11 @@
 from sqlalchemy.dialects.postgresql import CITEXT
 from sqlalchemy.types import TypeDecorator
 
-from domain.user import Email
+from backend.domain.user import Email
+
+"""
+ORM bridge between the Email domain value object and CITEXT
+"""
 
 
 class ValueObjectEmailType(TypeDecorator):
@@ -27,4 +31,3 @@ class ValueObjectEmailType(TypeDecorator):
             return None
 
         return Email(value=value)
-

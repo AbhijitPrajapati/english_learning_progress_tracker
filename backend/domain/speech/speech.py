@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from domain.user import UserId
+from backend.domain.user import UserId
 
 from .analysis import Analysis
 from .value_objects import SpeechId

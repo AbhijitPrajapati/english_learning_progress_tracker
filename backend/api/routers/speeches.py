@@ -1,10 +1,9 @@
+from backend.api.dependencies.application import ProcessSpeech, get_process_speech
+from backend.api.dependencies.auth import get_current_user
+from backend.api.schemas.analysis import SampleAnalysis
+from backend.api.schemas.speeches import SpeechCreationResponse
+from backend.domain.user import User
 from fastapi import APIRouter, Depends, File, UploadFile
-
-from api.dependencies.application import ProcessSpeech, get_process_speech
-from api.dependencies.auth import get_current_user
-from api.schemas.analysis import SampleAnalysis
-from api.schemas.speeches import SpeechCreationResponse
-from domain.user import User
 
 router = APIRouter(prefix="/samples")
 
