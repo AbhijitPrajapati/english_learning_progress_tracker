@@ -6,15 +6,13 @@ services:
       - "8000:8000"
     environment:
       POSTGRES__URL=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/{POSTGRES_DB}
-      WHISPER__MODEL=${BACKEND_WHISPER_MODEL}
-      WHISPER__DEVICE=${BACKEND_WHISPER_DEVICE}
+      WHISPER__MODEL=${WHISPER_MODEL}
+      WHISPER__DEVICE=${WHISPER_DEVICE}
       JWT__SECRET=${JWT_SECRET}
       JWT__ALGORITHM=${JWT_ALGORITHM}
       JWT__EXPIRATION_MINUTES=${JWT_EXPIRATION_MINUTES}
     depends_on:
-      - db
-    volumes:
-      - .:/backend
+      - postgres
 
   postgres:
     image: postgres:16
