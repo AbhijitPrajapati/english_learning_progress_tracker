@@ -1,9 +1,9 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from .jwt import JwtConfig
-from .llm import LLMConfig
-from .postgres import PostgresConfig
-from .whisper import WhisperConfig
+from backend.infrastructure.database import PostgresConfig
+from backend.infrastructure.grammar_analysis import LLMConfig
+from backend.infrastructure.token_service import JwtConfig
+from backend.infrastructure.transcription import WhisperConfig
 
 
 class InfrastructureSettings(BaseSettings):

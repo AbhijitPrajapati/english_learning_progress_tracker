@@ -6,11 +6,8 @@ import jwt
 from backend.application.ports.services import TokenService
 from backend.domain.user import UserId
 
-from .config.jwt import JwtConfig
-
-
-class InvalidToken(Exception):
-    pass
+from .config import JwtConfig
+from .exceptions import InvalidToken
 
 
 class JwtTokenService(TokenService):

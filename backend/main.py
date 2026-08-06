@@ -6,12 +6,18 @@ from backend.api.exception_handlers import base_exception_handler
 from backend.api.routers.analytics import router as analytics_router
 from backend.api.routers.auth import router as auth_router
 from backend.api.routers.speeches import router as samples_router
-from backend.infrastructure.composition import InfrastructureComposition
+from backend.infrastructure.composition import (
+    InfrastructureComposition,
+    InfrastructureSettings,
+)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.composition = InfrastructureComposition()  # initialize app infrastructure
+    infrastructure_settings = InfrastructureSettings()  # type: ignore
+    app.state.composition = InfrastructureComposition(
+        infrastructure_settings
+    )  # initialize app infrastructure
     yield
 
 

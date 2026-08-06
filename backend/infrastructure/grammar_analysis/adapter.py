@@ -3,13 +3,10 @@ import logging
 from backend.application.ports.services import GrammarAnalysisAdapter
 from backend.domain.speech import Analysis, Mistake, MistakeCategory, MistakeFrequency
 
-from .config.llm import LLMConfig
+from .config import LLMConfig
+from .exceptions import GrammarAnalysisError
 
 logger = logging.getLogger(__name__)
-
-
-class GrammarAnalysisError(Exception):
-    pass
 
 
 class LLMGrammarAnalysisAdapter(GrammarAnalysisAdapter):

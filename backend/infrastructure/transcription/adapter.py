@@ -4,13 +4,11 @@ from typing import BinaryIO
 from faster_whisper import WhisperModel
 
 from backend.application.ports.services import TranscriptionAdapter
-from backend.infrastructure.config.whisper import WhisperConfig
+
+from .config import WhisperConfig
+from .exceptions import TranscriptionError
 
 logger = logging.getLogger(__name__)
-
-
-class TranscriptionError(Exception):
-    pass
 
 
 class WhisperTranscriptionAdapter(TranscriptionAdapter):

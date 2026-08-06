@@ -1,0 +1,2 @@
+class GrammarAnalysisError(Exception):
+    pass
