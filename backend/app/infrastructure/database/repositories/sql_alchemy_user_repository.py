@@ -48,7 +48,7 @@ class SQLAlchemyUserRepository(UserRepository):
 
     async def get_by_email(self, email: Email) -> User | None:
         try:
-            stmt = select(User).where(User.email == email)  # type: ignore
+            stmt = select(ORMUser).where(ORMUser.email == email)  # type: ignore
             result = await self.session.execute(stmt)
             orm_user = result.first()
             if orm_user is None:
