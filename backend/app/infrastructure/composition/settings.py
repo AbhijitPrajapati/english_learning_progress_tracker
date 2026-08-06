@@ -14,4 +14,4 @@ class InfrastructureSettings(BaseSettings):
     postgres: PostgresConfig
     jwt: JwtConfig
 
-    model_config = SettingsConfigDict(env_nested_delimiter="__")
+    model_config = SettingsConfigDict(env_file=".env", env_nested_delimiter="__")

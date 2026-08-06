@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Backend for English learning progress tracker"
 requires-python = ">=3.14"
 dependencies = [
+    "asyncpg>=0.31.0",
     "fastapi[standard]>=0.140.7",
     "faster-whisper>=1.2.1",
     "psycopg>=3.3.4",

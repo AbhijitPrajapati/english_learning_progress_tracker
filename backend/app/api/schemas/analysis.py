@@ -16,7 +16,7 @@ class MistakeFrequency(BaseModel):
     occurances: int
 
 
-class SampleAnalysis(BaseModel):
+class SpeechAnalysis(BaseModel):
     frequencies: list[MistakeFrequency]
     mistakes: list[DetectedMistake]
     feedback: str

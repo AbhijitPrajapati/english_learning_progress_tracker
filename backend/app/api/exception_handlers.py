@@ -3,11 +3,11 @@ import logging
 from fastapi import Request
 from fastapi.responses import JSONResponse
 
-from backend.app.application.use_cases.auth.exceptions import (
+from app.application.exceptions import ApplicationError
+from app.application.use_cases.auth.exceptions import (
     EmailAlreadyRegistered,
     InvalidCredentials,
 )
-from app.application.exceptions import ApplicationError
 
 logger = logging.getLogger(__name__)
 

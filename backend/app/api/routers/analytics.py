@@ -13,7 +13,7 @@ from app.api.schemas.analytics import (
     TimeSeriesRequest,
     TimeSeriesResponse,
 )
-from backend.app.application.use_cases.analytics.models import Timeframe
+from app.application.use_cases.analytics.models import Timeframe
 from app.domain.user import User
 
 router = APIRouter(prefix="/analytics")

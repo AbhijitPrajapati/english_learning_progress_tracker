@@ -1,12 +1,3 @@
-from backend.app.application.use_cases.analytics.retrieve_distribution import (
-    RetrieveDistribution,
-)
-from backend.app.application.use_cases.analytics.retrieve_time_series import (
-    RetrieveTimeSeries,
-)
-from backend.app.application.use_cases.auth.authenticate_user import AuthenticateUser
-from backend.app.application.use_cases.auth.register_user import RegisterUser
-from backend.app.application.use_cases.speeches.process_speech import ProcessSpeech
 from fastapi import Depends
 
 from app.application.ports.services import (
@@ -15,6 +6,15 @@ from app.application.ports.services import (
     TranscriptionAdapter,
 )
 from app.application.ports.unit_of_work import UnitOfWork
+from app.application.use_cases.analytics.retrieve_distribution import (
+    RetrieveDistribution,
+)
+from app.application.use_cases.analytics.retrieve_time_series import (
+    RetrieveTimeSeries,
+)
+from app.application.use_cases.auth.authenticate_user import AuthenticateUser
+from app.application.use_cases.auth.register_user import RegisterUser
+from app.application.use_cases.speeches.process_speech import ProcessSpeech
 
 from .database import get_uow
 from .infrastructure import get_grammar_analyzer, get_password_hasher, get_transcriber

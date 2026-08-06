@@ -2,7 +2,7 @@ from typing import Protocol
 
 from pydantic import BaseModel
 
-from backend.app.application.use_cases.analytics.models import (
+from app.application.use_cases.analytics.models import (
     Distribution,
     MistakeTimeSeries,
     TimeBucket,

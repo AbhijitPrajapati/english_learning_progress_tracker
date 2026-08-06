@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from .analysis import SampleAnalysis
+from .analysis import SpeechAnalysis
 
 
 class SpeechCreationRequest(BaseModel):
@@ -14,4 +14,4 @@ class SpeechCreationResponse(BaseModel):
     id: UUID
     created_at: datetime
     transcript: str
-    analysis: SampleAnalysis
+    analysis: SpeechAnalysis

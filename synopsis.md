@@ -9,14 +9,14 @@ The application enables users to record short samples of speech, which are trans
 ## User Authentication
 
 - Basic user authentication
-- Access to personal error analytics and history
+- Access to personal error analytics and speech history
 
 ## Audio Procesing
 
 - Audio submission
 - Transcription
 - Grammer analysis
-- Error storage
+- Speech storage
 
 ## Grammer Analysis
 
@@ -30,7 +30,7 @@ Error Information:
 ## Analytics
 
 - Multiple timeframes: all-time, yearly, monthly, weekly
-- Total errors 
+- Total errors and speeches
 - Error distribution
 - Error frequency graph by category
 
@@ -39,4 +39,3 @@ Error Information:
 - FastAPI
 - Faster-whisper (local audio transcription)
 - PostgreSQL
-- OAuth

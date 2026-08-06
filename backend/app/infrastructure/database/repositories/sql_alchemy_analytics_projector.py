@@ -4,7 +4,9 @@ from sqlalchemy import Select, and_, func, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.application.use_cases.analytics.models import (
+from app.application.exceptions import InfrastructureError
+from app.application.ports.repositories import AnalyticsProjector
+from app.application.use_cases.analytics.models import (
     CategoryFrequency,
     Distribution,
     MistakeTimeSeries,
@@ -12,8 +14,6 @@ from backend.app.application.use_cases.analytics.models import (
     Timeframe,
     TimeSeriesPoint,
 )
-from app.application.exceptions import InfrastructureError
-from app.application.ports.repositories import AnalyticsProjector
 from app.domain.speech import Analysis, MistakeCategory, SpeechId
 from app.domain.user import UserId
 from app.infrastructure.database.models import MistakeFrequency as FrequencyORM

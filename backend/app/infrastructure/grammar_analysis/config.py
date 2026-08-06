@@ -2,4 +2,4 @@ from pydantic import BaseModel
 
 
 class LLMConfig(BaseModel):
-    setting = "test"
+    setting: str

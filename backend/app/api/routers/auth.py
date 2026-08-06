@@ -13,7 +13,7 @@ from app.api.schemas.auth import (
     RegisterRequest,
     RegisterResponse,
 )
-from backend.app.application.use_cases.auth.exceptions import (
+from app.application.use_cases.auth.exceptions import (
     EmailAlreadyRegistered,
     InvalidCredentials,
     UserNotFound,

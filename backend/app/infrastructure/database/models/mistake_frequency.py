@@ -16,7 +16,7 @@ class MistakeFrequency(Base):
     __tablename__ = "mistake_frequencies"
 
     speech_id: Mapped[SpeechId] = mapped_column(
-        ValueObjectUUIDType(SpeechId), ForeignKey("sessions.id"), nullable=False
+        ValueObjectUUIDType(SpeechId), ForeignKey("speeches.id"), nullable=False
     )
 
     category: Mapped[MistakeCategory] = mapped_column(
@@ -29,4 +29,4 @@ class MistakeFrequency(Base):
 
     speech: Mapped[Speech] = relationship(back_populates="mistake_frequencies")
 
-    __table_args__ = (PrimaryKeyConstraint("sample_id", "category"),)
+    __table_args__ = (PrimaryKeyConstraint("speech_id", "category"),)
