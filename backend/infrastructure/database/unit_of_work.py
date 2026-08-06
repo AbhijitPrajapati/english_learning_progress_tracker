@@ -5,9 +5,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.application.ports.unit_of_work import UnitOfWork
 
-from .repositories.sql_alchemy_analytics_projector import SQLAlchemyAnalyticsProjector
-from .repositories.sql_alchemy_speech_repository import SQLAlchemySpeechRepository
-from .repositories.sql_alchemy_user_repository import SQLAlchemyUserRepository
+from .repositories import (
+    SQLAlchemyAnalyticsProjector,
+    SQLAlchemySpeechRepository,
+    SQLAlchemyUserRepository,
+)
 
 logger = logging.getLogger(__name__)
 

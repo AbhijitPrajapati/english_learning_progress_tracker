@@ -1,4 +1,4 @@
-from backend.application.exception_base import ApplicationError
+from backend.application.exceptions import ApplicationError
 
 
 class InvalidCredentials(ApplicationError):

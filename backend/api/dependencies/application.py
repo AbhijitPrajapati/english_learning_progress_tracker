@@ -15,6 +15,10 @@ from backend.application.speeches.process_speech import ProcessSpeech
 from .database import get_uow
 from .infrastructure import get_grammar_analyzer, get_password_hasher, get_transcriber
 
+"""
+Application use-case dependencies
+"""
+
 
 async def get_process_speech(
     uow: UnitOfWork = Depends(get_uow),

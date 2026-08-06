@@ -1,19 +1,25 @@
+import logging
+
 from sqlalchemy import Select, and_, func, select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.application.analytics.models import (
+    CategoryFrequency,
     Distribution,
-    MistakeFrequency,
     MistakeTimeSeries,
     TimeBucket,
     Timeframe,
     TimeSeriesPoint,
 )
+from backend.application.exceptions import InfrastructureError
 from backend.application.ports.repositories import AnalyticsProjector
 from backend.domain.speech import Analysis, MistakeCategory, SpeechId
 from backend.domain.user import UserId
 from backend.infrastructure.database.models import MistakeFrequency as FrequencyORM
 from backend.infrastructure.database.models import Speech
+
+logger = logging.getLogger(__name__)
 
 
 class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
@@ -32,29 +38,34 @@ class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
         return stmt.join(FrequencyORM.speech).where(and_(*filters))
 
     async def distribution(self, user_id: UserId, timeframe: Timeframe) -> Distribution:
+        try:
+            stmt_total_speeches = self.filter_by_user_id_and_timeframe(
+                select(func.count()), user_id, timeframe
+            )
+            total_speeches = await self.session.scalar(stmt_total_speeches) or 0
 
-        stmt_total_samples = self.filter_by_user_id_and_timeframe(
-            select(func.count()), user_id, timeframe
-        )
-        total_samples = await self.session.scalar(stmt_total_samples) or 0
+            category_counts_stmt = self.filter_by_user_id_and_timeframe(
+                select(
+                    FrequencyORM.category.label("category"),
+                    func.sum(FrequencyORM.occurances).label("occurances"),
+                    func.sum(FrequencyORM.opportunities).label("opportunities"),
+                ),
+                user_id,
+                timeframe,
+            ).group_by(FrequencyORM.category)
+            category_counts_result = await self.session.execute(category_counts_stmt)
+            rows = category_counts_result.mappings().all()
 
-        category_counts_stmt = self.filter_by_user_id_and_timeframe(
-            select(
-                FrequencyORM.category.label("category"),
-                func.sum(FrequencyORM.occurances).label("occurances"),
-                func.sum(FrequencyORM.opportunities).label("opportunities"),
-            ),
-            user_id,
-            timeframe,
-        ).group_by(FrequencyORM.category)
-        category_counts_result = await self.session.execute(category_counts_stmt)
-        rows = category_counts_result.mappings().all()
+            mistake_frequencies = [
+                CategoryFrequency.model_validate(row) for row in rows
+            ]
 
-        mistake_frequencies = [MistakeFrequency.model_validate(row) for row in rows]
-
-        return Distribution(
-            mistake_frequencies=mistake_frequencies, total_samples=total_samples
-        )
+            return Distribution(
+                mistake_frequencies=mistake_frequencies, total_speeches=total_speeches
+            )
+        except SQLAlchemyError as e:
+            logger.exception("Failed to retrieve distibution analytics")
+            raise InfrastructureError() from e
 
     async def time_series(
         self,
@@ -63,30 +74,38 @@ class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
         mistake_category: MistakeCategory,
         bucket: TimeBucket,
     ) -> MistakeTimeSeries:
-        time_expr = func.date_trunc(bucket.value, Speech.created_at).label("time")
+        try:
+            time_expr = func.date_trunc(bucket.value, Speech.created_at).label("time")
 
-        stmt = (
-            self.filter_by_user_id_and_timeframe(
-                select(
-                    time_expr,
-                    func.sum(FrequencyORM.occurances).label("occurances"),
-                    func.sum(FrequencyORM.opportunities).label("opportunities"),
-                ).where(FrequencyORM.category == mistake_category),
-                user_id,
-                timeframe,
+            stmt = (
+                self.filter_by_user_id_and_timeframe(
+                    select(
+                        time_expr,
+                        func.sum(FrequencyORM.occurances).label("occurances"),
+                        func.sum(FrequencyORM.opportunities).label("opportunities"),
+                    ).where(FrequencyORM.category == mistake_category),
+                    user_id,
+                    timeframe,
+                )
+                .group_by(time_expr)
+                .order_by(time_expr)
             )
-            .group_by(time_expr)
-            .order_by(time_expr)
-        )
-        result = await self.session.execute(stmt)
-        rows = result.mappings().all()
-        points = [TimeSeriesPoint.model_validate(row) for row in rows]
-        return MistakeTimeSeries(points=points)
+            result = await self.session.execute(stmt)
+            rows = result.mappings().all()
+            points = [TimeSeriesPoint.model_validate(row) for row in rows]
+            return MistakeTimeSeries(points=points)
+        except SQLAlchemyError as e:
+            logger.exception("Failed to retrieve time series analytics")
+            raise InfrastructureError() from e
 
     async def add_analysis(self, speech_id: SpeechId, analysis: Analysis) -> None:
-        orm_freqs = [
-            FrequencyORM(speech_id=speech_id, **freq.model_dump())
-            for freq in analysis.frequencies
-        ]
-        self.session.add_all(orm_freqs)
-        await self.session.flush()
+        try:
+            orm_freqs = [
+                FrequencyORM(speech_id=speech_id, **freq.model_dump())
+                for freq in analysis.frequencies
+            ]
+            self.session.add_all(orm_freqs)
+            await self.session.flush()
+        except SQLAlchemyError as e:
+            logger.exception("Failed to add analysis")
+            raise InfrastructureError() from e

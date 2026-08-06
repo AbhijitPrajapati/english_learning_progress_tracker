@@ -3,6 +3,10 @@ from sqlalchemy.types import TypeDecorator
 
 from backend.domain.speech import Analysis
 
+"""
+ORM bridge between the Analysis domain and JSONB
+"""
+
 
 class ValueObjectAnalysisType(TypeDecorator):
     impl = JSONB

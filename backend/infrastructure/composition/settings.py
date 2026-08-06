@@ -7,6 +7,8 @@ from backend.infrastructure.transcription import WhisperConfig
 
 
 class InfrastructureSettings(BaseSettings):
+    """Unified settings"""
+
     whisper: WhisperConfig
     llm: LLMConfig
     postgres: PostgresConfig

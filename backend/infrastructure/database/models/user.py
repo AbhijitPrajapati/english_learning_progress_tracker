@@ -4,10 +4,10 @@ from sqlalchemy import DateTime, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.domain.user import Email, UserId
+from backend.infrastructure.database.types import ValueObjectUUIDType
 from backend.infrastructure.database.types.value_object_email import (
     ValueObjectEmailType,
 )
-from backend.infrastructure.database.types.value_object_uuid import ValueObjectUUIDType
 
 from .base import Base
 from .speech import Speech

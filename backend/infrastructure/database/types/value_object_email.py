@@ -3,6 +3,10 @@ from sqlalchemy.types import TypeDecorator
 
 from backend.domain.user import Email
 
+"""
+ORM bridge between the Email domain value object and CITEXT
+"""
+
 
 class ValueObjectEmailType(TypeDecorator):
     impl = CITEXT(320)

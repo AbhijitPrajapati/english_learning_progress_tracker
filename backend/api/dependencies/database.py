@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.application.ports.unit_of_work import UnitOfWork
 from backend.infrastructure.composition import InfrastructureComposition
-from backend.infrastructure.database.unit_of_work import SqlAlchemyUnitOfWork
+from backend.infrastructure.database import SqlAlchemyUnitOfWork
 
 from .composition import get_composition
 

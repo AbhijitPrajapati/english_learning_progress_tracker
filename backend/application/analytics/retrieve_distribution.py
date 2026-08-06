@@ -1,7 +1,12 @@
+import logging
+
+from backend.application.exceptions import ApplicationError, InfrastructureError
 from backend.application.ports.unit_of_work import UnitOfWork
 from backend.domain.user import UserId
 
 from .models import Distribution, Timeframe
+
+logger = logging.getLogger(__name__)
 
 
 class RetrieveDistribution:
@@ -9,4 +14,8 @@ class RetrieveDistribution:
         self.uow = uow
 
     async def execute(self, user_id: UserId, timeframe: Timeframe) -> Distribution:
-        return await self.uow.analytics_projector.distribution(user_id, timeframe)
+        try:
+            return await self.uow.analytics_projector.distribution(user_id, timeframe)
+        except InfrastructureError as e:
+            logger.exception("Failed to retrieve error distribution")
+            raise ApplicationError() from e

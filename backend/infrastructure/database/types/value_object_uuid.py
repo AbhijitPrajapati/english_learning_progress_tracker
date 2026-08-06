@@ -1,6 +1,10 @@
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.types import TypeDecorator
 
+"""
+ORM bridge between the ID domain value objects and Postgres UUID
+"""
+
 
 class ValueObjectUUIDType(TypeDecorator):
     impl = UUID(as_uuid=True)

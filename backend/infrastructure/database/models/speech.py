@@ -5,10 +5,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.domain.speech import Analysis, SpeechId
 from backend.domain.user import UserId
+from backend.infrastructure.database.types import ValueObjectUUIDType
 from backend.infrastructure.database.types.value_object_analysis import (
     ValueObjectAnalysisType,
 )
-from backend.infrastructure.database.types.value_object_uuid import ValueObjectUUIDType
 
 from .base import Base
 from .mistake_frequency import MistakeFrequency

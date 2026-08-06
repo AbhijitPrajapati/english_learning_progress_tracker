@@ -1,10 +1,10 @@
 import logging
 
+from backend.application.exceptions import InfrastructureError
 from backend.application.ports.services import GrammarAnalysisAdapter
-from backend.domain.speech import Analysis, Mistake, MistakeCategory, MistakeFrequency
+from backend.domain.speech import Analysis, CategoryFrequency, Mistake, MistakeCategory
 
 from .config import LLMConfig
-from .exceptions import GrammarAnalysisError
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class LLMGrammarAnalysisAdapter(GrammarAnalysisAdapter):
             pass
         except Exception as e:
             logger.exception("LLM inference failed")
-            raise GrammarAnalysisError() from e
+            raise InfrastructureError() from e
 
         mistakes = [
             Mistake(
@@ -37,10 +37,10 @@ class LLMGrammarAnalysisAdapter(GrammarAnalysisAdapter):
             ),
         ]
         freq = [
-            MistakeFrequency(
+            CategoryFrequency(
                 category=MistakeCategory.ABC, opportunities=10, occurances=1
             ),
-            MistakeFrequency(
+            CategoryFrequency(
                 category=MistakeCategory.DEF, opportunities=5, occurances=1
             ),
         ]

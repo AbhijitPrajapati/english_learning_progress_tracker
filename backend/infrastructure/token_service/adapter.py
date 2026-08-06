@@ -1,13 +1,16 @@
+import logging
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 import jwt
 
+from backend.application.exceptions import InfrastructureError
 from backend.application.ports.services import TokenService
 from backend.domain.user import UserId
 
 from .config import JwtConfig
-from .exceptions import InvalidToken
+
+logger = logging.getLogger(__name__)
 
 
 class JwtTokenService(TokenService):
@@ -26,5 +29,6 @@ class JwtTokenService(TokenService):
         try:
             payload = jwt.decode(token, self.secret, algorithms=[self.algorithm])
         except Exception as e:
-            raise InvalidToken() from e
+            logger.exception("Invalid token")
+            raise InfrastructureError() from e
         return UserId(value=UUID(payload["sub"]))

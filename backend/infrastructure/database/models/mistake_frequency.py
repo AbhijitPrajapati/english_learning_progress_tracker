@@ -2,7 +2,7 @@ from sqlalchemy import Enum, ForeignKey, Integer, PrimaryKeyConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.domain.speech import MistakeCategory, SpeechId
-from backend.infrastructure.database.types.value_object_uuid import ValueObjectUUIDType
+from backend.infrastructure.database.types import ValueObjectUUIDType
 
 from .base import Base
 from .speech import Speech

@@ -12,6 +12,8 @@ from .settings import InfrastructureSettings
 
 
 class InfrastructureComposition:
+    """Composition root object"""
+
     def __init__(self, settings: InfrastructureSettings):
         logging_setup()
         self.engine = create_engine(settings.postgres)
