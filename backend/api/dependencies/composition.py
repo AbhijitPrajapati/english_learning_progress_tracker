@@ -1,7 +1,7 @@
+from fastapi import Request
+
 from backend.infrastructure.composition import InfrastructureComposition
 
-composition = InfrastructureComposition()
 
-
-def get_composition() -> InfrastructureComposition:
-    return composition
+def get_composition(request: Request) -> InfrastructureComposition:
+    return request.app.state.composition
