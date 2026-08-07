@@ -1,14 +1,33 @@
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
 from app.infrastructure.database import (
+    PostgresConfig,
     create_engine,
     create_session_factory,
 )
-from app.infrastructure.grammar_analysis import LLMGrammarAnalysisAdapter
+from app.infrastructure.grammar_analysis import LLMConfig, LLMGrammarAnalysisAdapter
 from app.infrastructure.logging import logging_setup
 from app.infrastructure.password_hasher import PwdLibPasswordHasher
-from app.infrastructure.token_service import JwtTokenService
-from app.infrastructure.transcription import WhisperTranscriptionAdapter
+from app.infrastructure.token_service import JwtConfig, JwtTokenService
+from app.infrastructure.transcription import WhisperConfig, WhisperTranscriptionAdapter
 
-from .settings import InfrastructureSettings
+
+class DatabaseSettings(BaseSettings):
+    """
+    Only contains database settings
+    Used for alembic migrations
+    """
+
+    postgres: PostgresConfig
+    model_config = SettingsConfigDict(env_nested_delimiter="__", extra="ignore")
+
+
+class InfrastructureSettings(DatabaseSettings):
+    """Unified composition settings"""
+
+    whisper: WhisperConfig
+    llm: LLMConfig
+    jwt: JwtConfig
 
 
 class InfrastructureComposition:

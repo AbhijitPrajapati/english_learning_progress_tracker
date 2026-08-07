@@ -39,6 +39,6 @@ class Speech(Base):
 
     user: Mapped[User] = relationship(back_populates="speeches")
 
-    metrics: Mapped[list[MistakeFrequency]] = relationship(
-        back_populates="speeches", cascade="all, delete-orphan"
+    mistake_frequencies: Mapped[list[MistakeFrequency]] = relationship(
+        back_populates="speech", cascade="all, delete-orphan"
     )
