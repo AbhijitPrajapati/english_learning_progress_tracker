@@ -1,16 +1,13 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
-
+from app.domain.base import DomainObject
 from app.domain.user import UserId
 
 from .analysis import Analysis
 from .value_objects import SpeechId
 
 
-class Speech(BaseModel):
-    model_config = ConfigDict(frozen=True)
-
+class Speech(DomainObject):
     id: SpeechId
     user_id: UserId
     transcript: str

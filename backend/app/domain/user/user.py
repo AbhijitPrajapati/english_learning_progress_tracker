@@ -1,13 +1,11 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from app.domain.base import DomainObject
 
 from .value_objects import Email, UserId
 
 
-class User(BaseModel):
-    model_config = ConfigDict(frozen=True)
-
+class User(DomainObject):
     id: UserId
     email: Email
     password_hash: str

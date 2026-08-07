@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 
 from app.api.dependencies.application import (
     AuthenticateUser,
@@ -13,11 +13,6 @@ from app.api.schemas.auth import (
     RegisterRequest,
     RegisterResponse,
 )
-from app.application.use_cases.auth.exceptions import (
-    EmailAlreadyRegistered,
-    InvalidCredentials,
-    UserNotFound,
-)
 from app.domain.user import Email
 
 router = APIRouter(prefix="/auth")
@@ -29,14 +24,9 @@ async def login(
     authenticate_user: AuthenticateUser = Depends(get_authenticate_user),
     token_service: TokenService = Depends(get_token_service),
 ) -> LoginResponse:
-    try:
-        user = await authenticate_user.execute(
-            Email(value=request.email), password=request.password
-        )
-    except UserNotFound:
-        raise HTTPException(status_code=404, detail="User not found")
-    except InvalidCredentials:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    user = await authenticate_user.execute(
+        Email(value=request.email), password=request.password
+    )
     token = token_service.issue(user.id)
     return LoginResponse(access_token=token, user_id=user.id.value)
 
@@ -45,10 +35,7 @@ async def login(
 async def register(
     request: RegisterRequest, register_user: RegisterUser = Depends(get_register_user)
 ) -> RegisterResponse:
-    try:
-        user = await register_user.execute(Email(value=request.email), request.password)
-    except EmailAlreadyRegistered:
-        raise HTTPException(status_code=409, detail="Email already registered")
+    user = await register_user.execute(Email(value=request.email), request.password)
     return RegisterResponse(
         id=user.id.value, email=user.email.value, created_at=user.created_at
     )

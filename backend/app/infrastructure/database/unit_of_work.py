@@ -33,7 +33,6 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
         if exc_type:
-            logger.exception("Transaction failed", extra={"exception": exc})
             await self.rollback()
         else:
             await self.commit()

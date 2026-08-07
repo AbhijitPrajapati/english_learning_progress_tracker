@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Text, func
+from sqlalchemy import DateTime, ForeignKey, Text, func, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.domain.speech import Analysis, SpeechId
@@ -22,7 +22,9 @@ class Speech(Base):
     __tablename__ = "speeches"
 
     id: Mapped[SpeechId] = mapped_column(
-        ValueObjectUUIDType(SpeechId), primary_key=True
+        ValueObjectUUIDType(SpeechId),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
     )
 
     user_id: Mapped[UserId] = mapped_column(

@@ -1,7 +1,5 @@
-import logging
 from datetime import datetime
 from typing import BinaryIO
-from uuid import uuid7
 
 from pydantic import BaseModel
 
@@ -14,8 +12,6 @@ from app.application.ports.services import (
 from app.application.ports.unit_of_work import UnitOfWork
 from app.domain.speech import Analysis, Speech, SpeechId
 from app.domain.user import UserId
-
-logger = logging.getLogger(__name__)
 
 
 class ProcessSpeechResult(BaseModel):
@@ -43,14 +39,8 @@ class ProcessSpeech:
             transcript: str = self.transcriber.transcribe(file_stream)
             analysis: Analysis = self.grammar_analyzer.analyze(transcript)
 
-            speech_id = SpeechId(value=uuid7())
             speech: Speech = await self.uow.speeches.create(
-                NewSpeech(
-                    id=speech_id,
-                    user_id=user_id,
-                    transcript=transcript,
-                    analysis=analysis,
-                )
+                NewSpeech(user_id=user_id, transcript=transcript, analysis=analysis)
             )
             await self.uow.analytics_projector.add_analysis(speech.id, analysis)
             await self.uow.commit()
@@ -61,5 +51,4 @@ class ProcessSpeech:
                 analysis=analysis,
             )
         except InfrastructureError as e:
-            logger.exception("Speech procesing failed")
             raise ApplicationError() from e

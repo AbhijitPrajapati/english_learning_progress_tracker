@@ -1,11 +1,13 @@
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr
+from pydantic import EmailStr
+
+from app.domain.base import DomainObject
 
 
-class UserId(BaseModel):
+class UserId(DomainObject):
     value: UUID
 
 
-class Email(BaseModel):
+class Email(DomainObject):
     value: EmailStr

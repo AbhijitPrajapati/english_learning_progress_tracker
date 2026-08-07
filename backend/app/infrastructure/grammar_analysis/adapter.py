@@ -19,8 +19,7 @@ class LLMGrammarAnalysisAdapter(GrammarAnalysisAdapter):
         try:
             pass
         except Exception as e:
-            logger.exception("LLM inference failed")
-            raise InfrastructureError() from e
+            raise InfrastructureError("Failed to load") from e
 
         mistakes = [
             Mistake(

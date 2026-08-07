@@ -1,5 +1,3 @@
-import logging
-
 from sqlalchemy import Select, and_, func, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,8 +16,6 @@ from app.domain.speech import Analysis, MistakeCategory, SpeechId
 from app.domain.user import UserId
 from app.infrastructure.database.models import MistakeFrequency as FrequencyORM
 from app.infrastructure.database.models import Speech
-
-logger = logging.getLogger(__name__)
 
 
 class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
@@ -64,7 +60,6 @@ class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
                 mistake_frequencies=mistake_frequencies, total_speeches=total_speeches
             )
         except SQLAlchemyError as e:
-            logger.exception("Failed to retrieve distibution analytics")
             raise InfrastructureError() from e
 
     async def time_series(
@@ -95,7 +90,6 @@ class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
             points = [TimeSeriesPoint.model_validate(row) for row in rows]
             return MistakeTimeSeries(points=points)
         except SQLAlchemyError as e:
-            logger.exception("Failed to retrieve time series analytics")
             raise InfrastructureError() from e
 
     async def add_analysis(self, speech_id: SpeechId, analysis: Analysis) -> None:
@@ -107,5 +101,4 @@ class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
             self.session.add_all(orm_freqs)
             await self.session.flush()
         except SQLAlchemyError as e:
-            logger.exception("Failed to add analysis")
             raise InfrastructureError() from e

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, String, func
+from sqlalchemy import DateTime, String, func, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.domain.user import Email, UserId
@@ -19,7 +19,11 @@ if TYPE_CHECKING:
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[UserId] = mapped_column(ValueObjectUUIDType(UserId), primary_key=True)
+    id: Mapped[UserId] = mapped_column(
+        ValueObjectUUIDType(UserId),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+    )
     email: Mapped[Email] = mapped_column(
         ValueObjectEmailType, unique=True, nullable=False, index=True
     )

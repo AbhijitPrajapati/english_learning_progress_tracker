@@ -7,12 +7,13 @@ from app.application.exceptions import ApplicationError
 from app.application.use_cases.auth.exceptions import (
     EmailAlreadyRegistered,
     InvalidCredentials,
+    UserNotFound,
 )
 
 logger = logging.getLogger(__name__)
 
 
-def base_exception(request: Request, exc: Exception) -> JSONResponse:
+async def base_exception(request: Request, exc: Exception) -> JSONResponse:
     """Consistent response for unexpected server errors."""
     logger.exception(
         "Unexpected backend error",
@@ -21,8 +22,8 @@ def base_exception(request: Request, exc: Exception) -> JSONResponse:
     return JSONResponse(status_code=500, content={"detail": "Internal server error"})
 
 
-def application_error(request: Request, exc: ApplicationError) -> JSONResponse:
-    logger.exception(
+async def application_error(request: Request, exc: ApplicationError) -> JSONResponse:
+    logger.info(
         "Backend application error",
         extra={"path": request.url.path, "detail": str(exc)},
     )
@@ -31,7 +32,9 @@ def application_error(request: Request, exc: ApplicationError) -> JSONResponse:
     )
 
 
-def invalid_credentials(request: Request, exc: InvalidCredentials) -> JSONResponse:
+async def invalid_credentials(
+    request: Request, exc: InvalidCredentials
+) -> JSONResponse:
     logger.info(
         "Invalid credentials",
         extra={"path": request.url.path, "detail": str(exc)},
@@ -41,7 +44,7 @@ def invalid_credentials(request: Request, exc: InvalidCredentials) -> JSONRespon
     )
 
 
-def email_already_registered(
+async def email_already_registered(
     request: Request, exc: EmailAlreadyRegistered
 ) -> JSONResponse:
     logger.info(
@@ -51,4 +54,15 @@ def email_already_registered(
     return JSONResponse(
         status_code=409,
         content={"detail": "An account with this email already exists."},
+    )
+
+
+async def user_not_found(request: Request, exc: UserNotFound) -> JSONResponse:
+    logger.info(
+        "User not found",
+        extra={"path": request.url.path, "detail": str(exc)},
+    )
+    return JSONResponse(
+        status_code=404,
+        content={"detail": "An account with this email does not exist."},
     )

@@ -1,10 +1,10 @@
 from enum import StrEnum
 from uuid import UUID
 
-from pydantic import BaseModel
+from app.domain.base import DomainObject
 
 
-class SpeechId(BaseModel):
+class SpeechId(DomainObject):
     value: UUID
 
 

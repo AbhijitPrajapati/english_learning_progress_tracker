@@ -1,5 +1,3 @@
-import logging
-
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,8 +7,6 @@ from app.application.ports.repositories import NewUser, UpdateUser, UserReposito
 from app.domain.user import Email, User, UserId
 from app.infrastructure.database.models import User as ORMUser
 
-logger = logging.getLogger(__name__)
-
 
 class SQLAlchemyUserRepository(UserRepository):
     def __init__(self, session: AsyncSession):
@@ -18,9 +14,7 @@ class SQLAlchemyUserRepository(UserRepository):
 
     async def create(self, user: NewUser) -> User:
         try:
-            orm_user = ORMUser(
-                id=user.id, email=user.email, password_hash=user.password_hash
-            )
+            orm_user = ORMUser(email=user.email, password_hash=user.password_hash)
             self.session.add(orm_user)
             await self.session.flush()
             return User(
@@ -30,7 +24,6 @@ class SQLAlchemyUserRepository(UserRepository):
                 created_at=orm_user.created_at,
             )
         except SQLAlchemyError as e:
-            logger.exception("Create user failed")
             raise InfrastructureError() from e
 
     async def get(self, user_id: UserId) -> User | None:
@@ -45,7 +38,6 @@ class SQLAlchemyUserRepository(UserRepository):
                 created_at=orm_user.created_at,
             )
         except SQLAlchemyError as e:
-            logger.exception("Get user by ID failed")
             raise InfrastructureError() from e
 
     async def get_by_email(self, email: Email) -> User | None:
@@ -62,7 +54,6 @@ class SQLAlchemyUserRepository(UserRepository):
                 created_at=orm_user.created_at,
             )
         except SQLAlchemyError as e:
-            logger.exception("Get user by email failed")
             raise InfrastructureError() from e
 
     async def delete(self, user_id: UserId) -> bool:
@@ -74,7 +65,6 @@ class SQLAlchemyUserRepository(UserRepository):
             await self.session.flush()
             return True
         except SQLAlchemyError as e:
-            logger.exception("Delete user failed")
             raise InfrastructureError() from e
 
     async def update(self, user_id: UserId, update_user: UpdateUser) -> User | None:
@@ -91,5 +81,4 @@ class SQLAlchemyUserRepository(UserRepository):
                 created_at=orm_user.created_at,
             )
         except SQLAlchemyError as e:
-            logger.exception("Update user failed")
             raise InfrastructureError() from e
