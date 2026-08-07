@@ -1,10 +1,11 @@
 import logging
+from uuid import uuid7
 
 from app.application.exceptions import ApplicationError, InfrastructureError
 from app.application.ports.repositories import NewUser
 from app.application.ports.services import PasswordHasher
 from app.application.ports.unit_of_work import UnitOfWork
-from app.domain.user import Email, User
+from app.domain.user import Email, User, UserId
 
 from .exceptions import EmailAlreadyRegistered
 
@@ -24,7 +25,8 @@ class RegisterUser:
                 raise EmailAlreadyRegistered()
 
             hashed_password = self.password_hasher.hash(password)
-            new_user = NewUser(email=email, password_hash=hashed_password)
+            user_id = UserId(value=uuid7())
+            new_user = NewUser(id=user_id, email=email, password_hash=hashed_password)
             user = await self.uow.users.create(new_user)
             await self.uow.commit()
             return user

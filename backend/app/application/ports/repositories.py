@@ -13,6 +13,7 @@ from app.domain.user import Email, User, UserId
 
 
 class NewUser(BaseModel):
+    id: UserId
     email: Email
     password_hash: str
 
@@ -22,6 +23,7 @@ class UpdateUser(BaseModel):
 
 
 class NewSpeech(BaseModel):
+    id: SpeechId
     user_id: UserId
     transcript: str
     analysis: Analysis

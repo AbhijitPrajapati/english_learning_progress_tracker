@@ -18,7 +18,9 @@ class SQLAlchemyUserRepository(UserRepository):
 
     async def create(self, user: NewUser) -> User:
         try:
-            orm_user = ORMUser(email=user.email, password_hash=user.password_hash)
+            orm_user = ORMUser(
+                id=user.id, email=user.email, password_hash=user.password_hash
+            )
             self.session.add(orm_user)
             await self.session.flush()
             return User(

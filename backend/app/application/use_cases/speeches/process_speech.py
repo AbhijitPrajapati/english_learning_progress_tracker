@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 from typing import BinaryIO
+from uuid import uuid7
 
 from pydantic import BaseModel
 
@@ -42,8 +43,14 @@ class ProcessSpeech:
             transcript: str = self.transcriber.transcribe(file_stream)
             analysis: Analysis = self.grammar_analyzer.analyze(transcript)
 
+            speech_id = SpeechId(value=uuid7())
             speech: Speech = await self.uow.speeches.create(
-                NewSpeech(user_id=user_id, transcript=transcript, analysis=analysis)
+                NewSpeech(
+                    id=speech_id,
+                    user_id=user_id,
+                    transcript=transcript,
+                    analysis=analysis,
+                )
             )
             await self.uow.analytics_projector.add_analysis(speech.id, analysis)
             await self.uow.commit()

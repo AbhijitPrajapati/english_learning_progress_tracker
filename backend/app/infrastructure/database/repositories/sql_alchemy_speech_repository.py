@@ -20,6 +20,7 @@ class SQLAlchemySpeechRepository(SpeechRepository):
     async def create(self, speech: NewSpeech) -> Speech:
         try:
             orm_sample = ORMSpeech(
+                id=speech.id,
                 user_id=speech.user_id,
                 transcript=speech.transcript,
                 analysis=speech.analysis,
