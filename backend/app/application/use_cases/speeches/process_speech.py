@@ -3,7 +3,6 @@ from typing import BinaryIO
 
 from pydantic import BaseModel
 
-from app.application.exceptions import ApplicationError, InfrastructureError
 from app.application.ports.repositories import NewSpeech
 from app.application.ports.services import (
     GrammarAnalysisAdapter,
@@ -35,20 +34,17 @@ class ProcessSpeech:
     async def execute(
         self, user_id: UserId, file_stream: BinaryIO
     ) -> ProcessSpeechResult:
-        try:
-            transcript: str = self.transcriber.transcribe(file_stream)
-            analysis: Analysis = self.grammar_analyzer.analyze(transcript)
+        transcript: str = self.transcriber.transcribe(file_stream)
+        analysis: Analysis = self.grammar_analyzer.analyze(transcript)
 
-            speech: Speech = await self.uow.speeches.create(
-                NewSpeech(user_id=user_id, transcript=transcript, analysis=analysis)
-            )
-            await self.uow.analytics_projector.add_analysis(speech.id, analysis)
-            await self.uow.commit()
-            return ProcessSpeechResult(
-                speech_id=speech.id,
-                created_at=speech.created_at,
-                transcript=transcript,
-                analysis=analysis,
-            )
-        except InfrastructureError as e:
-            raise ApplicationError() from e
+        speech: Speech = await self.uow.speeches.create(
+            NewSpeech(user_id=user_id, transcript=transcript, analysis=analysis)
+        )
+        await self.uow.analytics_projector.add_analysis(speech.id, analysis)
+        await self.uow.commit()
+        return ProcessSpeechResult(
+            speech_id=speech.id,
+            created_at=speech.created_at,
+            transcript=transcript,
+            analysis=analysis,
+        )

@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api.exceptions import register_exception_handlers
+from app.api.exception_handlers import register_exception_handlers
 from app.api.routers.analytics import router as analytics_router
 from app.api.routers.auth import router as auth_router
 from app.api.routers.speeches import router as samples_router

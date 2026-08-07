@@ -1,4 +1,3 @@
-from app.application.exceptions import ApplicationError, InfrastructureError
 from app.application.ports.unit_of_work import UnitOfWork
 from app.domain.user import UserId
 
@@ -10,7 +9,4 @@ class RetrieveDistribution:
         self.uow = uow
 
     async def execute(self, user_id: UserId, timeframe: Timeframe) -> Distribution:
-        try:
-            return await self.uow.analytics_projector.distribution(user_id, timeframe)
-        except InfrastructureError as e:
-            raise ApplicationError() from e
+        return await self.uow.analytics_projector.distribution(user_id, timeframe)

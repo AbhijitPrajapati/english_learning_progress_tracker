@@ -1,4 +1,3 @@
-from app.application.exceptions import ApplicationError, InfrastructureError
 from app.application.ports.services import PasswordHasher
 from app.application.ports.unit_of_work import UnitOfWork
 from app.domain.user import Email, User
@@ -12,14 +11,11 @@ class AuthenticateUser:
         self.password_hasher = password_hasher
 
     async def execute(self, email: Email, password: str) -> User:
-        try:
-            user = await self.uow.users.get_by_email(email)
-            if user is None:
-                raise UserNotFound()
+        user = await self.uow.users.get_by_email(email)
+        if user is None:
+            raise UserNotFound()
 
-            if not self.password_hasher.verify(password, user.password_hash):
-                raise InvalidCredentials()
+        if not self.password_hasher.verify(password, user.password_hash):
+            raise InvalidCredentials()
 
-            return user
-        except InfrastructureError as e:
-            raise ApplicationError() from e
+        return user
