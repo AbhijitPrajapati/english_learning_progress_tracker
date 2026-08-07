@@ -44,7 +44,7 @@ class SQLAlchemyUserRepository(UserRepository):
         try:
             stmt = select(ORMUser).where(ORMUser.email == email)  # type: ignore
             result = await self.session.execute(stmt)
-            orm_user = result.first()
+            orm_user = result.scalar_one_or_none()
             if orm_user is None:
                 return None
             return User(

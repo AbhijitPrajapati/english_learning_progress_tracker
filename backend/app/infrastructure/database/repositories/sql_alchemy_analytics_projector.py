@@ -50,10 +50,15 @@ class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
                 timeframe,
             ).group_by(FrequencyORM.category)
             category_counts_result = await self.session.execute(category_counts_stmt)
-            rows = category_counts_result.mappings().all()
+            rows = category_counts_result.scalars().all()
 
             mistake_frequencies = [
-                CategoryFrequency.model_validate(row) for row in rows
+                CategoryFrequency(
+                    occurances=row.occurances,
+                    opportunities=row.opportunities,
+                    category=row.category,
+                )
+                for row in rows
             ]
 
             return Distribution(
@@ -87,7 +92,14 @@ class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
             )
             result = await self.session.execute(stmt)
             rows = result.mappings().all()
-            points = [TimeSeriesPoint.model_validate(row) for row in rows]
+            points = [
+                TimeSeriesPoint(
+                    time=row["time"],
+                    occurances=row["occurances"],
+                    opportunities=row["opportunities"],
+                )
+                for row in rows
+            ]
             return MistakeTimeSeries(points=points)
         except SQLAlchemyError as e:
             raise InfrastructureError() from e

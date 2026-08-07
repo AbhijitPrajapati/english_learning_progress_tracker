@@ -22,9 +22,6 @@ class SQLAlchemySpeechRepository(SpeechRepository):
             )
             self.session.add(orm_speech)
             await self.session.flush()
-
-            await self.session.flush()
-
             return Speech(
                 id=orm_speech.id,
                 user_id=orm_speech.user_id,
@@ -74,7 +71,13 @@ class SQLAlchemySpeechRepository(SpeechRepository):
             )
             result = await self.session.execute(stmt)
             return [
-                Speech.model_validate(row, extra="ignore")
+                Speech(
+                    id=row.id,
+                    user_id=row.user_id,
+                    transcript=row.transcript,
+                    analysis=row.analysis,
+                    created_at=row.created_at,
+                )
                 for row in result.scalars().all()
             ]
         except SQLAlchemyError as e:
