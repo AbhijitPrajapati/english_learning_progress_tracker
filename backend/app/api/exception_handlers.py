@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 from app.application.use_cases.auth.exceptions import (
     EmailAlreadyRegistered,
     InvalidCredentials,
+    InvalidToken,
     UserNotFound,
 )
 
@@ -50,4 +51,12 @@ def register_exception_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=404,
             content={"detail": "An account with this email does not exist."},
+        )
+
+    @app.exception_handler(InvalidToken)
+    async def invalid_token(request: Request, exc: InvalidToken) -> JSONResponse:
+        log_exception("User not found", exc, request)
+        return JSONResponse(
+            status_code=401,
+            content={"detail": "Authentication token is invalid."},
         )

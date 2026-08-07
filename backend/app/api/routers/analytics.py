@@ -6,7 +6,7 @@ from app.api.dependencies.application import (
     get_retrieve_distribution,
     get_retrieve_time_series,
 )
-from app.api.dependencies.auth import get_current_user
+from app.api.dependencies.current_user import get_current_user
 from app.api.schemas.analytics import (
     DistributionRequest,
     DistributionResponse,

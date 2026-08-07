@@ -11,3 +11,7 @@ class UserNotFound(ApplicationError):
 
 class EmailAlreadyRegistered(ApplicationError):
     pass
+
+
+class InvalidToken(ApplicationError):
+    pass
