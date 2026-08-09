@@ -20,7 +20,7 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(Exception)
     async def base_exception(request: Request, exc: Exception) -> JSONResponse:
-        logger.exception("Internal server error", extra={"path": request.url.path})
+        logger.exception("Unexpected server error", extra={"path": request.url.path})
         return JSONResponse(
             status_code=500,
             content={"detail": "Something went wrong. Please try again."},
@@ -35,7 +35,7 @@ def register_exception_handlers(app: FastAPI) -> None:
             status_code=401, content={"detail": "Email or password is incorrect."}
         )
 
-    @app.exception_handler(InvalidCredentials)
+    @app.exception_handler(EmailAlreadyRegistered)
     async def email_already_registered(
         request: Request, exc: EmailAlreadyRegistered
     ) -> JSONResponse:
@@ -55,7 +55,7 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(InvalidToken)
     async def invalid_token(request: Request, exc: InvalidToken) -> JSONResponse:
-        log_exception("User not found", exc, request)
+        log_exception("Invalid token", exc, request)
         return JSONResponse(
             status_code=401,
             content={"detail": "Authentication token is invalid."},

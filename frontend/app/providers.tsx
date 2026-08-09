@@ -1,44 +1,36 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { clearAuthToken, getStoredAuthToken, saveAuthToken } from "@/lib/api";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { authService, sessionStore } from "@/lib/infrastructure/composition";
+import { AuthSession, AuthCredentials } from "@/lib/application/models";
 
 type AuthContextValue = {
-  token: string | null;
-  userId: string | null;
-  login: (token: string, userId: string) => void;
+  userId: string | null,
+  isAuthenticated: boolean,
+  login: (credentials: AuthCredentials) => Promise<void>;
   logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [session, setSession] = useState<AuthSession | null>(() => sessionStore.getSession(),);
 
-  useEffect(() => {
-    const storedToken = getStoredAuthToken();
-    if (storedToken) {
-      setToken(storedToken);
-      setUserId(window.localStorage.getItem("authUserId"));
-    }
+  const userId = session?.userId ?? null;
+  const isAuthenticated = session !== null;
+
+  const login = useCallback(async (credentials: AuthCredentials) => {
+    const session = await authService.login(credentials);
+    sessionStore.setSession(session);
+    setSession(session);
   }, []);
 
-  const login = (nextToken: string, nextUserId: string) => {
-    saveAuthToken(nextToken);
-    window.localStorage.setItem("authUserId", nextUserId);
-    setToken(nextToken);
-    setUserId(nextUserId);
-  };
+  const logout = useCallback(() => {
+    sessionStore.clearSession();
+    setSession(null);
+  }, [])
 
-  const logout = () => {
-    clearAuthToken();
-    window.localStorage.removeItem("authUserId");
-    setToken(null);
-    setUserId(null);
-  };
-
-  const value = useMemo(() => ({ token, userId, login, logout }), [token, userId]);
+  const value = useMemo(() => ({ userId: userId, isAuthenticated, login, logout }), [userId, isAuthenticated, login, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

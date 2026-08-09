@@ -1,32 +1,35 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import type { FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useAuth } from "@/app/providers";
-import { speechApi } from "@/lib/api";
+import { speechService } from "@/lib/infrastructure/composition";
+import { SpeechUploadSection } from "@/components/speech/SpeechUploadSection";
+import { SpeechResultCard } from "@/components/speech/SpeechResultCard";
+import { ApiError } from "@/lib/infrastructure/api/errors";
+import type { Speech } from "@/lib/domain/speech";
 
 export default function HomePage() {
   const router = useRouter();
-  const { token, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [result, setResult] = useState<Awaited<ReturnType<typeof speechApi.upload>> | null>(null);
+  const [result, setResult] = useState<Speech | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) {
+    if (!isAuthenticated) {
       router.replace("/auth");
     }
-  }, [router, token]);
+  }, [router, isAuthenticated]);
 
   const fileName = useMemo(() => file?.name ?? "No file selected", [file]);
 
-  async function handleUpload(event: React.FormEvent) {
+  async function handleUpload(event: FormEvent) {
     event.preventDefault();
     if (!file) {
       setError("Please select an audio file first.");
@@ -37,16 +40,20 @@ export default function HomePage() {
     setIsUploading(true);
 
     try {
-      const response = await speechApi.upload(file);
+      const response = await speechService.upload(file);
       setResult(response);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed.");
+      if (err instanceof ApiError) {
+        setError(err.detail ?? "Upload failed due to a request error.");
+      } else {
+        setError(err instanceof Error ? err.message : "Upload failed.");
+      }
     } finally {
       setIsUploading(false);
     }
   }
 
-  if (!token) {
+  if (!isAuthenticated) {
     return null;
   }
 
@@ -73,17 +80,14 @@ export default function HomePage() {
               <CardDescription>Send a short audio clip to the backend for transcription and grammar analysis.</CardDescription>
             </CardHeader>
             <CardContent>
-              <form className="space-y-4" onSubmit={handleUpload}>
-                <div className="space-y-2">
-                  <Label htmlFor="audio-file">Audio clip</Label>
-                  <Input id="audio-file" type="file" accept="audio/*" onChange={(event) => setFile(event.target.files?.[0] ?? null)} />
-                  <p className="text-sm text-muted-foreground">Selected file: {fileName}</p>
-                </div>
-                {error ? <p className="text-sm text-destructive">{error}</p> : null}
-                <Button type="submit" disabled={isUploading}>
-                  {isUploading ? "Processing..." : "Upload and analyze"}
-                </Button>
-              </form>
+              <SpeechUploadSection
+                fileName={fileName}
+                file={file}
+                isUploading={isUploading}
+                error={error}
+                onFileChange={setFile}
+                onSubmit={handleUpload}
+              />
             </CardContent>
           </Card>
 
@@ -93,33 +97,7 @@ export default function HomePage() {
               <CardDescription>Feedback and detected mistakes returned by the speech endpoint.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {!result ? (
-                <p className="text-sm text-muted-foreground">No speech has been processed yet.</p>
-              ) : (
-                <>
-                  <div>
-                    <p className="text-sm font-medium">Transcript</p>
-                    <p className="text-sm text-muted-foreground">{result.transcript}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Feedback</p>
-                    <p className="text-sm text-muted-foreground">{result.analysis.feedback}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Detected mistakes</p>
-                    <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
-                      {result.analysis.mistakes.map((mistake, index) => (
-                        <li key={`${mistake.category}-${index}`} className="rounded-md border p-3">
-                          <p className="font-medium text-foreground">{mistake.category}</p>
-                          <p>Original: {mistake.original_text}</p>
-                          <p>Correction: {mistake.correction}</p>
-                          <p>Explanation: {mistake.explanation}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </>
-              )}
+              <SpeechResultCard speech={result} />
             </CardContent>
           </Card>
         </div>

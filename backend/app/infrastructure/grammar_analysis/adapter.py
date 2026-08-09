@@ -1,6 +1,5 @@
 import logging
 
-from app.application.exceptions import InfrastructureError
 from app.application.ports.services import GrammarAnalysisAdapter
 from app.domain.speech import Analysis, CategoryFrequency, Mistake, MistakeCategory
 
@@ -16,11 +15,6 @@ class LLMGrammarAnalysisAdapter(GrammarAnalysisAdapter):
         logger.info("Initialized dummy llm")
 
     def analyze(self, text: str) -> Analysis:
-        try:
-            pass
-        except Exception as e:
-            raise InfrastructureError("Failed to load") from e
-
         mistakes = [
             Mistake(
                 category=MistakeCategory.ABC,

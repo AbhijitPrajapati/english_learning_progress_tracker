@@ -1,4 +1,3 @@
-from app.application.exceptions import InfrastructureError
 from app.application.ports.services import TokenService
 from app.application.ports.unit_of_work import UnitOfWork
 from app.domain.user import User
@@ -12,10 +11,9 @@ class GetUserFromToken:
         self.token_service = token_service
 
     async def execute(self, token: str) -> User:
-        try:
-            user_id = self.token_service.verify(token)
-        except InfrastructureError as e:
-            raise InvalidToken() from e
+        user_id = self.token_service.verify(token)
+        if user_id is None:
+            raise InvalidToken()
         user = await self.uow.users.get(user_id)
         if user is None:
             raise UserNotFound()

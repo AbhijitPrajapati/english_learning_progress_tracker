@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import type { FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { authApi } from "@/lib/api";
 import { useAuth } from "@/app/providers";
+import { authService } from "@/lib/infrastructure/composition";
+import { AuthForm } from "@/components/auth/AuthForm";
+import { ApiError } from "@/lib/infrastructure/api/errors";
+import { AuthCredentials } from "@/lib/application/models";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -19,24 +20,25 @@ export default function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError(null);
     setIsSubmitting(true);
 
-    try {
-      if (mode === "login") {
-        const response = await authApi.login({ email, password });
-        login(response.access_token, response.user_id);
-      } else {
-        await authApi.register({ email, password });
-        const response = await authApi.login({ email, password });
-        login(response.access_token, response.user_id);
-      }
+    const credentials: AuthCredentials = { email, password };
 
+    try {
+      if (mode === "register") {
+        await authService.register(credentials);
+      }
+      login(credentials);
       router.push("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Authentication failed");
+      if (err instanceof ApiError) {
+        setError(err.detail ?? "Authentication failed.");
+      } else {
+        setError(err instanceof Error ? err.message : "Authentication failed.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -50,24 +52,18 @@ export default function AuthPage() {
           <CardDescription>Use your email and password to sign in or create an account.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} required />
-            </div>
-            {error ? <p className="text-sm text-destructive">{error}</p> : null}
-            <Button className="w-full" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Please wait..." : mode === "login" ? "Sign in" : "Create account"}
-            </Button>
-          </form>
+          <AuthForm
+            mode={mode}
+            email={email}
+            password={password}
+            error={error}
+            isSubmitting={isSubmitting}
+            onEmailChange={setEmail}
+            onPasswordChange={setPassword}
+            onToggleMode={() => setMode(mode === "login" ? "register" : "login")}
+            onSubmit={handleSubmit}
+          />
           <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-            <button type="button" className="font-medium text-primary" onClick={() => setMode(mode === "login" ? "register" : "login")}>
-              {mode === "login" ? "Need an account?" : "Already have an account?"}
-            </button>
             <Link className="font-medium text-primary" href="/">
               Skip for now
             </Link>

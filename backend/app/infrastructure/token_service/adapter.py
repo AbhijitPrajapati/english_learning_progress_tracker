@@ -3,7 +3,6 @@ from uuid import UUID
 
 import jwt
 
-from app.application.exceptions import InfrastructureError
 from app.application.ports.services import TokenService
 from app.domain.user import UserId
 
@@ -22,9 +21,9 @@ class JwtTokenService(TokenService):
         payload = {"sub": str(user_id.value), "iat": now, "exp": now + delta}
         return jwt.encode(payload, self.secret, algorithm=self.algorithm)
 
-    def verify(self, token: str) -> UserId:
+    def verify(self, token: str) -> UserId | None:
         try:
             payload = jwt.decode(token, self.secret, algorithms=[self.algorithm])
-        except Exception as e:
-            raise InfrastructureError() from e
+        except jwt.exceptions.InvalidTokenError:
+            return None
         return UserId(value=UUID(payload["sub"]))

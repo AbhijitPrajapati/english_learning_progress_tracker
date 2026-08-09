@@ -5,19 +5,24 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
 import { useAuth } from "@/app/providers";
-import { analyticsApi } from "@/lib/api";
+import { analyticsService } from "@/lib/infrastructure/composition";
+import { AnalyticsFilters } from "@/components/analytics/AnalyticsFilters";
+import { DistributionPanel } from "@/components/analytics/DistributionPanel";
+import { TimeSeriesPanel } from "@/components/analytics/TimeSeriesPanel";
+import { ApiError } from "@/lib/infrastructure/api/errors";import { MistakeCategory } from "@/lib/domain/analysis";
+import { AnalyticsDistribution, AnalyticsTimeSeries, Timeframe } from "@/lib/application/models";
+;
 
-const timeframes = [
-  { label: "All time", value: "all_time" },
-  { label: "Yearly", value: "yearly" },
-  { label: "Monthly", value: "monthly" },
-  { label: "Weekly", value: "weekly" },
-] as const;
+const TIMEFRAMES = [
+  { value: "all_time", label: "All Time" },
+  { value: "yearly", label: "Yearly" },
+  { value: "monthly", label: "Monthly" },
+  { value: "weekly", label: "Weekly" },
+]
+type TimeframeSelection = (typeof TIMEFRAMES)[number]["value"]
 
-function getTimeframeRange(selected: (typeof timeframes)[number]["value"]) {
+function getTimeframe(selected: TimeframeSelection): Timeframe {
   const end = new Date();
   const start = new Date(end);
 
@@ -37,60 +42,76 @@ function getTimeframeRange(selected: (typeof timeframes)[number]["value"]) {
   };
 }
 
-const mistakeCategories = [
-  { label: "Test abc error", value: "test abc error" },
-  { label: "Test def error", value: "test def error" },
-] as const;
-
 export default function AnalyticsPage() {
   const router = useRouter();
-  const { token, logout } = useAuth();
-  const [timeframe, setTimeframe] = useState<(typeof timeframes)[number]["value"]>("all_time");
-  const [mistakeCategory, setMistakeCategory] = useState<(typeof mistakeCategories)[number]["value"]>("test abc error");
-  const [distribution, setDistribution] = useState<Awaited<ReturnType<typeof analyticsApi.getDistribution>> | null>(null);
-  const [timeSeries, setTimeSeries] = useState<Awaited<ReturnType<typeof analyticsApi.getTimeSeries>> | null>(null);
+  const { isAuthenticated, logout } = useAuth();
+  const [timeframe, setTimeframe] = useState<TimeframeSelection>("monthly");
+  const [mistakeCategory, setMistakeCategory] = useState<MistakeCategory>("test_abc_error");
+  const [distribution, setDistribution] = useState<AnalyticsDistribution | null>(null);
+  const [timeSeries, setTimeSeries] = useState<AnalyticsTimeSeries | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) {
+    if (!isAuthenticated) {
       router.replace("/auth");
-      return;
+    }
+  }, [router, isAuthenticated]);
+  
+  useEffect(() => {
+    if (!isAuthenticated) return
+
+    const loadTimeSeries = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const timerange = getTimeframe(timeframe);
+        const timeseries = await analyticsService.getTimeSeries(timerange, mistakeCategory);
+        setTimeSeries(timeseries);
+      } catch (err) {
+        if (err instanceof ApiError) {
+          setError(err.detail ?? "Unable to load time series.");
+        } else {
+          setError(err instanceof Error ? err.message : "Unable to load time series.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
     }
 
-    void loadAnalytics();
-  }, [router, token]);
-
-  const loadAnalytics = async (selectedTimeframe = timeframe) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const { start, end } = getTimeframeRange(selectedTimeframe);
-      const [nextDistribution, nextTimeSeries] = await Promise.all([
-        analyticsApi.getDistribution({ start, end }),
-        analyticsApi.getTimeSeries({ start, end }, mistakeCategory),
-      ]);
-      setDistribution(nextDistribution);
-      setTimeSeries(nextTimeSeries);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to load analytics.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    loadTimeSeries();
+  }
+  )
 
   useEffect(() => {
-    if (!token) {
-      return;
+    if (!isAuthenticated) return
+
+    const loadDistribution = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const timerange = getTimeframe(timeframe);
+        const distribution = await analyticsService.getDistribution(timerange);
+        setDistribution(distribution);
+      } catch (err) {
+        if (err instanceof ApiError) {
+          setError(err.detail ?? "Unable to load distribution.");
+        } else {
+          setError(err instanceof Error ? err.message : "Unable to load distribution.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
     }
 
-    void loadAnalytics(timeframe);
-  }, [mistakeCategory, token, timeframe]);
+    loadDistribution();
+  })
 
-  const selectedTimeframeLabel = useMemo(() => timeframes.find((option) => option.value === timeframe)?.label ?? "All time", [timeframe]);
+  const selectedTimeframeLabel = useMemo(() => TIMEFRAMES.find((option) => option.value === timeframe)?.label ?? "All time", [timeframe]);
 
-  if (!token) {
+  if (!isAuthenticated) {
     return null;
   }
 
@@ -115,27 +136,13 @@ export default function AnalyticsPage() {
             <CardTitle>Filters</CardTitle>
             <CardDescription>Choose a timeframe and a mistake category to inspect analytics.</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="timeframe">Timeframe</Label>
-              <Select id="timeframe" value={timeframe} onChange={(event) => setTimeframe(event.target.value as (typeof timeframes)[number]["value"])}>
-                {timeframes.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="mistake-category">Mistake category</Label>
-              <Select id="mistake-category" value={mistakeCategory} onChange={(event) => setMistakeCategory(event.target.value as (typeof mistakeCategories)[number]["value"])}>
-                {mistakeCategories.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Select>
-            </div>
+          <CardContent>
+            <AnalyticsFilters
+              timeframe={timeframe}
+              mistakeCategory={mistakeCategory}
+              onTimeframeChange={(value) => setTimeframe(value as TimeframeSelection)}
+              onMistakeCategoryChange={(value) => setMistakeCategory(value as MistakeCategory)}
+            />
           </CardContent>
         </Card>
 
@@ -150,20 +157,8 @@ export default function AnalyticsPage() {
             <CardContent>
               {isLoading && !distribution ? (
                 <p className="text-sm text-muted-foreground">Loading distribution…</p>
-              ) : distribution ? (
-                <div className="space-y-3">
-                  <div className="text-sm text-muted-foreground">Total samples: {distribution.total_samples}</div>
-                  <ul className="space-y-2">
-                    {distribution.mistake_frequencies.map((item) => (
-                      <li key={item.category} className="flex items-center justify-between rounded-md border p-3 text-sm">
-                        <span>{item.category}</span>
-                        <span className="font-medium">{item.occurances}/{item.opportunities}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
               ) : (
-                <p className="text-sm text-muted-foreground">No distribution available.</p>
+                <DistributionPanel distribution={distribution} />
               )}
             </CardContent>
           </Card>
@@ -176,17 +171,8 @@ export default function AnalyticsPage() {
             <CardContent>
               {isLoading && !timeSeries ? (
                 <p className="text-sm text-muted-foreground">Loading time series…</p>
-              ) : timeSeries?.points.length ? (
-                <ul className="space-y-2">
-                  {timeSeries.points.map((point) => (
-                    <li key={point.time} className="rounded-md border p-3 text-sm">
-                      <div className="font-medium">{new Date(point.time).toLocaleDateString()}</div>
-                      <div className="text-muted-foreground">Opportunities: {point.opportunities} • Occurrences: {point.occurances}</div>
-                    </li>
-                  ))}
-                </ul>
               ) : (
-                <p className="text-sm text-muted-foreground">No time series data available.</p>
+                <TimeSeriesPanel timeSeries={timeSeries} />
               )}
             </CardContent>
           </Card>
