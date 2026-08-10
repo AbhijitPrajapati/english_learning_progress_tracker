@@ -7,16 +7,10 @@ type AnalyticsFiltersProps = {
   mistakeCategory: string;
   onTimeframeChange: (value: string) => void;
   onMistakeCategoryChange: (value: string) => void;
+  timeframes: Array<{label: string, value: string}>
 };
 
-const timeframes = [
-  { label: "All time", value: "all_time" },
-  { label: "Yearly", value: "yearly" },
-  { label: "Monthly", value: "monthly" },
-  { label: "Weekly", value: "weekly" },
-];
-
-export function AnalyticsFilters({ timeframe, mistakeCategory, onTimeframeChange, onMistakeCategoryChange }: AnalyticsFiltersProps) {
+export function AnalyticsFilters({ timeframe, mistakeCategory, onTimeframeChange, onMistakeCategoryChange, timeframes }: AnalyticsFiltersProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <div className="space-y-2">

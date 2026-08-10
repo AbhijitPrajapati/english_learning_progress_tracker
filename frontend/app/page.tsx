@@ -7,11 +7,10 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/app/providers";
-import { speechService } from "@/lib/infrastructure/composition";
 import { SpeechUploadSection } from "@/components/speech/SpeechUploadSection";
 import { SpeechResultCard } from "@/components/speech/SpeechResultCard";
-import { ApiError } from "@/lib/infrastructure/api/errors";
 import type { Speech } from "@/lib/domain/speech";
+import { uploadSpeech } from "@/lib/services";
 
 export default function HomePage() {
   const router = useRouter();
@@ -40,14 +39,10 @@ export default function HomePage() {
     setIsUploading(true);
 
     try {
-      const response = await speechService.upload(file);
+      const response = await uploadSpeech(file);
       setResult(response);
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.detail ?? "Upload failed due to a request error.");
-      } else {
-        setError(err instanceof Error ? err.message : "Upload failed.");
-      }
+    } catch {
+      setError("Upload failed");
     } finally {
       setIsUploading(false);
     }

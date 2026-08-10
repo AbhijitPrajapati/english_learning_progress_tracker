@@ -6,10 +6,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/app/providers";
-import { authService } from "@/lib/infrastructure/composition";
 import { AuthForm } from "@/components/auth/AuthForm";
-import { ApiError } from "@/lib/infrastructure/api/errors";
 import { AuthCredentials } from "@/lib/application/models";
+import { register } from "@/lib/services";
+import { ApplicationError } from "@/lib/application/errors";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -29,15 +29,13 @@ export default function AuthPage() {
 
     try {
       if (mode === "register") {
-        await authService.register(credentials);
+        await register(credentials);
       }
       login(credentials);
       router.push("/");
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.detail ?? "Authentication failed.");
-      } else {
-        setError(err instanceof Error ? err.message : "Authentication failed.");
+      if (err instanceof ApplicationError) {
+        setError(err.message);
       }
     } finally {
       setIsSubmitting(false);

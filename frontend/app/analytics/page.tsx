@@ -6,13 +6,12 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/app/providers";
-import { analyticsService } from "@/lib/infrastructure/composition";
 import { AnalyticsFilters } from "@/components/analytics/AnalyticsFilters";
 import { DistributionPanel } from "@/components/analytics/DistributionPanel";
 import { TimeSeriesPanel } from "@/components/analytics/TimeSeriesPanel";
-import { ApiError } from "@/lib/infrastructure/api/errors";import { MistakeCategory } from "@/lib/domain/analysis";
+import { MistakeCategory } from "@/lib/domain/analysis";
 import { AnalyticsDistribution, AnalyticsTimeSeries, Timeframe } from "@/lib/application/models";
-;
+import { getDistribution, getTimeSeries } from "@/lib/services";
 
 const TIMEFRAMES = [
   { value: "all_time", label: "All Time" },
@@ -67,14 +66,10 @@ export default function AnalyticsPage() {
 
       try {
         const timerange = getTimeframe(timeframe);
-        const timeseries = await analyticsService.getTimeSeries(timerange, mistakeCategory);
+        const timeseries = await getTimeSeries(timerange, mistakeCategory);
         setTimeSeries(timeseries);
-      } catch (err) {
-        if (err instanceof ApiError) {
-          setError(err.detail ?? "Unable to load time series.");
-        } else {
-          setError(err instanceof Error ? err.message : "Unable to load time series.");
-        }
+      } catch {
+        setError("Unable to load time series.")
       } finally {
         setIsLoading(false);
       }
@@ -93,14 +88,10 @@ export default function AnalyticsPage() {
 
       try {
         const timerange = getTimeframe(timeframe);
-        const distribution = await analyticsService.getDistribution(timerange);
+        const distribution = await getDistribution(timerange);
         setDistribution(distribution);
-      } catch (err) {
-        if (err instanceof ApiError) {
-          setError(err.detail ?? "Unable to load distribution.");
-        } else {
-          setError(err instanceof Error ? err.message : "Unable to load distribution.");
-        }
+      } catch {
+        setError("Unable to load distribution.")
       } finally {
         setIsLoading(false);
       }
@@ -142,6 +133,7 @@ export default function AnalyticsPage() {
               mistakeCategory={mistakeCategory}
               onTimeframeChange={(value) => setTimeframe(value as TimeframeSelection)}
               onMistakeCategoryChange={(value) => setMistakeCategory(value as MistakeCategory)}
+              timeframes={TIMEFRAMES}
             />
           </CardContent>
         </Card>

@@ -7,7 +7,6 @@ from app.application.use_cases.auth.exceptions import (
     EmailAlreadyRegistered,
     InvalidCredentials,
     InvalidToken,
-    UserNotFound,
 )
 
 logger = logging.getLogger(__name__)
@@ -20,7 +19,9 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(Exception)
     async def base_exception(request: Request, exc: Exception) -> JSONResponse:
-        logger.exception("Unexpected server error", extra={"path": request.url.path})
+        logger.error(
+            "Unexpected server error", extra={"path": request.url.path}, exc_info=exc
+        )
         return JSONResponse(
             status_code=500,
             content={"detail": "Something went wrong. Please try again."},
@@ -43,14 +44,6 @@ def register_exception_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=409,
             content={"detail": "An account with this email already exists."},
-        )
-
-    @app.exception_handler(UserNotFound)
-    async def user_not_found(request: Request, exc: UserNotFound) -> JSONResponse:
-        log_exception("User not found", exc, request)
-        return JSONResponse(
-            status_code=404,
-            content={"detail": "An account with this email does not exist."},
         )
 
     @app.exception_handler(InvalidToken)

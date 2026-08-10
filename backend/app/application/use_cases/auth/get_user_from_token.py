@@ -2,7 +2,7 @@ from app.application.ports.services import TokenService
 from app.application.ports.unit_of_work import UnitOfWork
 from app.domain.user import User
 
-from .exceptions import InvalidToken, UserNotFound
+from .exceptions import InvalidToken
 
 
 class GetUserFromToken:
@@ -16,5 +16,5 @@ class GetUserFromToken:
             raise InvalidToken()
         user = await self.uow.users.get(user_id)
         if user is None:
-            raise UserNotFound()
+            raise InvalidToken()
         return user

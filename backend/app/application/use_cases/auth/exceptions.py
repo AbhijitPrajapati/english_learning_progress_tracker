@@ -5,10 +5,6 @@ class InvalidCredentials(ApplicationError):
     pass
 
 
-class UserNotFound(ApplicationError):
-    pass
-
-
 class EmailAlreadyRegistered(ApplicationError):
     pass
 
