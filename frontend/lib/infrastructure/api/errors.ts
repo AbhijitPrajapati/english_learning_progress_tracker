@@ -1,12 +1,15 @@
+type ErrorCode = "UNEXPECTED" | "INVALID_CREDENTIALS" | "INVALID_TOKEN" | "ALREADY_REGISTERED"
 export class ApiError extends Error {
   readonly status: number;
-  readonly body: unknown;
+  readonly detail: string;
+  readonly code: ErrorCode;
 
-  constructor(status: number, body?: unknown) {
-    super(`API request failed with status ${status}`);
+  constructor(status: number, detail: string, code: ErrorCode) {
+    super(`API request failed with status ${status}\nError Code: ${code}\nDetail: ${detail}`);
     this.name = "ApiError";
     this.status = status;
-    this.body = body;
+    this.detail = detail;
+    this.code = code;
 
     Object.setPrototypeOf(this, ApiError.prototype);
   }

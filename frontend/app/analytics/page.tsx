@@ -5,13 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/app/providers";
+import { useAuth, useDependencies } from "@/app/providers";
 import { AnalyticsFilters } from "@/components/analytics/AnalyticsFilters";
 import { DistributionPanel } from "@/components/analytics/DistributionPanel";
 import { TimeSeriesPanel } from "@/components/analytics/TimeSeriesPanel";
 import { MistakeCategory } from "@/lib/domain/analysis";
 import { AnalyticsDistribution, AnalyticsTimeSeries, Timeframe } from "@/lib/application/models";
-import { getDistribution, getTimeSeries } from "@/lib/services";
 
 const TIMEFRAMES = [
   { value: "all_time", label: "All Time" },
@@ -43,22 +42,23 @@ function getTimeframe(selected: TimeframeSelection): Timeframe {
 
 export default function AnalyticsPage() {
   const router = useRouter();
-  const { isAuthenticated, logout } = useAuth();
+  const { session, logout } = useAuth();
   const [timeframe, setTimeframe] = useState<TimeframeSelection>("monthly");
   const [mistakeCategory, setMistakeCategory] = useState<MistakeCategory>("test_abc_error");
   const [distribution, setDistribution] = useState<AnalyticsDistribution | null>(null);
   const [timeSeries, setTimeSeries] = useState<AnalyticsTimeSeries | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { getDistribution, getTimeSeries } = useDependencies();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!session) {
       router.replace("/auth");
     }
-  }, [router, isAuthenticated]);
+  }, [router, session]);
   
   useEffect(() => {
-    if (!isAuthenticated) return
+    if (!session) return
 
     const loadTimeSeries = async () => {
       setIsLoading(true);
@@ -80,7 +80,7 @@ export default function AnalyticsPage() {
   )
 
   useEffect(() => {
-    if (!isAuthenticated) return
+    if (!session) return
 
     const loadDistribution = async () => {
       setIsLoading(true);
@@ -102,7 +102,7 @@ export default function AnalyticsPage() {
 
   const selectedTimeframeLabel = useMemo(() => TIMEFRAMES.find((option) => option.value === timeframe)?.label ?? "All time", [timeframe]);
 
-  if (!isAuthenticated) {
+  if (!session) {
     return null;
   }
 

@@ -15,7 +15,7 @@ export interface CategoryFrequency extends Frequency {
 }
 
 export interface DetectedMistake {
-  category: string;
+  category: MistakeCategory;
   originalText: string;
   correction: string;
   explanation: string;

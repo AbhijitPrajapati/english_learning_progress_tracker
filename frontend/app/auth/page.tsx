@@ -5,10 +5,9 @@ import type { FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/app/providers";
+import { useAuth, useDependencies } from "@/app/providers";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { AuthCredentials } from "@/lib/application/models";
-import { register } from "@/lib/services";
 import { ApplicationError } from "@/lib/application/errors";
 
 export default function AuthPage() {
@@ -19,6 +18,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { register } = useDependencies();
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -31,7 +31,7 @@ export default function AuthPage() {
       if (mode === "register") {
         await register(credentials);
       }
-      login(credentials);
+      await login(credentials);
       router.push("/");
     } catch (err) {
       if (err instanceof ApplicationError) {

@@ -6,25 +6,25 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/app/providers";
+import { useAuth, useDependencies } from "@/app/providers";
 import { SpeechUploadSection } from "@/components/speech/SpeechUploadSection";
 import { SpeechResultCard } from "@/components/speech/SpeechResultCard";
 import type { Speech } from "@/lib/domain/speech";
-import { uploadSpeech } from "@/lib/services";
 
 export default function HomePage() {
   const router = useRouter();
-  const { isAuthenticated, logout } = useAuth();
+  const { session, logout } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [result, setResult] = useState<Speech | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { uploadSpeech } = useDependencies();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!session) {
       router.replace("/auth");
     }
-  }, [router, isAuthenticated]);
+  }, [router, session]);
 
   const fileName = useMemo(() => file?.name ?? "No file selected", [file]);
 
@@ -48,7 +48,7 @@ export default function HomePage() {
     }
   }
 
-  if (!isAuthenticated) {
+  if (!session) {
     return null;
   }
 

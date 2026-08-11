@@ -1,7 +1,7 @@
-import type { SpeechPort } from "@/lib/application/ports";
+import type { SpeechGateway } from "@/lib/application/ports";
 import { MistakeCategory } from "@/lib/domain/analysis";
 import { Speech } from "@/lib/domain/speech";
-import { ApiClient } from "@/lib/infrastructure/api/client";
+import { AuthenticatedApiClient } from "@/lib/infrastructure/api/authenticated-client";
 
 
 export interface CategoryFrequencyResponse {
@@ -11,7 +11,7 @@ export interface CategoryFrequencyResponse {
 }
 
 export interface DetectedMistakeResponse {
-  category: string;
+  category: MistakeCategory;
   original_text: string;
   correction: string;
   explanation: string;
@@ -30,7 +30,7 @@ interface SpeechResponse {
   analysis: SpeechAnalysisResponse;
 }
 
-export const createSpeechService = (client: ApiClient): SpeechPort => ({
+export const createSpeechGateway = (client: AuthenticatedApiClient): SpeechGateway => ({
   upload: async (file: File): Promise<Speech> => {
     const formData = new FormData();
     formData.append("file", file);

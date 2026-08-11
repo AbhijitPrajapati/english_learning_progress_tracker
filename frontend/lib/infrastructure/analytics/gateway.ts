@@ -1,7 +1,7 @@
-import type { AnalyticsPort } from "@/lib/application/ports";
+import type { AnalyticsGateway } from "@/lib/application/ports";
 import type { AnalyticsDistribution, Timeframe, AnalyticsTimeSeries } from "@/lib/application/models";
 import type { MistakeCategory } from "@/lib/domain/analysis";
-import type { ApiClient } from "@/lib/infrastructure/api/client";
+import type { AuthenticatedApiClient } from "@/lib/infrastructure/api/authenticated-client";
 
 interface MistakeFrequencyResponse {
   occurances: number;
@@ -24,11 +24,14 @@ interface TimeSeriesResponse {
   points: TimeSeriesPointResponse[]
 }
 
-export const createAnalyticsService = (client: ApiClient): AnalyticsPort => ({
+export const createAnalyticsGateway = (client: AuthenticatedApiClient): AnalyticsGateway => ({
   getDistribution: async (timeframe: Timeframe): Promise<AnalyticsDistribution> => {
     const payload = await client.request<DistributionResponse>("/analytics/distribution", {
       method: "POST",
       body: JSON.stringify({ timeframe }),
+      headers: {
+            "Content-Type": "application/json",
+      }
     });
     return {
       totalSamples: payload.total_samples,
@@ -44,6 +47,9 @@ export const createAnalyticsService = (client: ApiClient): AnalyticsPort => ({
     const payload = await client.request<TimeSeriesResponse>("/analytics/time-series", {
         method: "POST",
         body: JSON.stringify({ timeframe, mistake_category: mistakeCategory }),
+        headers: {
+            "Content-Type": "application/json",
+        }
       });
     return {
       points: payload.points.map((freq: TimeSeriesPointResponse) => ({

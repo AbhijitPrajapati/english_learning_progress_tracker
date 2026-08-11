@@ -19,13 +19,6 @@ export class InvalidCredentials extends ApplicationError {
   }
 }
 
-export class UserNotFound extends ApplicationError {
-  constructor() {
-    super("User not found")
-    this.name = "UserNotFound"
-  }
-}
-
 export class InvalidToken extends ApplicationError {
   constructor() {
     super("Invalid token")

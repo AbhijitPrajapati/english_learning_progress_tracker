@@ -1,13 +1,36 @@
 import { ApiClient } from "@/lib/infrastructure/api/client";
-import { createAuthService } from "@/lib/infrastructure/api/auth";
-import { createSpeechService } from "@/lib/infrastructure/api/speech";
-import { createAnalyticsService } from "@/lib/infrastructure/api/analytics";
-import { createSessionStore } from "./session_store";
+import { createAuthGateway } from "@/lib/infrastructure/auth/gateway";
+import { createSpeechGateway } from "@/lib/infrastructure/speech/gateway";
+import { createAnalyticsGateway } from "@/lib/infrastructure/analytics/gateway";
+import { createSessionStore } from "./auth/session-store";
+import { createGetDistribution, createGetTimeSeries, createLogin, createLogout, createRegister, createRestoreSession, createUploadSpeech, GetDistribution, GetTimeSeries, Login, Logout, Register, RestoreSession, UploadSpeech } from "@/lib/application/use-cases";
+import { AuthenticatedApiClient } from "./api/authenticated-client";
 
 
-export const sessionStore = createSessionStore()
-const apiClient = new ApiClient((): string | null => sessionStore.getSession()?.accessToken ?? null);
+const sessionStore = createSessionStore()
+const apiClient = new ApiClient();
+const authenticatedApiClient = new AuthenticatedApiClient(apiClient, (): string | null => sessionStore.getSession()?.accessToken ?? null);
 
-export const authService = createAuthService(apiClient);
-export const speechService = createSpeechService(apiClient);
-export const analyticsService = createAnalyticsService(apiClient);
+const authGateway = createAuthGateway(apiClient);
+const speechGateway = createSpeechGateway(authenticatedApiClient);
+const analyticsGateway = createAnalyticsGateway(authenticatedApiClient);
+
+export interface ApplicationDependencies {
+    getDistribution: GetDistribution,
+    getTimeSeries: GetTimeSeries,
+    login: Login,
+    register: Register,
+    logout: Logout,
+    restoreSession: RestoreSession,
+    uploadSpeech: UploadSpeech
+}
+
+export const createDependencies = (): ApplicationDependencies => ({
+    getDistribution: createGetDistribution(analyticsGateway),
+    getTimeSeries: createGetTimeSeries(analyticsGateway),
+    login: createLogin(authGateway, sessionStore),
+    register: createRegister(authGateway),
+    logout: createLogout(sessionStore),
+    restoreSession: createRestoreSession(sessionStore),
+    uploadSpeech: createUploadSpeech(speechGateway)
+});

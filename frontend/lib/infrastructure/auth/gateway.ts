@@ -1,9 +1,9 @@
 import { AuthCredentials, AuthSession } from "@/lib/application/models";
-import type { AuthPort } from "@/lib/application/ports";
+import type { AuthGateway } from "@/lib/application/ports";
 
 import { User } from "@/lib/domain/user";
 import { ApiClient } from "@/lib/infrastructure/api/client";
-import { ApiError } from "./errors";
+import { ApiError } from "../api/errors";
 import { EmailAlreadyRegistered, InvalidCredentials } from "@/lib/application/errors";
 
 interface LoginResponse {
@@ -18,12 +18,15 @@ interface RegisterResponse {
   created_at: string;
 }
 
-export const createAuthService = (client: ApiClient): AuthPort => ({
+export const createAuthGateway = (client: ApiClient): AuthGateway => ({
   login: async (credentials: AuthCredentials): Promise<AuthSession> => {
     try {
       const payload = await client.request<LoginResponse>("/auth/login", {
           method: "POST",
           body: JSON.stringify(credentials),
+          headers: {
+            "Content-Type": "application/json",
+          }
         });
       return {
         accessToken: payload.access_token,
@@ -42,6 +45,9 @@ export const createAuthService = (client: ApiClient): AuthPort => ({
       const payload = await client.request<RegisterResponse>("/auth/register", {
           method: "POST",
           body: JSON.stringify(credentials),
+          headers: {
+            "Content-Type": "application/json",
+          }
         });
       return {
         id: payload.id,
