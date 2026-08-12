@@ -19,7 +19,6 @@ export interface AnalyticsGateway {
 export interface AuthGateway {
   login(credentials: AuthCredentials): Promise<AuthSession>;
   register(credentials: AuthCredentials): Promise<User>;
-  // logout(): Promise<void>;
 }
 
 export interface SpeechGateway {

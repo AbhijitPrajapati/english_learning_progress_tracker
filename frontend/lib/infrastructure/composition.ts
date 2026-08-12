@@ -42,12 +42,14 @@ export interface ApplicationDependencies {
   uploadSpeech: UploadSpeech;
 }
 
-export const createDependencies = (): ApplicationDependencies => ({
-  getDistribution: createGetDistribution(analyticsGateway),
-  getTimeSeries: createGetTimeSeries(analyticsGateway),
-  login: createLogin(authGateway, sessionStore),
-  register: createRegister(authGateway),
-  logout: createLogout(sessionStore),
-  restoreSession: createRestoreSession(sessionStore),
-  uploadSpeech: createUploadSpeech(speechGateway),
-});
+export function createDependencies(): ApplicationDependencies {
+  return {
+    getDistribution: createGetDistribution(analyticsGateway),
+    getTimeSeries: createGetTimeSeries(analyticsGateway),
+    login: createLogin(authGateway, sessionStore),
+    register: createRegister(authGateway),
+    logout: createLogout(sessionStore),
+    restoreSession: createRestoreSession(sessionStore),
+    uploadSpeech: createUploadSpeech(speechGateway),
+  };
+}

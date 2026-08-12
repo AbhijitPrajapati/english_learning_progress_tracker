@@ -29,40 +29,42 @@ interface SpeechResponse {
   analysis: SpeechAnalysisResponse;
 }
 
-export const createSpeechGateway = (
+export function createSpeechGateway(
   client: AuthenticatedApiClient,
-): SpeechGateway => ({
-  upload: async (file: File): Promise<Speech> => {
-    const formData = new FormData();
-    formData.append("file", file);
+): SpeechGateway {
+  return {
+    upload: async (file: File): Promise<Speech> => {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    const payload = await client.request<SpeechResponse>("/speeches/", {
-      method: "POST",
-      body: formData,
-    });
+      const payload = await client.request<SpeechResponse>("/speeches/", {
+        method: "POST",
+        body: formData,
+      });
 
-    return {
-      id: payload.id,
-      createdAt: payload.created_at,
-      transcript: payload.transcript,
-      analysis: {
-        feedback: payload.analysis.feedback,
-        frequencies: payload.analysis.frequencies.map(
-          (freq: CategoryFrequencyResponse) => ({
-            category: freq.category,
-            occurances: freq.occurances,
-            opportunities: freq.opportunities,
-          }),
-        ),
-        mistakes: payload.analysis.mistakes.map(
-          (mistake: DetectedMistakeResponse) => ({
-            category: mistake.category,
-            originalText: mistake.original_text,
-            correction: mistake.correction,
-            explanation: mistake.explanation,
-          }),
-        ),
-      },
-    };
-  },
-});
+      return {
+        id: payload.id,
+        createdAt: payload.created_at,
+        transcript: payload.transcript,
+        analysis: {
+          feedback: payload.analysis.feedback,
+          frequencies: payload.analysis.frequencies.map(
+            (freq: CategoryFrequencyResponse) => ({
+              category: freq.category,
+              occurances: freq.occurances,
+              opportunities: freq.opportunities,
+            }),
+          ),
+          mistakes: payload.analysis.mistakes.map(
+            (mistake: DetectedMistakeResponse) => ({
+              category: mistake.category,
+              originalText: mistake.original_text,
+              correction: mistake.correction,
+              explanation: mistake.explanation,
+            }),
+          ),
+        },
+      };
+    },
+  };
+}

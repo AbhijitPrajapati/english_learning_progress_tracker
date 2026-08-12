@@ -1,4 +1,4 @@
-import type { FormEvent } from "react";
+import type { SubmitEventHandler } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,7 +12,7 @@ type AuthFormProps = {
   onEmailChange: (email: string) => void;
   onPasswordChange: (password: string) => void;
   onToggleMode: () => void;
-  onSubmit: (event: FormEvent) => void;
+  onSubmit: SubmitEventHandler;
 };
 
 export function AuthForm({

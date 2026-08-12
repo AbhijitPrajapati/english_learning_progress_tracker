@@ -74,7 +74,7 @@ export default function AnalyticsPage() {
   useEffect(() => {
     if (!session) return;
 
-    const loadTimeSeries = async () => {
+    async function loadTimeSeries(): Promise<void> {
       setIsLoading(true);
       setError(null);
 
@@ -87,7 +87,7 @@ export default function AnalyticsPage() {
       } finally {
         setIsLoading(false);
       }
-    };
+    }
 
     loadTimeSeries();
   });
@@ -95,7 +95,7 @@ export default function AnalyticsPage() {
   useEffect(() => {
     if (!session) return;
 
-    const loadDistribution = async () => {
+    async function loadDistribution(): Promise<void> {
       setIsLoading(true);
       setError(null);
 
@@ -108,7 +108,7 @@ export default function AnalyticsPage() {
       } finally {
         setIsLoading(false);
       }
-    };
+    }
 
     loadDistribution();
   });

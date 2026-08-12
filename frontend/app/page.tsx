@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { FormEvent } from "react";
+import type { SubmitEventHandler } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,7 @@ export default function HomePage() {
 
   const fileName = useMemo(() => file?.name ?? "No file selected", [file]);
 
-  async function handleUpload(event: FormEvent) {
+  const handleUpload: SubmitEventHandler = async (event) => {
     event.preventDefault();
     if (!file) {
       setError("Please select an audio file first.");
@@ -52,7 +52,7 @@ export default function HomePage() {
     } finally {
       setIsUploading(false);
     }
-  }
+  };
 
   if (!session) {
     return null;

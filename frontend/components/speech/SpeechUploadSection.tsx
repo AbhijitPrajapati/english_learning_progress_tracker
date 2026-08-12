@@ -1,4 +1,4 @@
-import type { FormEvent } from "react";
+import type { SubmitEventHandler } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +9,7 @@ type SpeechUploadSectionProps = {
   isUploading: boolean;
   error: string | null;
   onFileChange: (file: File | null) => void;
-  onSubmit: (event: FormEvent) => void;
+  onSubmit: SubmitEventHandler;
 };
 
 export function SpeechUploadSection({

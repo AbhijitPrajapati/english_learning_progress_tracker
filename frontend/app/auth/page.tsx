@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { SubmitEventHandler } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -26,7 +26,7 @@ export default function AuthPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { register } = useDependencies();
 
-  async function handleSubmit(event: FormEvent) {
+  const handleSubmit: SubmitEventHandler = async (event) => {
     event.preventDefault();
     setError(null);
     setIsSubmitting(true);
@@ -46,7 +46,7 @@ export default function AuthPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">

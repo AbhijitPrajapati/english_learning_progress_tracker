@@ -22,13 +22,13 @@ export function DependencyProvider({
   );
 }
 
-export const useDependencies = (): ApplicationDependencies => {
+export function useDependencies(): ApplicationDependencies {
   const dependencies = useContext(DependencyContext);
   if (!dependencies) {
     throw new Error("useDependencies must be used within a DependencyProvider");
   }
   return dependencies;
-};
+}
 
 interface AuthContextValue {
   session: AuthSession | null;

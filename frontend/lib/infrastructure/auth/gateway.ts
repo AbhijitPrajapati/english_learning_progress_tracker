@@ -21,47 +21,52 @@ interface RegisterResponse {
   created_at: string;
 }
 
-export const createAuthGateway = (client: ApiClient): AuthGateway => ({
-  login: async (credentials: AuthCredentials): Promise<AuthSession> => {
-    try {
-      const payload = await client.request<LoginResponse>("/auth/login", {
-        method: "POST",
-        body: JSON.stringify(credentials),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      return {
-        accessToken: payload.access_token,
-        tokenType: payload.token_type,
-        userId: payload.user_id,
-      };
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 401) {
-        throw new InvalidCredentials();
+export function createAuthGateway(client: ApiClient): AuthGateway {
+  return {
+    login: async (credentials: AuthCredentials): Promise<AuthSession> => {
+      try {
+        const payload = await client.request<LoginResponse>("/auth/login", {
+          method: "POST",
+          body: JSON.stringify(credentials),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        return {
+          accessToken: payload.access_token,
+          tokenType: payload.token_type,
+          userId: payload.user_id,
+        };
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 401) {
+          throw new InvalidCredentials();
+        }
+        throw error;
       }
-      throw error;
-    }
-  },
-  register: async (credentials: AuthCredentials): Promise<User> => {
-    try {
-      const payload = await client.request<RegisterResponse>("/auth/register", {
-        method: "POST",
-        body: JSON.stringify(credentials),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      return {
-        id: payload.id,
-        email: payload.email,
-        createdAt: new Date(payload.created_at),
-      };
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 409) {
-        throw new EmailAlreadyRegistered();
+    },
+    register: async (credentials: AuthCredentials): Promise<User> => {
+      try {
+        const payload = await client.request<RegisterResponse>(
+          "/auth/register",
+          {
+            method: "POST",
+            body: JSON.stringify(credentials),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          },
+        );
+        return {
+          id: payload.id,
+          email: payload.email,
+          createdAt: new Date(payload.created_at),
+        };
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 409) {
+          throw new EmailAlreadyRegistered();
+        }
+        throw error;
       }
-      throw error;
-    }
-  },
-});
+    },
+  };
+}
