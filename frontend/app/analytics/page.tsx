@@ -4,21 +4,31 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useAuth, useDependencies } from "@/app/providers";
 import { AnalyticsFilters } from "@/components/analytics/AnalyticsFilters";
 import { DistributionPanel } from "@/components/analytics/DistributionPanel";
 import { TimeSeriesPanel } from "@/components/analytics/TimeSeriesPanel";
 import { MistakeCategory } from "@/lib/domain/analysis";
-import { AnalyticsDistribution, AnalyticsTimeSeries, Timeframe } from "@/lib/application/models";
+import {
+  AnalyticsDistribution,
+  AnalyticsTimeSeries,
+  Timeframe,
+} from "@/lib/application/models";
 
 const TIMEFRAMES = [
   { value: "all_time", label: "All Time" },
   { value: "yearly", label: "Yearly" },
   { value: "monthly", label: "Monthly" },
   { value: "weekly", label: "Weekly" },
-]
-type TimeframeSelection = (typeof TIMEFRAMES)[number]["value"]
+];
+type TimeframeSelection = (typeof TIMEFRAMES)[number]["value"];
 
 function getTimeframe(selected: TimeframeSelection): Timeframe {
   const end = new Date();
@@ -44,9 +54,13 @@ export default function AnalyticsPage() {
   const router = useRouter();
   const { session, logout } = useAuth();
   const [timeframe, setTimeframe] = useState<TimeframeSelection>("monthly");
-  const [mistakeCategory, setMistakeCategory] = useState<MistakeCategory>("test_abc_error");
-  const [distribution, setDistribution] = useState<AnalyticsDistribution | null>(null);
-  const [timeSeries, setTimeSeries] = useState<AnalyticsTimeSeries | null>(null);
+  const [mistakeCategory, setMistakeCategory] =
+    useState<MistakeCategory>("test_abc_error");
+  const [distribution, setDistribution] =
+    useState<AnalyticsDistribution | null>(null);
+  const [timeSeries, setTimeSeries] = useState<AnalyticsTimeSeries | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { getDistribution, getTimeSeries } = useDependencies();
@@ -56,9 +70,9 @@ export default function AnalyticsPage() {
       router.replace("/auth");
     }
   }, [router, session]);
-  
+
   useEffect(() => {
-    if (!session) return
+    if (!session) return;
 
     const loadTimeSeries = async () => {
       setIsLoading(true);
@@ -69,18 +83,17 @@ export default function AnalyticsPage() {
         const timeseries = await getTimeSeries(timerange, mistakeCategory);
         setTimeSeries(timeseries);
       } catch {
-        setError("Unable to load time series.")
+        setError("Unable to load time series.");
       } finally {
         setIsLoading(false);
       }
-    }
+    };
 
     loadTimeSeries();
-  }
-  )
+  });
 
   useEffect(() => {
-    if (!session) return
+    if (!session) return;
 
     const loadDistribution = async () => {
       setIsLoading(true);
@@ -91,16 +104,21 @@ export default function AnalyticsPage() {
         const distribution = await getDistribution(timerange);
         setDistribution(distribution);
       } catch {
-        setError("Unable to load distribution.")
+        setError("Unable to load distribution.");
       } finally {
         setIsLoading(false);
       }
-    }
+    };
 
     loadDistribution();
-  })
+  });
 
-  const selectedTimeframeLabel = useMemo(() => TIMEFRAMES.find((option) => option.value === timeframe)?.label ?? "All time", [timeframe]);
+  const selectedTimeframeLabel = useMemo(
+    () =>
+      TIMEFRAMES.find((option) => option.value === timeframe)?.label ??
+      "All time",
+    [timeframe],
+  );
 
   if (!session) {
     return null;
@@ -112,27 +130,37 @@ export default function AnalyticsPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm font-medium text-primary">Analytics</p>
-            <h1 className="text-3xl font-semibold tracking-tight">Track recurring mistakes over time</h1>
+            <h1 className="text-3xl font-semibold tracking-tight">
+              Track recurring mistakes over time
+            </h1>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/">
               <Button variant="outline">Home</Button>
             </Link>
-            <Button variant="secondary" onClick={logout}>Logout</Button>
+            <Button variant="secondary" onClick={logout}>
+              Logout
+            </Button>
           </div>
         </div>
 
         <Card>
           <CardHeader>
             <CardTitle>Filters</CardTitle>
-            <CardDescription>Choose a timeframe and a mistake category to inspect analytics.</CardDescription>
+            <CardDescription>
+              Choose a timeframe and a mistake category to inspect analytics.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <AnalyticsFilters
               timeframe={timeframe}
               mistakeCategory={mistakeCategory}
-              onTimeframeChange={(value) => setTimeframe(value as TimeframeSelection)}
-              onMistakeCategoryChange={(value) => setMistakeCategory(value as MistakeCategory)}
+              onTimeframeChange={(value) =>
+                setTimeframe(value as TimeframeSelection)
+              }
+              onMistakeCategoryChange={(value) =>
+                setMistakeCategory(value as MistakeCategory)
+              }
               timeframes={TIMEFRAMES}
             />
           </CardContent>
@@ -144,11 +172,15 @@ export default function AnalyticsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Distribution</CardTitle>
-              <CardDescription>Overview for {selectedTimeframeLabel}</CardDescription>
+              <CardDescription>
+                Overview for {selectedTimeframeLabel}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {isLoading && !distribution ? (
-                <p className="text-sm text-muted-foreground">Loading distribution…</p>
+                <p className="text-sm text-muted-foreground">
+                  Loading distribution…
+                </p>
               ) : (
                 <DistributionPanel distribution={distribution} />
               )}
@@ -162,7 +194,9 @@ export default function AnalyticsPage() {
             </CardHeader>
             <CardContent>
               {isLoading && !timeSeries ? (
-                <p className="text-sm text-muted-foreground">Loading time series…</p>
+                <p className="text-sm text-muted-foreground">
+                  Loading time series…
+                </p>
               ) : (
                 <TimeSeriesPanel timeSeries={timeSeries} />
               )}

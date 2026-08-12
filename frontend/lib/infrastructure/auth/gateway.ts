@@ -4,7 +4,10 @@ import type { AuthGateway } from "@/lib/application/ports";
 import { User } from "@/lib/domain/user";
 import { ApiClient } from "@/lib/infrastructure/api/client";
 import { ApiError } from "../api/errors";
-import { EmailAlreadyRegistered, InvalidCredentials } from "@/lib/application/errors";
+import {
+  EmailAlreadyRegistered,
+  InvalidCredentials,
+} from "@/lib/application/errors";
 
 interface LoginResponse {
   access_token: string;
@@ -22,17 +25,17 @@ export const createAuthGateway = (client: ApiClient): AuthGateway => ({
   login: async (credentials: AuthCredentials): Promise<AuthSession> => {
     try {
       const payload = await client.request<LoginResponse>("/auth/login", {
-          method: "POST",
-          body: JSON.stringify(credentials),
-          headers: {
-            "Content-Type": "application/json",
-          }
-        });
+        method: "POST",
+        body: JSON.stringify(credentials),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       return {
         accessToken: payload.access_token,
         tokenType: payload.token_type,
-        userId: payload.user_id
-      }
+        userId: payload.user_id,
+      };
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {
         throw new InvalidCredentials();
@@ -43,22 +46,22 @@ export const createAuthGateway = (client: ApiClient): AuthGateway => ({
   register: async (credentials: AuthCredentials): Promise<User> => {
     try {
       const payload = await client.request<RegisterResponse>("/auth/register", {
-          method: "POST",
-          body: JSON.stringify(credentials),
-          headers: {
-            "Content-Type": "application/json",
-          }
-        });
+        method: "POST",
+        body: JSON.stringify(credentials),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       return {
         id: payload.id,
         email: payload.email,
-        createdAt: new Date(payload.created_at)
-      }
+        createdAt: new Date(payload.created_at),
+      };
     } catch (error) {
       if (error instanceof ApiError && error.status === 409) {
         throw new EmailAlreadyRegistered();
       }
       throw error;
     }
-  }
-})
+  },
+});

@@ -1,9 +1,7 @@
 import { ApiError, NetworkError } from "@/lib/infrastructure/api/errors";
 
 export class ApiClient {
-
-  constructor(private readonly baseUrl = "/api") {
-  }
+  constructor(private readonly baseUrl = "/api") {}
 
   async request<T>(path: string, init?: RequestInit): Promise<T> {
     const url = `${this.baseUrl}${path}`;

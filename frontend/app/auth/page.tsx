@@ -4,7 +4,13 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useAuth, useDependencies } from "@/app/providers";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { AuthCredentials } from "@/lib/application/models";
@@ -47,7 +53,9 @@ export default function AuthPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Welcome back</CardTitle>
-          <CardDescription>Use your email and password to sign in or create an account.</CardDescription>
+          <CardDescription>
+            Use your email and password to sign in or create an account.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <AuthForm
@@ -58,7 +66,9 @@ export default function AuthPage() {
             isSubmitting={isSubmitting}
             onEmailChange={setEmail}
             onPasswordChange={setPassword}
-            onToggleMode={() => setMode(mode === "login" ? "register" : "login")}
+            onToggleMode={() =>
+              setMode(mode === "login" ? "register" : "login")
+            }
             onSubmit={handleSubmit}
           />
           <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">

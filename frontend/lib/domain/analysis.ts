@@ -1,17 +1,17 @@
 export const MISTAKE_CATEGORIES = [
   { value: "test_abc_error", label: "test abc error" },
   { value: "test_def_error", label: "test def error" },
-] as const
+] as const;
 
-export type MistakeCategory = (typeof MISTAKE_CATEGORIES)[number]["value"]
+export type MistakeCategory = (typeof MISTAKE_CATEGORIES)[number]["value"];
 
 export interface Frequency {
-    occurances: number;
-    opportunities: number;
+  occurances: number;
+  opportunities: number;
 }
 
 export interface CategoryFrequency extends Frequency {
-    category: MistakeCategory;
+  category: MistakeCategory;
 }
 
 export interface DetectedMistake {

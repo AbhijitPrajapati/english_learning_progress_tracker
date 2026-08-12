@@ -7,15 +7,25 @@ type AnalyticsFiltersProps = {
   mistakeCategory: string;
   onTimeframeChange: (value: string) => void;
   onMistakeCategoryChange: (value: string) => void;
-  timeframes: Array<{label: string, value: string}>
+  timeframes: Array<{ label: string; value: string }>;
 };
 
-export function AnalyticsFilters({ timeframe, mistakeCategory, onTimeframeChange, onMistakeCategoryChange, timeframes }: AnalyticsFiltersProps) {
+export function AnalyticsFilters({
+  timeframe,
+  mistakeCategory,
+  onTimeframeChange,
+  onMistakeCategoryChange,
+  timeframes,
+}: AnalyticsFiltersProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <div className="space-y-2">
         <Label htmlFor="timeframe">Timeframe</Label>
-        <Select id="timeframe" value={timeframe} onChange={(event) => onTimeframeChange(event.target.value)}>
+        <Select
+          id="timeframe"
+          value={timeframe}
+          onChange={(event) => onTimeframeChange(event.target.value)}
+        >
           {timeframes.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -25,7 +35,11 @@ export function AnalyticsFilters({ timeframe, mistakeCategory, onTimeframeChange
       </div>
       <div className="space-y-2">
         <Label htmlFor="mistake-category">Mistake category</Label>
-        <Select id="mistake-category" value={mistakeCategory} onChange={(event) => onMistakeCategoryChange(event.target.value)}>
+        <Select
+          id="mistake-category"
+          value={mistakeCategory}
+          onChange={(event) => onMistakeCategoryChange(event.target.value)}
+        >
           {MISTAKE_CATEGORIES.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}

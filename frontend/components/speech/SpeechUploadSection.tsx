@@ -24,8 +24,15 @@ export function SpeechUploadSection({
     <form className="space-y-4" onSubmit={onSubmit}>
       <div className="space-y-2">
         <Label htmlFor="audio-file">Audio clip</Label>
-        <Input id="audio-file" type="file" accept="audio/*" onChange={(event) => onFileChange(event.target.files?.[0] ?? null)} />
-        <p className="text-sm text-muted-foreground">Selected file: {fileName}</p>
+        <Input
+          id="audio-file"
+          type="file"
+          accept="audio/*"
+          onChange={(event) => onFileChange(event.target.files?.[0] ?? null)}
+        />
+        <p className="text-sm text-muted-foreground">
+          Selected file: {fileName}
+        </p>
       </div>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       <Button type="submit" disabled={isUploading || !file}>

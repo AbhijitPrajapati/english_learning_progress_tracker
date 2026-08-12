@@ -1,8 +1,8 @@
 import { CategoryFrequency, Frequency } from "@/lib/domain/analysis";
 
 export interface AuthCredentials {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
 export interface AnalyticsDistribution {
@@ -14,7 +14,6 @@ export interface Timeframe {
   start: string;
   end: string;
 }
-
 
 export interface TimeSeriesPoint extends Frequency {
   time: string;

@@ -5,7 +5,13 @@ import type { FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useAuth, useDependencies } from "@/app/providers";
 import { SpeechUploadSection } from "@/components/speech/SpeechUploadSection";
 import { SpeechResultCard } from "@/components/speech/SpeechResultCard";
@@ -57,14 +63,20 @@ export default function HomePage() {
       <div className="mx-auto flex max-w-6xl flex-col gap-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-medium text-primary">English learning tracker</p>
-            <h1 className="text-3xl font-semibold tracking-tight">Upload a speech sample</h1>
+            <p className="text-sm font-medium text-primary">
+              English learning tracker
+            </p>
+            <h1 className="text-3xl font-semibold tracking-tight">
+              Upload a speech sample
+            </h1>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/analytics">
               <Button variant="outline">Analytics</Button>
             </Link>
-            <Button variant="secondary" onClick={logout}>Logout</Button>
+            <Button variant="secondary" onClick={logout}>
+              Logout
+            </Button>
           </div>
         </div>
 
@@ -72,7 +84,10 @@ export default function HomePage() {
           <Card>
             <CardHeader>
               <CardTitle>Upload audio</CardTitle>
-              <CardDescription>Send a short audio clip to the backend for transcription and grammar analysis.</CardDescription>
+              <CardDescription>
+                Send a short audio clip to the backend for transcription and
+                grammar analysis.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <SpeechUploadSection
@@ -89,7 +104,9 @@ export default function HomePage() {
           <Card>
             <CardHeader>
               <CardTitle>Latest result</CardTitle>
-              <CardDescription>Feedback and detected mistakes returned by the speech endpoint.</CardDescription>
+              <CardDescription>
+                Feedback and detected mistakes returned by the speech endpoint.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <SpeechResultCard speech={result} />
