@@ -12,25 +12,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAuth, useDependencies } from "@/app/providers";
+import { useAuth, useUseCases } from "@/app/providers";
 import { SpeechUploadSection } from "@/components/speech/SpeechUploadSection";
 import { SpeechResultCard } from "@/components/speech/SpeechResultCard";
 import type { Speech } from "@/lib/domain/speech";
 
 export default function HomePage() {
   const router = useRouter();
-  const { session, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [result, setResult] = useState<Speech | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { uploadSpeech } = useDependencies();
+  const { uploadSpeech, logout } = useUseCases();
 
   useEffect(() => {
-    if (!session) {
+    if (!isAuthenticated) {
       router.replace("/auth");
     }
-  }, [router, session]);
+  }, [router, isAuthenticated]);
 
   const fileName = useMemo(() => file?.name ?? "No file selected", [file]);
 
@@ -54,7 +54,7 @@ export default function HomePage() {
     }
   };
 
-  if (!session) {
+  if (!isAuthenticated) {
     return null;
   }
 

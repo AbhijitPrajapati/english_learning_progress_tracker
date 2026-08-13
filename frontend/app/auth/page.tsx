@@ -11,20 +11,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAuth, useDependencies } from "@/app/providers";
+import { useUseCases } from "@/app/providers";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { AuthCredentials } from "@/lib/application/models";
 import { ApplicationError } from "@/lib/application/errors";
 
 export default function AuthPage() {
   const router = useRouter();
-  const { login } = useAuth();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { register } = useDependencies();
+  const { register, login } = useUseCases();
 
   const handleSubmit: SubmitEventHandler = async (event) => {
     event.preventDefault();

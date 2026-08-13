@@ -5,7 +5,9 @@ import type {
   AnalyticsTimeSeries,
 } from "@/lib/application/models";
 import type { MistakeCategory } from "@/lib/domain/analysis";
-import type { AuthenticatedApiClient } from "@/lib/infrastructure/api/authenticated-client";
+import { ApiClient } from "../api/client";
+import { ApiError } from "../api/errors";
+import { InvalidToken } from "@/lib/application/errors";
 
 interface MistakeFrequencyResponse {
   occurances: number;
@@ -28,59 +30,75 @@ interface TimeSeriesResponse {
   points: TimeSeriesPointResponse[];
 }
 
-export function createAnalyticsGateway(
-  client: AuthenticatedApiClient,
-): AnalyticsGateway {
+export function createAnalyticsGateway(client: ApiClient): AnalyticsGateway {
   return {
     getDistribution: async (
       timeframe: Timeframe,
+      accessToken: string | null,
     ): Promise<AnalyticsDistribution> => {
-      const payload = await client.request<DistributionResponse>(
-        "/analytics/distribution",
-        {
-          method: "POST",
-          body: JSON.stringify({ timeframe }),
-          headers: {
-            "Content-Type": "application/json",
+      try {
+        const payload = await client.request<DistributionResponse>(
+          "/analytics/distribution",
+          {
+            method: "POST",
+            body: JSON.stringify({ timeframe }),
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
           },
-        },
-      );
-      return {
-        totalSamples: payload.total_samples,
-        mistakeFrequencies: payload.mistake_frequencies.map(
-          (freq: MistakeFrequencyResponse) => ({
-            category: freq.category,
-            opportunities: freq.opportunities,
-            occurances: freq.occurances,
-          }),
-        ),
-      };
+        );
+        return {
+          totalSamples: payload.total_samples,
+          mistakeFrequencies: payload.mistake_frequencies.map(
+            (freq: MistakeFrequencyResponse) => ({
+              category: freq.category,
+              opportunities: freq.opportunities,
+              occurances: freq.occurances,
+            }),
+          ),
+        };
+      } catch (error) {
+        if (error instanceof ApiError && error.code == "INVALID_TOKEN") {
+          throw new InvalidToken();
+        }
+        throw error;
+      }
     },
 
     getTimeSeries: async (
       timeframe: Timeframe,
       mistakeCategory: MistakeCategory,
+      accessToken: string | null,
     ): Promise<AnalyticsTimeSeries> => {
-      const payload = await client.request<TimeSeriesResponse>(
-        "/analytics/time-series",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            timeframe,
-            mistake_category: mistakeCategory,
-          }),
-          headers: {
-            "Content-Type": "application/json",
+      try {
+        const payload = await client.request<TimeSeriesResponse>(
+          "/analytics/time-series",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              timeframe,
+              mistake_category: mistakeCategory,
+            }),
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
           },
-        },
-      );
-      return {
-        points: payload.points.map((freq: TimeSeriesPointResponse) => ({
-          time: freq.time,
-          opportunities: freq.opportunities,
-          occurances: freq.occurances,
-        })),
-      };
+        );
+        return {
+          points: payload.points.map((freq: TimeSeriesPointResponse) => ({
+            time: freq.time,
+            opportunities: freq.opportunities,
+            occurances: freq.occurances,
+          })),
+        };
+      } catch (error) {
+        if (error instanceof ApiError && error.code == "INVALID_TOKEN") {
+          throw new InvalidToken();
+        }
+        throw error;
+      }
     },
   };
 }

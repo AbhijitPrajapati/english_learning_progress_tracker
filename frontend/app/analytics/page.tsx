@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAuth, useDependencies } from "@/app/providers";
+import { useAuth, useUseCases } from "@/app/providers";
 import { AnalyticsFilters } from "@/components/analytics/AnalyticsFilters";
 import { DistributionPanel } from "@/components/analytics/DistributionPanel";
 import { TimeSeriesPanel } from "@/components/analytics/TimeSeriesPanel";
@@ -52,7 +52,7 @@ function getTimeframe(selected: TimeframeSelection): Timeframe {
 
 export default function AnalyticsPage() {
   const router = useRouter();
-  const { session, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [timeframe, setTimeframe] = useState<TimeframeSelection>("monthly");
   const [mistakeCategory, setMistakeCategory] =
     useState<MistakeCategory>("test_abc_error");
@@ -63,16 +63,16 @@ export default function AnalyticsPage() {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { getDistribution, getTimeSeries } = useDependencies();
+  const { getDistribution, getTimeSeries, logout } = useUseCases();
 
   useEffect(() => {
-    if (!session) {
+    if (!isAuthenticated) {
       router.replace("/auth");
     }
-  }, [router, session]);
+  }, [router, isAuthenticated]);
 
   useEffect(() => {
-    if (!session) return;
+    if (!isAuthenticated) return;
 
     async function loadTimeSeries(): Promise<void> {
       setIsLoading(true);
@@ -93,7 +93,7 @@ export default function AnalyticsPage() {
   });
 
   useEffect(() => {
-    if (!session) return;
+    if (!isAuthenticated) return;
 
     async function loadDistribution(): Promise<void> {
       setIsLoading(true);
@@ -120,7 +120,7 @@ export default function AnalyticsPage() {
     [timeframe],
   );
 
-  if (!session) {
+  if (!isAuthenticated) {
     return null;
   }
 

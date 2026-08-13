@@ -3,8 +3,17 @@ import type { AuthSession } from "@/lib/application/models";
 
 const STORAGE_KEY = "authSession";
 
-const parseOrNull = (raw: string | null): AuthSession | null =>
-  raw ? JSON.parse(raw) : null;
+function parseOrNull(raw: string | null): AuthSession | null {
+  if (!raw) {
+    return null;
+  }
+  try {
+    return JSON.parse(raw);
+  } catch {
+    window.localStorage.removeItem(STORAGE_KEY);
+    return null;
+  }
+}
 
 export function createSessionStore(): SessionStore {
   return {

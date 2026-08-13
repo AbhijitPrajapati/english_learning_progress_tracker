@@ -9,10 +9,14 @@ import type {
 } from "./models";
 
 export interface AnalyticsGateway {
-  getDistribution(timeframe: Timeframe): Promise<AnalyticsDistribution>;
+  getDistribution(
+    timeframe: Timeframe,
+    accessToken: string | null,
+  ): Promise<AnalyticsDistribution>;
   getTimeSeries(
     timeframe: Timeframe,
     mistakeCategory: string,
+    accessToken: string | null,
   ): Promise<AnalyticsTimeSeries>;
 }
 
@@ -22,7 +26,7 @@ export interface AuthGateway {
 }
 
 export interface SpeechGateway {
-  upload(file: File): Promise<Speech>;
+  upload(file: File, accessToken: string | null): Promise<Speech>;
 }
 
 export interface SessionStore {

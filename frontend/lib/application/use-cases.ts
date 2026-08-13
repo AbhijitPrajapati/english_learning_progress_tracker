@@ -15,59 +15,53 @@ import { MistakeCategory } from "@/lib/domain/analysis";
 import { Speech } from "@/lib/domain/speech";
 import { User } from "@/lib/domain/user";
 
-export type GetDistribution = (
-  timeframe: Timeframe,
-) => Promise<AnalyticsDistribution>;
-export function createGetDistribution(
-  analyticsGateway: AnalyticsGateway,
-): GetDistribution {
-  return async (timeframe: Timeframe) =>
-    analyticsGateway.getDistribution(timeframe);
-}
+export default class ApplicationUseCases {
+  constructor(
+    private readonly sessionStore: SessionStore,
+    private readonly authGateway: AuthGateway,
+    private readonly analyticsGateway: AnalyticsGateway,
+    private readonly speechGateway: SpeechGateway,
+  ) {}
 
-export type GetTimeSeries = (
-  timeframe: Timeframe,
-  mistakeCategory: MistakeCategory,
-) => Promise<AnalyticsTimeSeries>;
+  async getDistribution(timeframe: Timeframe): Promise<AnalyticsDistribution> {
+    const session = this.sessionStore.getSession();
+    return this.analyticsGateway.getDistribution(
+      timeframe,
+      session?.accessToken ?? null,
+    );
+  }
 
-export function createGetTimeSeries(
-  analyticsGateway: AnalyticsGateway,
-): GetTimeSeries {
-  return async (timeframe: Timeframe, mistakeCategory: MistakeCategory) =>
-    analyticsGateway.getTimeSeries(timeframe, mistakeCategory);
-}
+  async getTimeSeries(
+    timeframe: Timeframe,
+    mistakeCategory: MistakeCategory,
+  ): Promise<AnalyticsTimeSeries> {
+    const session = this.sessionStore.getSession();
+    return this.analyticsGateway.getTimeSeries(
+      timeframe,
+      mistakeCategory,
+      session?.accessToken ?? null,
+    );
+  }
 
-export type Login = (credentials: AuthCredentials) => Promise<AuthSession>;
-export function createLogin(
-  authGateway: AuthGateway,
-  sessionStore: SessionStore,
-): Login {
-  return async (credentials: AuthCredentials) => {
-    const session = await authGateway.login(credentials);
-    sessionStore.setSession(session);
-    return session;
-  };
-}
+  async login(credentials: AuthCredentials): Promise<void> {
+    const session = await this.authGateway.login(credentials);
+    this.sessionStore.setSession(session);
+  }
 
-export type Register = (credentials: AuthCredentials) => Promise<User>;
-export function createRegister(authGateway: AuthGateway): Register {
-  return async (credentials: AuthCredentials) =>
-    authGateway.register(credentials);
-}
+  async register(credentials: AuthCredentials): Promise<User> {
+    return this.authGateway.register(credentials);
+  }
 
-export type Logout = () => void;
-export function createLogout(sessionStore: SessionStore): Logout {
-  return async () => sessionStore.clearSession();
-}
+  logout(): void {
+    this.sessionStore.clearSession();
+  }
 
-export type RestoreSession = () => AuthSession | null;
-export function createRestoreSession(
-  sessionStore: SessionStore,
-): RestoreSession {
-  return () => sessionStore.getSession();
-}
+  restoreSession(): AuthSession | null {
+    return this.sessionStore.getSession();
+  }
 
-export type UploadSpeech = (file: File) => Promise<Speech>;
-export function createUploadSpeech(speechGateway: SpeechGateway): UploadSpeech {
-  return async (file: File) => speechGateway.upload(file);
+  async uploadSpeech(file: File): Promise<Speech> {
+    const session = this.sessionStore.getSession();
+    return this.speechGateway.upload(file, session?.accessToken ?? null);
+  }
 }
