@@ -27,7 +27,7 @@ async def upload_speech(
     current_user: User = Depends(get_current_user),
 ) -> SpeechResponse:
     result = await process_speech.execute(current_user.id, file.file)
-    return SpeechResponse.from_domain(result)
+    return SpeechResponse.model_validate(result)
 
 @router.delete("/{speech_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_speech(speech_id: SpeechId, delete_speech: DeleteSpeech = Depends(get_delete_speech), current_user: User = Depends(get_current_user)):
@@ -36,4 +36,4 @@ async def delete_speech(speech_id: SpeechId, delete_speech: DeleteSpeech = Depen
 @router.get("/", response_model=SpeechListResponse)
 async def list_speeches(request: SpeechListRequest, list_speeches: ListSpeeches = Depends(get_list_speeches), current_user: User = Depends(get_current_user)):
     speeches = await list_speeches.execute(current_user.id, request.limit, request.offset)
-    return SpeechListResponse.from_domain(speeches)
+    return SpeechListResponse.model_validate(speeches)

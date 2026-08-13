@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 from app.domain.speech import Speech
 
@@ -14,7 +14,7 @@ class SpeechResponse(BaseModel):
     analysis: SpeechAnalysis
     created_at: datetime
 
-    @classmethod
+    @model_validator(mode="before")
     def from_domain(cls, speech: Speech) -> SpeechResponse:
         return SpeechResponse(
         id=speech.id.value,
@@ -30,6 +30,6 @@ class SpeechListRequest(BaseModel):
 class SpeechListResponse(BaseModel):
     speeches: list[SpeechResponse]
 
-    @classmethod
+    @model_validator(mode="before")
     def from_domain(cls, speeches: list[Speech]) -> SpeechListResponse:
-        return SpeechListResponse(speeches=[SpeechResponse.from_domain(s) for s in speeches])
+        return SpeechListResponse(speeches=[SpeechResponse.model_validate(s) for s in speeches])
