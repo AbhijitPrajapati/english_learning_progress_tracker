@@ -27,6 +27,12 @@ export interface AuthGateway {
 
 export interface SpeechGateway {
   upload(file: File, accessToken: string | null): Promise<Speech>;
+  delete(speech_id: string, accessToken: string | null): Promise<void>;
+  list(
+    accessToken: string | null,
+    limit: number,
+    offset: number,
+  ): Promise<Array<Speech>>;
 }
 
 export interface SessionStore {

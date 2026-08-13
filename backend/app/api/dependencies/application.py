@@ -7,15 +7,14 @@ from app.application.ports.services import (
     TranscriptionAdapter,
 )
 from app.application.ports.unit_of_work import UnitOfWork
-from app.application.use_cases.analytics.retrieve_distribution import (
-    RetrieveDistribution,
+from app.application.use_cases.analytics import RetrieveDistribution, RetrieveTimeSeries
+from app.application.use_cases.auth import (
+    AuthenticateUser,
+    GetUserFromToken,
+    IssueToken,
+    RegisterUser,
 )
-from app.application.use_cases.analytics.retrieve_time_series import RetrieveTimeSeries
-from app.application.use_cases.auth.authenticate_user import AuthenticateUser
-from app.application.use_cases.auth.get_user_from_token import GetUserFromToken
-from app.application.use_cases.auth.issue_token import IssueToken
-from app.application.use_cases.auth.register_user import RegisterUser
-from app.application.use_cases.speeches.process_speech import ProcessSpeech
+from app.application.use_cases.speeches import DeleteSpeech, ListSpeeches, ProcessSpeech
 
 from .database import get_uow
 from .infrastructure import (
@@ -39,6 +38,11 @@ async def get_process_speech(
         uow=uow, transcriber=transcriber, grammar_analyzer=grammar_analyzer
     )
 
+async def get_delete_speech(uow: UnitOfWork = Depends(get_uow)) -> DeleteSpeech:
+    return DeleteSpeech(uow)
+
+async def get_list_speeches(uow: UnitOfWork = Depends(get_uow)) -> ListSpeeches:
+    return ListSpeeches(uow)
 
 async def get_authenticate_user(
     uow: UnitOfWork = Depends(get_uow),

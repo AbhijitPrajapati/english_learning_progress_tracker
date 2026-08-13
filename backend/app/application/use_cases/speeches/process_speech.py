@@ -1,7 +1,4 @@
-from datetime import datetime
 from typing import BinaryIO
-
-from pydantic import BaseModel
 
 from app.application.ports.repositories import NewSpeech
 from app.application.ports.services import (
@@ -9,15 +6,8 @@ from app.application.ports.services import (
     TranscriptionAdapter,
 )
 from app.application.ports.unit_of_work import UnitOfWork
-from app.domain.speech import Analysis, Speech, SpeechId
+from app.domain.speech import Analysis, Speech
 from app.domain.user import UserId
-
-
-class ProcessSpeechResult(BaseModel):
-    speech_id: SpeechId
-    created_at: datetime
-    transcript: str
-    analysis: Analysis
 
 
 class ProcessSpeech:
@@ -33,7 +23,7 @@ class ProcessSpeech:
 
     async def execute(
         self, user_id: UserId, file_stream: BinaryIO
-    ) -> ProcessSpeechResult:
+    ) -> Speech:
         transcript: str = self.transcriber.transcribe(file_stream)
         analysis: Analysis = self.grammar_analyzer.analyze(transcript)
 
@@ -42,9 +32,4 @@ class ProcessSpeech:
         )
         await self.uow.analytics_projector.add_analysis(speech.id, analysis)
         await self.uow.commit()
-        return ProcessSpeechResult(
-            speech_id=speech.id,
-            created_at=speech.created_at,
-            transcript=transcript,
-            analysis=analysis,
-        )
+        return speech

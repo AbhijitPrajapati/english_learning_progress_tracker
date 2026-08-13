@@ -39,13 +39,10 @@ class SQLAlchemySpeechRepository(SpeechRepository):
             analysis=orm_speech.analysis,
         )
 
-    async def delete(self, speech_id: SpeechId) -> bool:
+    async def delete(self, speech_id: SpeechId) -> None:
         speech = await self.session.get(ORMSpeech, speech_id)
-        if speech is None:
-            return False
         await self.session.delete(speech)
         await self.session.flush()
-        return True
 
     async def list(self, user_id: UserId, limit: int, offset: int) -> list[Speech]:
         stmt = (

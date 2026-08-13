@@ -1,5 +1,9 @@
 type ErrorCode =
-  "UNEXPECTED" | "INVALID_CREDENTIALS" | "INVALID_TOKEN" | "ALREADY_REGISTERED";
+  | "UNEXPECTED"
+  | "INVALID_CREDENTIALS"
+  | "INVALID_TOKEN"
+  | "ALREADY_REGISTERED"
+  | "SPEECH_NOT_FOUND";
 export class ApiError extends Error {
   readonly status: number;
   readonly detail: string;

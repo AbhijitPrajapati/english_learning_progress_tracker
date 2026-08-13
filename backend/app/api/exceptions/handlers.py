@@ -6,6 +6,7 @@ from app.application.use_cases.auth.exceptions import (
     InvalidCredentials,
     InvalidToken,
 )
+from app.application.use_cases.speeches.exceptions import SpeechNotFound
 
 from .model import ErrorBody, ErrorCode
 from .util import log_exception
@@ -57,5 +58,16 @@ def register_exception_handlers(app: FastAPI) -> None:
             content=ErrorBody(
                 detail="Authentication token is invalid.",
                 code=ErrorCode.INVALID_TOKEN,
+            ).model_dump(),
+        )
+
+    @app.exception_handler(SpeechNotFound)
+    async def speech_not_found(request: Request, exc: SpeechNotFound) -> JSONResponse:
+        log_exception("Speech not found", exc, request)
+        return JSONResponse(
+            status_code=404,
+            content=ErrorBody(
+                detail="Speech not found.",
+                code=ErrorCode.SPEECH_NOT_FOUND,
             ).model_dump(),
         )

@@ -25,3 +25,10 @@ export class InvalidToken extends ApplicationError {
     this.name = "InvalidToken";
   }
 }
+
+export class SpeechNotFound extends ApplicationError {
+  constructor() {
+    super("Speech not found");
+    this.name = "SpeechNotFound";
+  }
+}

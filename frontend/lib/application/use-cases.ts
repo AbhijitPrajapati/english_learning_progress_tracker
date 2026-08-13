@@ -64,4 +64,14 @@ export default class ApplicationUseCases {
     const session = this.sessionStore.getSession();
     return this.speechGateway.upload(file, session?.accessToken ?? null);
   }
+
+  async deleteSpeech(speech_id: string): Promise<void> {
+    const session = this.sessionStore.getSession();
+    await this.speechGateway.delete(speech_id, session?.accessToken ?? null);
+  }
+
+  async listSpeeches(limit: number, offset: number): Promise<Array<Speech>> {
+    const session = this.sessionStore.getSession();
+    return this.speechGateway.list(session?.accessToken ?? null, limit, offset);
+  }
 }
