@@ -1,20 +1,23 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 
 from app.api.dependencies.application import (
     AuthenticateUser,
+    DeleteUser,
     IssueToken,
     RegisterUser,
     get_authenticate_user,
+    get_delete_user,
     get_issue_token,
     get_register_user,
 )
+from app.api.dependencies.current_user import get_current_user
 from app.api.schemas.auth import (
     LoginRequest,
     LoginResponse,
     RegisterRequest,
     RegisterResponse,
 )
-from app.domain.user import Email
+from app.domain.user import Email, User
 
 router = APIRouter(prefix="/auth")
 
@@ -40,3 +43,7 @@ async def register(
     return RegisterResponse(
         id=user.id.value, email=user.email.value, created_at=user.created_at
     )
+
+@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+async def delete(delete_user: DeleteUser = Depends(get_delete_user), current_user: User = Depends(get_current_user)) -> None:
+    await delete_user.execute(current_user.id)

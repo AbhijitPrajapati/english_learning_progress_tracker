@@ -23,6 +23,7 @@ export interface AnalyticsGateway {
 export interface AuthGateway {
   login(credentials: AuthCredentials): Promise<AuthSession>;
   register(credentials: AuthCredentials): Promise<User>;
+  delete(accessToken: string | null): Promise<void>;
 }
 
 export interface SpeechGateway {

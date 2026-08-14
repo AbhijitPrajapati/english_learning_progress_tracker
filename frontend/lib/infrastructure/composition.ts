@@ -1,17 +1,19 @@
-import { ApiClient } from "@/lib/infrastructure/api/client";
-import { createAuthGateway } from "@/lib/infrastructure/auth/gateway";
-import { createSpeechGateway } from "@/lib/infrastructure/speech/gateway";
-import { createAnalyticsGateway } from "@/lib/infrastructure/analytics/gateway";
-import { createSessionStore } from "./auth/session-store";
+import ApiClient from "@/lib/infrastructure/api/client";
+import HttpAuthGateway from "@/lib/infrastructure/auth/gateway";
+import HttpSpeechGateway from "@/lib/infrastructure/speech/gateway";
+import LocalSessionStore from "./auth/session-store";
 import ApplicationUseCases from "@/lib/application/use-cases";
+import HttpAnalyticsGateway from "./analytics/gateway";
+import AuthenticatedApiClient from "./api/authenticated-client";
 
 const apiClient = new ApiClient();
+const authenticatedApiClient = new AuthenticatedApiClient(apiClient);
 
-const authGateway = createAuthGateway(apiClient);
-const speechGateway = createSpeechGateway(apiClient);
-const analyticsGateway = createAnalyticsGateway(apiClient);
+const authGateway = new HttpAuthGateway(apiClient);
+const speechGateway = new HttpSpeechGateway(authenticatedApiClient);
+const analyticsGateway = new HttpAnalyticsGateway(authenticatedApiClient);
 
-const sessionStore = createSessionStore();
+const sessionStore = new LocalSessionStore();
 
 export default function createUseCases(): ApplicationUseCases {
   return new ApplicationUseCases(

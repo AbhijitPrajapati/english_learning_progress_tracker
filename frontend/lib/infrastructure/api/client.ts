@@ -1,6 +1,6 @@
 import { ApiError, NetworkError } from "@/lib/infrastructure/api/errors";
 
-export class ApiClient {
+export default class ApiClient {
   constructor(private readonly baseUrl = "/api") {}
 
   async request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -16,6 +16,6 @@ export class ApiClient {
     if (!response.ok) {
       throw new ApiError(response.status, json.detail, json.code);
     }
-    return json as Promise<T>;
+    return json;
   }
 }

@@ -14,3 +14,4 @@ class DeleteSpeech:
         if speech is None or speech.user_id != user_id:
             raise SpeechNotFound()
         await self.uow.speeches.delete(speech_id)
+        await self.uow.commit()

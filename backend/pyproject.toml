@@ -15,4 +15,4 @@ dependencies = [
 ]
 
 [tool.ruff.lint.flake8-bugbear]
-extend-immutable-calls = ["fastapi.Depends", "fastapi.File"]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.File", "fastapi.Path"]

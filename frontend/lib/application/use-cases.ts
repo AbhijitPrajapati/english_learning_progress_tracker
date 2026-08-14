@@ -23,23 +23,23 @@ export default class ApplicationUseCases {
     private readonly speechGateway: SpeechGateway,
   ) {}
 
-  async getDistribution(timeframe: Timeframe): Promise<AnalyticsDistribution> {
+  private getToken(): string | null {
     const session = this.sessionStore.getSession();
-    return this.analyticsGateway.getDistribution(
-      timeframe,
-      session?.accessToken ?? null,
-    );
+    return session?.accessToken ?? null;
+  }
+
+  async getDistribution(timeframe: Timeframe): Promise<AnalyticsDistribution> {
+    return this.analyticsGateway.getDistribution(timeframe, this.getToken());
   }
 
   async getTimeSeries(
     timeframe: Timeframe,
     mistakeCategory: MistakeCategory,
   ): Promise<AnalyticsTimeSeries> {
-    const session = this.sessionStore.getSession();
     return this.analyticsGateway.getTimeSeries(
       timeframe,
       mistakeCategory,
-      session?.accessToken ?? null,
+      this.getToken(),
     );
   }
 
@@ -52,6 +52,10 @@ export default class ApplicationUseCases {
     return this.authGateway.register(credentials);
   }
 
+  async delete_account(): Promise<void> {
+    return this.authGateway.delete(this.getToken());
+  }
+
   logout(): void {
     this.sessionStore.clearSession();
   }
@@ -61,17 +65,14 @@ export default class ApplicationUseCases {
   }
 
   async uploadSpeech(file: File): Promise<Speech> {
-    const session = this.sessionStore.getSession();
-    return this.speechGateway.upload(file, session?.accessToken ?? null);
+    return this.speechGateway.upload(file, this.getToken());
   }
 
   async deleteSpeech(speech_id: string): Promise<void> {
-    const session = this.sessionStore.getSession();
-    await this.speechGateway.delete(speech_id, session?.accessToken ?? null);
+    await this.speechGateway.delete(speech_id, this.getToken());
   }
 
   async listSpeeches(limit: number, offset: number): Promise<Array<Speech>> {
-    const session = this.sessionStore.getSession();
-    return this.speechGateway.list(session?.accessToken ?? null, limit, offset);
+    return this.speechGateway.list(this.getToken(), limit, offset);
   }
 }

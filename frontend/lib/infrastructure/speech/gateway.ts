@@ -1,164 +1,105 @@
 import type { SpeechGateway } from "@/lib/application/ports";
-import { MistakeCategory } from "@/lib/domain/analysis";
 import { Speech } from "@/lib/domain/speech";
-import { ApiClient } from "../api/client";
 import { ApiError } from "../api/errors";
 import { InvalidToken, SpeechNotFound } from "@/lib/application/errors";
+import { components } from "../openapi-schema";
+import AuthenticatedApiClient from "../api/authenticated-client";
 
-export interface CategoryFrequencyResponse {
-  category: MistakeCategory;
-  occurances: number;
-  opportunities: number;
-}
+type DetectedMistakeResponse = components["schemas"]["DetectedMistake"];
+type SpeechResponse = components["schemas"]["SpeechResponse"];
+type SpeechesResponse = components["schemas"]["SpeechListResponse"];
 
-export interface DetectedMistakeResponse {
-  category: MistakeCategory;
-  original_text: string;
-  correction: string;
-  explanation: string;
-}
+export default class HttpSpeechGateway implements SpeechGateway {
+  constructor(private readonly client: AuthenticatedApiClient) {}
 
-export interface SpeechAnalysisResponse {
-  frequencies: CategoryFrequencyResponse[];
-  mistakes: DetectedMistakeResponse[];
-  feedback: string;
-}
+  async upload(file: File, accessToken: string | null): Promise<Speech> {
+    if (!accessToken) {
+      throw new InvalidToken();
+    }
 
-interface SpeechResponse {
-  id: string;
-  created_at: string;
-  transcript: string;
-  analysis: SpeechAnalysisResponse;
-}
+    const formData = new FormData();
+    formData.append("file", file);
 
-interface SpeechesResponse {
-  speeches: Array<SpeechResponse>;
-}
-
-export function createSpeechGateway(client: ApiClient): SpeechGateway {
-  return {
-    upload: async (file: File, accessToken: string | null): Promise<Speech> => {
-      if (!accessToken) {
-        throw new InvalidToken();
-      }
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      try {
-        const payload = await client.request<SpeechResponse>("/speeches/", {
-          method: "POST",
-          body: formData,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        return {
-          id: payload.id,
-          createdAt: payload.created_at,
-          transcript: payload.transcript,
-          analysis: {
-            feedback: payload.analysis.feedback,
-            frequencies: payload.analysis.frequencies.map(
-              (freq: CategoryFrequencyResponse) => ({
-                category: freq.category,
-                occurances: freq.occurances,
-                opportunities: freq.opportunities,
-              }),
-            ),
-            mistakes: payload.analysis.mistakes.map(
-              (mistake: DetectedMistakeResponse) => ({
-                category: mistake.category,
-                originalText: mistake.original_text,
-                correction: mistake.correction,
-                explanation: mistake.explanation,
-              }),
-            ),
-          },
-        };
-      } catch (error) {
-        if (error instanceof ApiError && error.code == "INVALID_TOKEN") {
-          throw new InvalidToken();
-        }
-        throw error;
-      }
-    },
-
-    delete: async (
-      speech_id: string,
-      accessToken: string | null,
-    ): Promise<void> => {
-      if (!accessToken) {
-        throw new InvalidToken();
-      }
-      const url = `/speeches/${speech_id}/`;
-      try {
-        await client.request(url, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-      } catch (error) {
-        if (error instanceof ApiError) {
-          if (error.code == "INVALID_TOKEN") {
-            throw new InvalidToken();
-          }
-          if (error.code == "SPEECH_NOT_FOUND") {
-            throw new SpeechNotFound();
-          }
-        }
-        throw error;
-      }
-    },
-    list: async (
-      accessToken: string | null,
-      limit: number,
-      offset: number,
-    ): Promise<Array<Speech>> => {
-      if (!accessToken) {
-        throw new InvalidToken();
-      }
-      try {
-        const payload = await client.request<SpeechesResponse>("/speeches/", {
-          method: "GET",
-          body: JSON.stringify({
-            limit,
-            offset,
+    const payload = await this.client.request<SpeechResponse>("/speeches/", {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return {
+      id: payload.speech_id,
+      createdAt: payload.created_at,
+      transcript: payload.transcript,
+      analysis: {
+        feedback: payload.analysis.feedback,
+        frequencies: payload.analysis.frequencies,
+        mistakes: payload.analysis.mistakes.map(
+          (mistake: DetectedMistakeResponse) => ({
+            category: mistake.category,
+            originalText: mistake.original_text,
+            correction: mistake.correction,
+            explanation: mistake.explanation,
           }),
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        return payload.speeches.map((speech: SpeechResponse) => ({
-          id: speech.id,
-          createdAt: speech.created_at,
-          transcript: speech.transcript,
-          analysis: {
-            feedback: speech.analysis.feedback,
-            frequencies: speech.analysis.frequencies.map(
-              (freq: CategoryFrequencyResponse) => ({
-                category: freq.category,
-                occurances: freq.occurances,
-                opportunities: freq.opportunities,
-              }),
-            ),
-            mistakes: speech.analysis.mistakes.map(
-              (mistake: DetectedMistakeResponse) => ({
-                category: mistake.category,
-                originalText: mistake.original_text,
-                correction: mistake.correction,
-                explanation: mistake.explanation,
-              }),
-            ),
-          },
-        }));
-      } catch (error) {
-        if (error instanceof ApiError && error.code == "INVALID_TOKEN") {
-          throw new InvalidToken();
-        }
-        throw error;
+        ),
+      },
+    };
+  }
+
+  async delete(speech_id: string, accessToken: string | null): Promise<void> {
+    if (!accessToken) {
+      throw new InvalidToken();
+    }
+    const url = `/speeches/${speech_id}/`;
+    try {
+      await this.client.request(url, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.code == "SPEECH_NOT_FOUND") {
+        throw new SpeechNotFound();
       }
-    },
-  };
+      throw error;
+    }
+  }
+
+  async list(
+    accessToken: string | null,
+    limit: number,
+    offset: number,
+  ): Promise<Array<Speech>> {
+    if (!accessToken) {
+      throw new InvalidToken();
+    }
+    const payload = await this.client.request<SpeechesResponse>("/speeches/", {
+      method: "GET",
+      body: JSON.stringify({
+        limit,
+        offset,
+      }),
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return payload.speeches.map((speech: SpeechResponse) => ({
+      id: speech.speech_id,
+      createdAt: speech.created_at,
+      transcript: speech.transcript,
+      analysis: {
+        feedback: speech.analysis.feedback,
+        frequencies: speech.analysis.frequencies,
+        mistakes: speech.analysis.mistakes.map(
+          (mistake: DetectedMistakeResponse) => ({
+            category: mistake.category,
+            originalText: mistake.original_text,
+            correction: mistake.correction,
+            explanation: mistake.explanation,
+          }),
+        ),
+      },
+    }));
+  }
 }

@@ -45,13 +45,10 @@ class SQLAlchemyUserRepository(UserRepository):
             created_at=orm_user.created_at,
         )
 
-    async def delete(self, user_id: UserId) -> bool:
+    async def delete(self, user_id: UserId) -> None:
         orm_user = await self.session.get(ORMUser, user_id)
-        if orm_user is None:
-            return False
         await self.session.delete(orm_user)
         await self.session.flush()
-        return True
 
     async def update(self, user_id: UserId, update_user: UpdateUser) -> User | None:
         orm_user = await self.session.get(ORMUser, user_id)

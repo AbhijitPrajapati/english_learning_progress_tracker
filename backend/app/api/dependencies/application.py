@@ -7,14 +7,18 @@ from app.application.ports.services import (
     TranscriptionAdapter,
 )
 from app.application.ports.unit_of_work import UnitOfWork
-from app.application.use_cases.analytics import RetrieveDistribution, RetrieveTimeSeries
-from app.application.use_cases.auth import (
-    AuthenticateUser,
-    GetUserFromToken,
-    IssueToken,
-    RegisterUser,
+from app.application.use_cases.analytics.retrieve_distribution import (
+    RetrieveDistribution,
 )
-from app.application.use_cases.speeches import DeleteSpeech, ListSpeeches, ProcessSpeech
+from app.application.use_cases.analytics.retrieve_time_series import RetrieveTimeSeries
+from app.application.use_cases.auth.authenticate_user import AuthenticateUser
+from app.application.use_cases.auth.delete_user import DeleteUser
+from app.application.use_cases.auth.get_user_from_token import GetUserFromToken
+from app.application.use_cases.auth.issue_token import IssueToken
+from app.application.use_cases.auth.register_user import RegisterUser
+from app.application.use_cases.speeches.delete_speech import DeleteSpeech
+from app.application.use_cases.speeches.list_speeches import ListSpeeches
+from app.application.use_cases.speeches.process_speech import ProcessSpeech
 
 from .database import get_uow
 from .infrastructure import (
@@ -63,6 +67,9 @@ async def get_register_user(
 ) -> RegisterUser:
     return RegisterUser(uow, password_hasher)
 
+    
+async def get_delete_user(uow: UnitOfWork = Depends(get_uow)) -> DeleteUser:
+    return DeleteUser(uow)
 
 async def get_user_from_token(
     uow: UnitOfWork = Depends(get_uow),

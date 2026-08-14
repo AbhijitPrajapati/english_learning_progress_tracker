@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, File, UploadFile, status
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, File, Path, UploadFile, status
 
 from app.api.dependencies.application import (
     DeleteSpeech,
@@ -27,13 +29,13 @@ async def upload_speech(
     current_user: User = Depends(get_current_user),
 ) -> SpeechResponse:
     result = await process_speech.execute(current_user.id, file.file)
-    return SpeechResponse.model_validate(result)
+    return SpeechResponse.from_domain(result)
 
 @router.delete("/{speech_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_speech(speech_id: SpeechId, delete_speech: DeleteSpeech = Depends(get_delete_speech), current_user: User = Depends(get_current_user)):
-    await delete_speech.execute(speech_id, current_user.id)
+async def delete_speech(speech_id: UUID = Path(...), delete_speech: DeleteSpeech = Depends(get_delete_speech), current_user: User = Depends(get_current_user)) -> None:
+    await delete_speech.execute(SpeechId(value=speech_id), current_user.id)
 
 @router.get("/", response_model=SpeechListResponse)
-async def list_speeches(request: SpeechListRequest, list_speeches: ListSpeeches = Depends(get_list_speeches), current_user: User = Depends(get_current_user)):
+async def list_speeches(request: SpeechListRequest, list_speeches: ListSpeeches = Depends(get_list_speeches), current_user: User = Depends(get_current_user)) -> SpeechListResponse:
     speeches = await list_speeches.execute(current_user.id, request.limit, request.offset)
-    return SpeechListResponse.model_validate(speeches)
+    return SpeechListResponse.from_domain(speeches)
