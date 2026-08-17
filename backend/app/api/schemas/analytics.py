@@ -1,29 +1,38 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import AwareDatetime, BaseModel, model_validator
 
-from .analysis import CategoryFrequency, MistakeCategory, MistakeFrequency
+from .analysis import CategoryFrequency, MistakeCategory
 
 
-class Timeframe(BaseModel):
-    start: datetime
-    end: datetime
+class DateRange(BaseModel):
+    start: AwareDatetime | None = None
+    end: AwareDatetime | None = None
+
+    @model_validator(mode="after")
+    def validate_order(self) -> DateRange:
+        if self.start is not None and self.end is not None and self.start > self.end:
+            raise ValueError("Date range start must not be after its end")
+        return self
+
 
 class DistributionRequest(BaseModel):
-    timeframe: Timeframe
+    date_range: DateRange
 
 
 class DistributionResponse(BaseModel):
-    total_samples: int
+    total_speeches: int
     mistake_frequencies: list[CategoryFrequency]
 
 
 class TimeSeriesRequest(BaseModel):
-    timeframe: Timeframe
+    date_range: DateRange
     mistake_category: MistakeCategory
 
 
-class TimeSeriesPoint(MistakeFrequency):
+class TimeSeriesPoint(BaseModel):
+    occurrences: int
+    opportunities: int
     time: datetime
 
 

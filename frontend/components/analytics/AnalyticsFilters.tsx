@@ -1,32 +1,34 @@
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { MISTAKE_CATEGORIES } from "@/lib/domain/analysis";
+import type { MistakeCategoryOption } from "@/lib/presentation/mistake-categories";
 
 type AnalyticsFiltersProps = {
-  timeframe: string;
+  dateRange: string;
   mistakeCategory: string;
-  onTimeframeChange: (value: string) => void;
+  onDateRangeChange: (value: string) => void;
   onMistakeCategoryChange: (value: string) => void;
-  timeframes: Array<{ label: string; value: string }>;
+  dateRanges: Array<{ label: string; value: string }>;
+  mistakeCategories: readonly MistakeCategoryOption[];
 };
 
 export function AnalyticsFilters({
-  timeframe,
+  dateRange,
   mistakeCategory,
-  onTimeframeChange,
+  onDateRangeChange,
   onMistakeCategoryChange,
-  timeframes,
+  dateRanges,
+  mistakeCategories,
 }: AnalyticsFiltersProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <div className="space-y-2">
-        <Label htmlFor="timeframe">Timeframe</Label>
+        <Label htmlFor="date-range">Date range</Label>
         <Select
-          id="timeframe"
-          value={timeframe}
-          onChange={(event) => onTimeframeChange(event.target.value)}
+          id="date-range"
+          value={dateRange}
+          onChange={(event) => onDateRangeChange(event.target.value)}
         >
-          {timeframes.map((option) => (
+          {dateRanges.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
@@ -40,8 +42,8 @@ export function AnalyticsFilters({
           value={mistakeCategory}
           onChange={(event) => onMistakeCategoryChange(event.target.value)}
         >
-          {MISTAKE_CATEGORIES.map((option) => (
-            <option key={option.value} value={option.value}>
+          {mistakeCategories.map((option) => (
+            <option key={option.id} value={option.id}>
               {option.label}
             </option>
           ))}

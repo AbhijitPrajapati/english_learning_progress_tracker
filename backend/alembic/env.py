@@ -6,9 +6,8 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-from app.infrastructure.composition import DatabaseSettings
+from app.settings import DatabaseSettings
 from app.infrastructure.database.models.base import Base
-from app.infrastructure.database.types import ValueObjectAnalysisType
 
 settings = DatabaseSettings()  # type: ignore
 
@@ -33,15 +32,6 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-
-
-def render_item(type_, obj, autogen_context):
-    if type_ != "type":
-        return False
-    if isinstance(obj, ValueObjectAnalysisType):
-        autogen_context.imports.add("from sqlalchemy.dialects import postgresql")
-        return "postgresql.JSONB()"
-    return False
 
 
 def run_migrations_offline() -> None:
@@ -72,7 +62,6 @@ def run_migrations_offline() -> None:
 def do_run_migrations(connection: Connection) -> None:
     context.configure(
         connection=connection,
-        render_item=render_item,
         target_metadata=target_metadata,
         compare_server_default=True,
     )

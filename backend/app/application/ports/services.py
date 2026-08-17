@@ -1,6 +1,7 @@
-from typing import BinaryIO, Protocol
+from typing import Protocol
 from uuid import UUID
 
+from app.application.contracts.audio import AudioSample
 from app.domain.analysis import Analysis
 
 
@@ -14,9 +15,9 @@ class TokenService(Protocol):
     def verify(self, token: str) -> UUID | None: ...
 
 
-class GrammarAnalysisAdapter(Protocol):
-    def analyze(self, text: str) -> Analysis: ...
+class GrammarAnalyzer(Protocol):
+    async def analyze(self, text: str) -> Analysis: ...
 
 
-class TranscriptionAdapter(Protocol):
-    def transcribe(self, file_stream: BinaryIO) -> str: ...
+class Transcriber(Protocol):
+    async def transcribe(self, audio: AudioSample) -> str: ...

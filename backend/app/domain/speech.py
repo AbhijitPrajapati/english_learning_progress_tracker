@@ -1,12 +1,12 @@
+from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
-
-from app.domain.base import DomainObject
 
 from .analysis import Analysis
 
 
-class Speech(DomainObject):
+@dataclass(frozen=True, slots=True)
+class Speech:
     id: UUID
     user_id: UUID
     transcript: str

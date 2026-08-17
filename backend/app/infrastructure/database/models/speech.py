@@ -1,13 +1,11 @@
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from sqlalchemy import DateTime, ForeignKey, Text, func, text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from app.domain.speech import Analysis
-from app.infrastructure.database.types import ValueObjectAnalysisType
 
 from .base import Base
 
@@ -26,7 +24,10 @@ class Speech(Base):
     )
 
     user_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
 
     created_at: Mapped[datetime] = mapped_column(
@@ -35,10 +36,10 @@ class Speech(Base):
 
     transcript: Mapped[str] = mapped_column(Text, nullable=False)
 
-    analysis: Mapped[Analysis] = mapped_column(ValueObjectAnalysisType)
+    analysis: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
 
     user: Mapped[User] = relationship(back_populates="speeches")
 
     mistake_frequencies: Mapped[list[MistakeFrequency]] = relationship(
-        back_populates="speech", cascade="all, delete-orphan"
+        back_populates="speech", cascade="all, delete-orphan", passive_deletes=True
     )

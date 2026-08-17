@@ -1,4 +1,5 @@
 import type { AnalyticsDistribution } from "@/lib/application/models";
+import { mistakeCategoryLabel } from "@/lib/presentation/mistake-categories";
 
 type DistributionPanelProps = {
   distribution: AnalyticsDistribution | null;
@@ -16,7 +17,7 @@ export function DistributionPanel({ distribution }: DistributionPanelProps) {
   return (
     <div className="space-y-3">
       <div className="text-sm text-muted-foreground">
-        Total samples: {distribution.totalSamples}
+        Total speeches: {distribution.totalSpeeches}
       </div>
       <ul className="space-y-2">
         {distribution.mistakeFrequencies.map((item) => (
@@ -24,9 +25,9 @@ export function DistributionPanel({ distribution }: DistributionPanelProps) {
             key={item.category}
             className="flex items-center justify-between rounded-md border p-3 text-sm"
           >
-            <span>{item.category}</span>
+            <span>{mistakeCategoryLabel(item.category)}</span>
             <span className="font-medium">
-              {item.occurances}/{item.opportunities}
+              {item.occurrences}/{item.opportunities}
             </span>
           </li>
         ))}

@@ -19,6 +19,13 @@ export class InvalidCredentials extends ApplicationError {
   }
 }
 
+export class InvalidCurrentPassword extends ApplicationError {
+  constructor() {
+    super("Current password is incorrect");
+    this.name = "InvalidCurrentPassword";
+  }
+}
+
 export class InvalidToken extends ApplicationError {
   constructor() {
     super("Invalid token");
@@ -30,5 +37,19 @@ export class SpeechNotFound extends ApplicationError {
   constructor() {
     super("Speech not found");
     this.name = "SpeechNotFound";
+  }
+}
+
+export class InvalidAudio extends ApplicationError {
+  constructor(message = "Invalid audio upload") {
+    super(message);
+    this.name = "InvalidAudio";
+  }
+}
+
+export class RequestRejected extends ApplicationError {
+  constructor(message: string, options?: ErrorOptions) {
+    super(message, options);
+    this.name = "RequestRejected";
   }
 }

@@ -1,4 +1,5 @@
-import { Speech } from "@/lib/domain/speech";
+import type { Speech } from "@/lib/domain/speech";
+import { mistakeCategoryLabel } from "@/lib/presentation/mistake-categories";
 
 type SpeechResultCardProps = {
   speech: Speech | null;
@@ -33,7 +34,9 @@ export function SpeechResultCard({ speech }: SpeechResultCardProps) {
               key={`${mistake.category}-${index}`}
               className="rounded-md border p-3"
             >
-              <p className="font-medium text-foreground">{mistake.category}</p>
+              <p className="font-medium text-foreground">
+                {mistakeCategoryLabel(mistake.category)}
+              </p>
               <p>Original: {mistake.originalText}</p>
               <p>Correction: {mistake.correction}</p>
               <p>Explanation: {mistake.explanation}</p>

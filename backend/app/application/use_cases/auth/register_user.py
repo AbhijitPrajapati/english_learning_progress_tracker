@@ -1,25 +1,32 @@
-
-
-from pydantic import EmailStr
-
+from app.application.contracts.auth import RegisteredUser
+from app.application.ports.repositories import EmailConflictError
 from app.application.ports.services import PasswordHasher
-from app.application.ports.unit_of_work import UnitOfWork
+from app.application.ports.unit_of_work import UnitOfWorkFactory
+from app.domain.user import EmailAddress, NewPassword
 
 from .exceptions import EmailAlreadyRegistered
-from .models import RegisteredUser
 
 
 class RegisterUser:
-    def __init__(self, uow: UnitOfWork, password_hasher: PasswordHasher) -> None:
-        self.uow = uow
+    def __init__(
+        self, uow_factory: UnitOfWorkFactory, password_hasher: PasswordHasher
+    ) -> None:
+        self.uow_factory = uow_factory
         self.password_hasher = password_hasher
 
-    async def execute(self, email: EmailStr, password: str) -> RegisteredUser:
-        existing = await self.uow.users.get_by_email(email)
-        if existing is not None:
-            raise EmailAlreadyRegistered()
+    async def execute(
+        self, email: EmailAddress, password: NewPassword
+    ) -> RegisteredUser:
+        async with self.uow_factory() as uow:
+            if await uow.users.get_by_email(email) is not None:
+                raise EmailAlreadyRegistered()
 
-        hashed_password = self.password_hasher.hash(password)
-        user = await self.uow.users.create(email, hashed_password)
-        await self.uow.commit()
+            try:
+                user = await uow.users.create(
+                    email, self.password_hasher.hash(password.value)
+                )
+                await uow.commit()
+            except EmailConflictError as error:
+                raise EmailAlreadyRegistered() from error
+
         return RegisteredUser(id=user.id, email=user.email, created_at=user.created_at)

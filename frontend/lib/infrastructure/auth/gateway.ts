@@ -1,64 +1,37 @@
-import { AuthCredentials, AuthSession } from "@/lib/application/models";
+import type { AuthCredentials, AuthSession } from "@/lib/application/models";
 import type { AuthGateway } from "@/lib/application/ports";
-
-import { User } from "@/lib/domain/user";
-import ApiClient from "@/lib/infrastructure/api/client";
-import { ApiError } from "../api/errors";
-import {
-  EmailAlreadyRegistered,
-  InvalidCredentials,
-} from "@/lib/application/errors";
-import { components } from "../openapi-schema";
-
-type LoginResponse = components["schemas"]["LoginResponse"];
-type RegisterResponse = components["schemas"]["RegisterResponse"];
+import type { User } from "@/lib/domain/user";
+import type { ApiWireClient } from "../api/wire-client";
+import { requireData, requireNoContent } from "../api/response";
+import { toDate } from "../api/scalars";
 
 export default class HttpAuthGateway implements AuthGateway {
-  constructor(private readonly client: ApiClient) {}
+  constructor(private readonly client: ApiWireClient) {}
 
   async login(credentials: AuthCredentials): Promise<AuthSession> {
-    try {
-      const payload = await this.client.request<LoginResponse>("/auth/login", {
-        method: "POST",
-        body: JSON.stringify(credentials),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      return {
-        accessToken: payload.access_token,
-        tokenType: payload.token_type,
-        userId: payload.user_id,
-      };
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 401) {
-        throw new InvalidCredentials();
-      }
-      throw error;
-    }
+    const payload = await requireData(
+      this.client.POST("/api/v1/auth/login", { body: credentials }),
+    );
+    return { userId: payload.user_id };
   }
+
   async register(credentials: AuthCredentials): Promise<User> {
-    try {
-      const payload = await this.client.request<RegisterResponse>(
-        "/auth/register",
-        {
-          method: "POST",
-          body: JSON.stringify(credentials),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-      return {
-        id: payload.id,
-        email: payload.email,
-        createdAt: new Date(payload.created_at),
-      };
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 409) {
-        throw new EmailAlreadyRegistered();
-      }
-      throw error;
-    }
+    const payload = await requireData(
+      this.client.POST("/api/v1/auth/register", { body: credentials }),
+    );
+    return {
+      id: payload.id,
+      email: payload.email,
+      createdAt: toDate(payload.created_at),
+    };
+  }
+
+  async getSession(): Promise<AuthSession> {
+    const payload = await requireData(this.client.GET("/api/v1/auth/session"));
+    return { userId: payload.user_id };
+  }
+
+  async logout(): Promise<void> {
+    await requireNoContent(this.client.POST("/api/v1/auth/logout"));
   }
 }

@@ -1,14 +1,17 @@
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel
 
 
-class ErrorCode(Enum):
+class ErrorCode(StrEnum):
     UNEXPECTED = "UNEXPECTED"
     INVALID_CREDENTIALS = "INVALID_CREDENTIALS"
+    INVALID_CURRENT_PASSWORD = "INVALID_CURRENT_PASSWORD"
     INVALID_TOKEN = "INVALID_TOKEN"
     ALREADY_REGISTERED = "ALREADY_REGISTERED"
     SPEECH_NOT_FOUND = "SPEECH_NOT_FOUND"
+    INVALID_AUDIO = "INVALID_AUDIO"
+    VALIDATION_ERROR = "VALIDATION_ERROR"
 
 
 class ErrorBody(BaseModel):

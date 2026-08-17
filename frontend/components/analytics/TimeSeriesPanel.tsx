@@ -16,13 +16,14 @@ export function TimeSeriesPanel({ timeSeries }: TimeSeriesPanelProps) {
   return (
     <ul className="space-y-2">
       {timeSeries.points.map((point) => (
-        <li key={point.time} className="rounded-md border p-3 text-sm">
-          <div className="font-medium">
-            {new Date(point.time).toLocaleDateString()}
-          </div>
+        <li
+          key={point.time.toISOString()}
+          className="rounded-md border p-3 text-sm"
+        >
+          <div className="font-medium">{point.time.toLocaleDateString()}</div>
           <div className="text-muted-foreground">
             Opportunities: {point.opportunities} • Occurrences:{" "}
-            {point.occurances}
+            {point.occurrences}
           </div>
         </li>
       ))}

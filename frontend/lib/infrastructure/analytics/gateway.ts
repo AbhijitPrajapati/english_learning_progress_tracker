@@ -1,53 +1,43 @@
-import type { AnalyticsGateway } from "@/lib/application/ports";
 import type {
   AnalyticsDistribution,
-  Timeframe,
   AnalyticsTimeSeries,
+  DateRange,
 } from "@/lib/application/models";
-import { components } from "../openapi-schema";
-import AuthenticatedApiClient from "../api/authenticated-client";
+import type { AnalyticsGateway } from "@/lib/application/ports";
+import type { MistakeCategoryId } from "@/lib/domain/analysis";
+import type { ApiWireClient } from "../api/wire-client";
+import { requireData } from "../api/response";
+import {
+  toDistribution,
+  toTimeSeries,
+  toWireDateRange,
+  toWireMistakeCategory,
+} from "./mapper";
 
-type DistributionResponse = components["schemas"]["DistributionResponse"];
-type TimeSeriesResponse = components["schemas"]["TimeSeriesResponse"];
 export default class HttpAnalyticsGateway implements AnalyticsGateway {
-  constructor(private readonly client: AuthenticatedApiClient) {}
+  constructor(private readonly client: ApiWireClient) {}
 
-  async getDistribution(
-    timeframe: Timeframe,
-    accessToken: string | null,
-  ): Promise<AnalyticsDistribution> {
-    const payload = await this.client.request<DistributionResponse>(
-      "/analytics/distribution",
-      {
-        method: "POST",
-        body: JSON.stringify({ timeframe }),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
+  async getDistribution(dateRange: DateRange): Promise<AnalyticsDistribution> {
+    const payload = await requireData(
+      this.client.POST("/api/v1/analytics/distribution", {
+        body: { date_range: toWireDateRange(dateRange) },
+      }),
     );
-    return {
-      totalSamples: payload.total_samples,
-      mistakeFrequencies: payload.mistake_frequencies,
-    };
+    return toDistribution(payload);
   }
 
   async getTimeSeries(
-    timeframe: Timeframe,
-    mistakeCategory: string,
-    accessToken: string | null,
+    dateRange: DateRange,
+    mistakeCategory: MistakeCategoryId,
   ): Promise<AnalyticsTimeSeries> {
-    return this.client.request<TimeSeriesResponse>("/analytics/time-series", {
-      method: "POST",
-      body: JSON.stringify({
-        timeframe,
-        mistake_category: mistakeCategory,
+    const payload = await requireData(
+      this.client.POST("/api/v1/analytics/time-series", {
+        body: {
+          date_range: toWireDateRange(dateRange),
+          mistake_category: toWireMistakeCategory(mistakeCategory),
+        },
       }),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    );
+    return toTimeSeries(payload);
   }
 }

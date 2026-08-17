@@ -1,80 +1,130 @@
-import {
+import type { MistakeCategoryId } from "@/lib/domain/analysis";
+import type { Speech } from "@/lib/domain/speech";
+import type { User } from "@/lib/domain/user";
+import { InvalidToken } from "./errors";
+import type {
+  AnalyticsDistribution,
+  AnalyticsTimeSeries,
+  AudioSample,
+  AuthCredentials,
+  AuthSession,
+  DateRange,
+  PasswordChange,
+} from "./models";
+import type {
   AccountGateway,
   AnalyticsGateway,
   AuthGateway,
-  SessionStore,
   SpeechGateway,
 } from "./ports";
-import type {
-  Timeframe,
-  AuthCredentials,
-  AnalyticsDistribution,
-  AnalyticsTimeSeries,
-  AuthSession,
-} from "./models";
-import { MistakeCategory } from "@/lib/domain/analysis";
-import { Speech } from "@/lib/domain/speech";
-import { User } from "@/lib/domain/user";
 
-export default class ApplicationUseCases {
-  constructor(
-    private readonly sessionStore: SessionStore,
-    private readonly authGateway: AuthGateway,
-    private readonly accountGateway: AccountGateway,
-    private readonly analyticsGateway: AnalyticsGateway,
-    private readonly speechGateway: SpeechGateway,
-  ) {}
+export type SessionListener = () => void;
 
-  private getToken(): string | null {
-    const session = this.sessionStore.getSession();
-    return session?.accessToken ?? null;
+interface Dependencies {
+  authGateway: AuthGateway;
+  accountGateway: AccountGateway;
+  analyticsGateway: AnalyticsGateway;
+  speechGateway: SpeechGateway;
+}
+
+export class Application {
+  private session: AuthSession | null = null;
+  private readonly listeners = new Set<SessionListener>();
+
+  constructor(private readonly dependencies: Dependencies) {}
+
+  private publishSession(nextSession: AuthSession | null): void {
+    this.session = nextSession;
+    this.listeners.forEach((listener) => listener());
   }
 
-  async getDistribution(timeframe: Timeframe): Promise<AnalyticsDistribution> {
-    return this.analyticsGateway.getDistribution(timeframe, this.getToken());
+  private async authenticated<T>(operation: () => Promise<T>): Promise<T> {
+    try {
+      return await operation();
+    } catch (error) {
+      if (error instanceof InvalidToken) this.publishSession(null);
+      throw error;
+    }
   }
 
-  async getTimeSeries(
-    timeframe: Timeframe,
-    mistakeCategory: MistakeCategory,
-  ): Promise<AnalyticsTimeSeries> {
-    return this.analyticsGateway.getTimeSeries(
-      timeframe,
-      mistakeCategory,
-      this.getToken(),
-    );
-  }
+  readonly auth = {
+    subscribe: (listener: SessionListener): (() => void) => {
+      this.listeners.add(listener);
+      return () => {
+        this.listeners.delete(listener);
+      };
+    },
+    getSnapshot: (): AuthSession | null => this.session,
+    restore: async (): Promise<AuthSession | null> => {
+      try {
+        const restored = await this.dependencies.authGateway.getSession();
+        this.publishSession(restored);
+        return restored;
+      } catch (error) {
+        if (error instanceof InvalidToken) {
+          this.publishSession(null);
+          return null;
+        }
+        throw error;
+      }
+    },
+    login: async (credentials: AuthCredentials): Promise<void> => {
+      this.publishSession(
+        await this.dependencies.authGateway.login(credentials),
+      );
+    },
+    register: async (credentials: AuthCredentials): Promise<User> => {
+      const user = await this.dependencies.authGateway.register(credentials);
+      this.publishSession(
+        await this.dependencies.authGateway.login(credentials),
+      );
+      return user;
+    },
+    logout: async (): Promise<void> => {
+      try {
+        await this.dependencies.authGateway.logout();
+      } finally {
+        this.publishSession(null);
+      }
+    },
+  };
 
-  async login(credentials: AuthCredentials): Promise<void> {
-    const session = await this.authGateway.login(credentials);
-    this.sessionStore.setSession(session);
-  }
+  readonly account = {
+    changePassword: (passwords: PasswordChange): Promise<void> =>
+      this.authenticated(() =>
+        this.dependencies.accountGateway.changePassword(passwords),
+      ),
+    delete: async (): Promise<void> => {
+      await this.authenticated(() => this.dependencies.accountGateway.delete());
+      this.publishSession(null);
+    },
+  };
 
-  async register(credentials: AuthCredentials): Promise<User> {
-    return this.authGateway.register(credentials);
-  }
+  readonly analytics = {
+    getDistribution: (dateRange: DateRange): Promise<AnalyticsDistribution> =>
+      this.authenticated(() =>
+        this.dependencies.analyticsGateway.getDistribution(dateRange),
+      ),
+    getTimeSeries: (
+      dateRange: DateRange,
+      mistakeCategory: MistakeCategoryId,
+    ): Promise<AnalyticsTimeSeries> =>
+      this.authenticated(() =>
+        this.dependencies.analyticsGateway.getTimeSeries(
+          dateRange,
+          mistakeCategory,
+        ),
+      ),
+  };
 
-  async delete_account(): Promise<void> {
-    return this.accountGateway.delete(this.getToken());
-  }
-
-  logout(): void {
-    this.sessionStore.clearSession();
-  }
-
-  restoreSession(): AuthSession | null {
-    return this.sessionStore.getSession();
-  }
-
-  async uploadSpeech(file: File): Promise<Speech> {
-    return this.speechGateway.upload(file, this.getToken());
-  }
-
-  async deleteSpeech(speech_id: string): Promise<void> {
-    await this.speechGateway.delete(speech_id, this.getToken());
-  }
-
-  async listSpeeches(limit: number, offset: number): Promise<Array<Speech>> {
-    return this.speechGateway.list(this.getToken(), limit, offset);
-  }
+  readonly speeches = {
+    upload: (audio: AudioSample): Promise<Speech> =>
+      this.authenticated(() => this.dependencies.speechGateway.upload(audio)),
+    delete: (speechId: string): Promise<void> =>
+      this.authenticated(() =>
+        this.dependencies.speechGateway.delete(speechId),
+      ),
+    list: (): Promise<Speech[]> =>
+      this.authenticated(() => this.dependencies.speechGateway.list(100, 0)),
+  };
 }

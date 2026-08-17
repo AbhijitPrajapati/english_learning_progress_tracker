@@ -1,21 +1,25 @@
-export const MISTAKE_CATEGORIES = [
-  { value: "test_abc_error", label: "test abc error" },
-  { value: "test_def_error", label: "test def error" },
+export const MISTAKE_CATEGORY_IDS = [
+  "subject_verb_agreement",
+  "verb_tense",
+  "article_usage",
+  "preposition_usage",
+  "word_order",
+  "plurality",
 ] as const;
 
-export type MistakeCategory = (typeof MISTAKE_CATEGORIES)[number]["value"];
+export type MistakeCategoryId = (typeof MISTAKE_CATEGORY_IDS)[number];
 
 export interface Frequency {
-  occurances: number;
+  occurrences: number;
   opportunities: number;
 }
 
 export interface CategoryFrequency extends Frequency {
-  category: MistakeCategory;
+  category: MistakeCategoryId;
 }
 
 export interface DetectedMistake {
-  category: MistakeCategory;
+  category: MistakeCategoryId;
   originalText: string;
   correction: string;
   explanation: string;

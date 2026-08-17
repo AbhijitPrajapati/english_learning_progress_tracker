@@ -1,84 +1,68 @@
 "use client";
 
-import { AuthCredentials, AuthSession } from "@/lib/application/models";
-import ApplicationUseCases from "@/lib/application/use-cases";
-import createUseCases from "@/lib/infrastructure/composition";
+import type { Application } from "@/lib/application/use-cases";
+import composeApplication from "@/lib/infrastructure/composition";
 import {
   createContext,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
+  useSyncExternalStore,
 } from "react";
 
-const UseCaseContext = createContext<ApplicationUseCases | null>(null);
+const ApplicationContext = createContext<Application | null>(null);
 
-export function UseCaseProvider({ children }: { children: React.ReactNode }) {
-  const [useCases] = useState(() => createUseCases());
+export function ApplicationProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [application] = useState(composeApplication);
   return (
-    <UseCaseContext.Provider value={useCases}>
+    <ApplicationContext.Provider value={application}>
       {children}
-    </UseCaseContext.Provider>
+    </ApplicationContext.Provider>
   );
 }
 
-export function useUseCases(): ApplicationUseCases {
-  const useCases = useContext(UseCaseContext);
-  if (!useCases) {
-    throw new Error("useUseCases must be used within a UseCaseProvider");
+export function useApplication(): Application {
+  const application = useContext(ApplicationContext);
+  if (!application) {
+    throw new Error("useApplication must be used within ApplicationProvider");
   }
-  return useCases;
+  return application;
 }
 
 interface AuthContextValue {
   isAuthenticated: boolean;
   isRestoring: boolean;
-  login: (credentials: AuthCredentials) => Promise<void>;
-  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const {
-    restoreSession,
-    login: loginUseCase,
-    logout: logoutUseCase,
-  } = useUseCases();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const application = useApplication();
+  const session = useSyncExternalStore(
+    application.auth.subscribe,
+    application.auth.getSnapshot,
+    () => null,
+  );
   const [isRestoring, setIsRestoring] = useState(true);
 
   useEffect(() => {
-    function handleRestore(): void {
-      const session: AuthSession | null = restoreSession();
-      setIsAuthenticated(session !== null);
-      setIsRestoring(false);
-    }
-    handleRestore();
-  }, [restoreSession]);
-
-  const login = useCallback(
-    async (credentials: AuthCredentials): Promise<void> => {
-      await loginUseCase(credentials);
-      setIsAuthenticated(true);
-    },
-    [loginUseCase],
-  );
-
-  const logout = useCallback((): void => {
-    logoutUseCase();
-    setIsAuthenticated(false);
-  }, [logoutUseCase]);
+    application.auth
+      .restore()
+      .catch(() => undefined)
+      .finally(() => setIsRestoring(false));
+  }, [application]);
 
   const value = useMemo(
     () => ({
-      isAuthenticated,
+      isAuthenticated: session !== null,
       isRestoring,
-      login,
-      logout,
     }),
-    [isAuthenticated, isRestoring, login, logout],
+    [session, isRestoring],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -86,8 +70,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 }

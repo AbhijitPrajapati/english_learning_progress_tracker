@@ -1,45 +1,38 @@
-import type { User } from "@/lib/domain/user";
+import type { MistakeCategoryId } from "@/lib/domain/analysis";
 import type { Speech } from "@/lib/domain/speech";
+import type { User } from "@/lib/domain/user";
 import type {
-  Timeframe,
   AnalyticsDistribution,
   AnalyticsTimeSeries,
+  AudioSample,
   AuthCredentials,
   AuthSession,
+  DateRange,
+  PasswordChange,
 } from "./models";
 
 export interface AnalyticsGateway {
-  getDistribution(
-    timeframe: Timeframe,
-    accessToken: string | null,
-  ): Promise<AnalyticsDistribution>;
+  getDistribution(dateRange: DateRange): Promise<AnalyticsDistribution>;
   getTimeSeries(
-    timeframe: Timeframe,
-    mistakeCategory: string,
-    accessToken: string | null,
+    dateRange: DateRange,
+    mistakeCategory: MistakeCategoryId,
   ): Promise<AnalyticsTimeSeries>;
 }
 
 export interface AuthGateway {
   login(credentials: AuthCredentials): Promise<AuthSession>;
   register(credentials: AuthCredentials): Promise<User>;
+  getSession(): Promise<AuthSession>;
+  logout(): Promise<void>;
 }
 
 export interface AccountGateway {
-  delete(accessToken: string | null): Promise<void>;
-}
-export interface SpeechGateway {
-  upload(file: File, accessToken: string | null): Promise<Speech>;
-  delete(speech_id: string, accessToken: string | null): Promise<void>;
-  list(
-    accessToken: string | null,
-    limit: number,
-    offset: number,
-  ): Promise<Array<Speech>>;
+  changePassword(passwords: PasswordChange): Promise<void>;
+  delete(): Promise<void>;
 }
 
-export interface SessionStore {
-  getSession(): AuthSession | null;
-  setSession(session: AuthSession): void;
-  clearSession(): void;
+export interface SpeechGateway {
+  upload(audio: AudioSample): Promise<Speech>;
+  delete(speechId: string): Promise<void>;
+  list(limit: number, offset: number): Promise<Speech[]>;
 }

@@ -23,6 +23,6 @@ class JwtTokenService(TokenService):
     def verify(self, token: str) -> UUID | None:
         try:
             payload = jwt.decode(token, self.secret, algorithms=[self.algorithm])
-        except jwt.exceptions.InvalidTokenError:
+            return UUID(payload["sub"])
+        except (jwt.exceptions.InvalidTokenError, KeyError, TypeError, ValueError):
             return None
-        return UUID(payload["sub"])

@@ -1,15 +1,19 @@
 from uuid import UUID
 
 from fastapi import Depends
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import APIKeyCookie
 
-from .application import GetUserIdFromToken, get_user_id_from_token
+from app.api.authentication import SESSION_COOKIE_NAME
+from app.api.dependencies.application import ContainerDependency
+from app.application.use_cases.auth.exceptions import InvalidToken
 
-bearer_scheme = HTTPBearer()
+session_cookie = APIKeyCookie(name=SESSION_COOKIE_NAME, auto_error=False)
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
-    get_user_from_token: GetUserIdFromToken = Depends(get_user_id_from_token),
+    container: ContainerDependency,
+    token: str | None = Depends(session_cookie),
 ) -> UUID:
-    return await get_user_from_token.execute(credentials.credentials)
+    if token is None:
+        raise InvalidToken()
+    return await container.get_user_id_from_token.execute(token)

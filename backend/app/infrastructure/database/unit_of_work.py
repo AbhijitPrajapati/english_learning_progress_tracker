@@ -1,38 +1,53 @@
-import logging
 from typing import Self
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.application.ports.unit_of_work import UnitOfWork
+from app.application.ports.unit_of_work import UnitOfWork, UnitOfWorkFactory
 
 from .repositories import (
-    SQLAlchemyAnalyticsProjector,
+    SQLAlchemyAnalysisProjectionWriter,
+    SQLAlchemyAnalyticsReader,
     SQLAlchemySpeechRepository,
     SQLAlchemyUserRepository,
 )
 
-logger = logging.getLogger(__name__)
-
 
 class SqlAlchemyUnitOfWork(UnitOfWork):
-    def __init__(self, session: AsyncSession):
-        self.session = session
-
-        self.users = SQLAlchemyUserRepository(session)
-        self.speeches = SQLAlchemySpeechRepository(session)
-        self.analytics_projector = SQLAlchemyAnalyticsProjector(session)
-
-    async def commit(self) -> None:
-        await self.session.commit()
-
-    async def rollback(self) -> None:
-        await self.session.rollback()
+    def __init__(self, session_factory: async_sessionmaker[AsyncSession]) -> None:
+        self.session_factory = session_factory
+        self.session: AsyncSession | None = None
+        self.committed = False
 
     async def __aenter__(self) -> Self:
+        self.session = self.session_factory()
+        self.users = SQLAlchemyUserRepository(self.session)
+        self.speeches = SQLAlchemySpeechRepository(self.session)
+        self.analytics = SQLAlchemyAnalyticsReader(self.session)
+        self.analysis_projection = SQLAlchemyAnalysisProjectionWriter(self.session)
         return self
 
+    async def commit(self) -> None:
+        if self.session is None:
+            raise RuntimeError("Unit of work has not been entered")
+        await self.session.commit()
+        self.committed = True
+
+    async def rollback(self) -> None:
+        if self.session is not None:
+            await self.session.rollback()
+
     async def __aexit__(self, exc_type, exc, tb) -> None:
-        if exc_type:
+        if self.session is None:
+            return
+        if exc_type is not None or not self.committed:
             await self.rollback()
-        else:
-            await self.commit()
+        await self.session.close()
+        self.session = None
+
+
+class SqlAlchemyUnitOfWorkFactory(UnitOfWorkFactory):
+    def __init__(self, session_factory: async_sessionmaker[AsyncSession]) -> None:
+        self.session_factory = session_factory
+
+    def __call__(self) -> SqlAlchemyUnitOfWork:
+        return SqlAlchemyUnitOfWork(self.session_factory)

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import type { SubmitEventHandler } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -11,9 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useUseCases } from "@/app/providers";
+import { useApplication } from "@/app/providers";
 import { AuthForm } from "@/components/auth/AuthForm";
-import { AuthCredentials } from "@/lib/application/models";
+import type { AuthCredentials } from "@/lib/application/models";
 import { ApplicationError } from "@/lib/application/errors";
 
 export default function AuthPage() {
@@ -23,7 +22,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { register, login } = useUseCases();
+  const application = useApplication();
 
   const handleSubmit: SubmitEventHandler = async (event) => {
     event.preventDefault();
@@ -34,13 +33,16 @@ export default function AuthPage() {
 
     try {
       if (mode === "register") {
-        await register(credentials);
+        await application.auth.register(credentials);
+      } else {
+        await application.auth.login(credentials);
       }
-      await login(credentials);
       router.push("/");
     } catch (err) {
       if (err instanceof ApplicationError) {
         setError(err.message);
+      } else {
+        setError("Unable to reach the service. Please try again.");
       }
     } finally {
       setIsSubmitting(false);
@@ -70,11 +72,6 @@ export default function AuthPage() {
             }
             onSubmit={handleSubmit}
           />
-          <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-            <Link className="font-medium text-primary" href="/">
-              Skip for now
-            </Link>
-          </div>
         </CardContent>
       </Card>
     </main>

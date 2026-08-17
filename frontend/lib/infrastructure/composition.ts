@@ -1,28 +1,16 @@
-import ApiClient from "@/lib/infrastructure/api/client";
-import HttpAuthGateway from "@/lib/infrastructure/auth/gateway";
-import HttpSpeechGateway from "@/lib/infrastructure/speech/gateway";
-import LocalSessionStore from "./auth/session-store";
-import ApplicationUseCases from "@/lib/application/use-cases";
-import HttpAnalyticsGateway from "./analytics/gateway";
-import AuthenticatedApiClient from "./api/authenticated-client";
+import { Application } from "@/lib/application/use-cases";
 import HttpAccountGateway from "./account/gateway";
+import HttpAnalyticsGateway from "./analytics/gateway";
+import { createWireClient } from "./api/wire-client";
+import HttpAuthGateway from "./auth/gateway";
+import HttpSpeechGateway from "./speech/gateway";
 
-const apiClient = new ApiClient();
-const authenticatedApiClient = new AuthenticatedApiClient(apiClient);
-
-const authGateway = new HttpAuthGateway(apiClient);
-const accountGateway = new HttpAccountGateway(authenticatedApiClient);
-const speechGateway = new HttpSpeechGateway(authenticatedApiClient);
-const analyticsGateway = new HttpAnalyticsGateway(authenticatedApiClient);
-
-const sessionStore = new LocalSessionStore();
-
-export default function createUseCases(): ApplicationUseCases {
-  return new ApplicationUseCases(
-    sessionStore,
-    authGateway,
-    accountGateway,
-    analyticsGateway,
-    speechGateway,
-  );
+export default function composeApplication(): Application {
+  const client = createWireClient();
+  return new Application({
+    authGateway: new HttpAuthGateway(client),
+    accountGateway: new HttpAccountGateway(client),
+    analyticsGateway: new HttpAnalyticsGateway(client),
+    speechGateway: new HttpSpeechGateway(client),
+  });
 }

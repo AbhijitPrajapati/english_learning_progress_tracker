@@ -1,43 +1,27 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from app.settings import InfrastructureSettings
 
-from app.infrastructure.database import (
-    PostgresConfig,
+from .database import (
+    SqlAlchemyUnitOfWorkFactory,
     create_engine,
     create_session_factory,
 )
-from app.infrastructure.grammar_analysis import LLMConfig, LLMGrammarAnalysisAdapter
-from app.infrastructure.logging import logging_setup
-from app.infrastructure.password_hasher import PwdLibPasswordHasher
-from app.infrastructure.token_service import JwtConfig, JwtTokenService
-from app.infrastructure.transcription import WhisperConfig, WhisperTranscriptionAdapter
-
-
-class DatabaseSettings(BaseSettings):
-    """
-    Only contains database settings
-    Used for alembic migrations
-    """
-
-    postgres: PostgresConfig
-    model_config = SettingsConfigDict(env_nested_delimiter="__", extra="ignore")
-
-
-class InfrastructureSettings(DatabaseSettings):
-    """Unified composition settings"""
-
-    whisper: WhisperConfig
-    llm: LLMConfig
-    jwt: JwtConfig
+from .grammar_analysis import OpenAIGrammarAnalysisAdapter
+from .logging import logging_setup
+from .password_hasher import PwdLibPasswordHasher
+from .token_service import JwtTokenService
+from .transcription import WhisperTranscriptionAdapter
 
 
 class InfrastructureComposition:
-    """Composition root object"""
-
-    def __init__(self, settings: InfrastructureSettings):
+    def __init__(self, settings: InfrastructureSettings) -> None:
         logging_setup()
         self.engine = create_engine(settings.postgres)
-        self.session_factory = create_session_factory(self.engine)
+        session_factory = create_session_factory(self.engine)
+        self.uow_factory = SqlAlchemyUnitOfWorkFactory(session_factory)
         self.transcriber = WhisperTranscriptionAdapter(settings.whisper)
-        self.grammar_analyzer = LLMGrammarAnalysisAdapter(settings.llm)
+        self.grammar_analyzer = OpenAIGrammarAnalysisAdapter(settings.llm)
         self.password_hasher = PwdLibPasswordHasher()
         self.token_service = JwtTokenService(settings.jwt)
+
+    async def close(self) -> None:
+        await self.engine.dispose()
