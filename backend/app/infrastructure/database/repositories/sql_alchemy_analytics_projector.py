@@ -12,7 +12,7 @@ from app.application.use_cases.analytics.models import (
     TimeSeriesPoint,
     TimeSeriesResponse,
 )
-from app.domain.speech import Analysis, MistakeCategory
+from app.domain.analysis import Analysis, MistakeCategory
 from app.infrastructure.database.models import MistakeFrequency as FrequencyORM
 from app.infrastructure.database.models import Speech
 

@@ -3,8 +3,6 @@ from enum import StrEnum
 
 from pydantic import BaseModel
 
-from app.domain.speech import CategoryFrequency, Frequency
-
 
 class Timeframe(BaseModel):
     start: datetime | None
@@ -18,6 +16,14 @@ class Timeframe(BaseModel):
 
 class DistributionRequest(BaseModel):
     timeframe: Timeframe
+
+
+class Frequency(BaseModel):
+    occurances: int
+    opportunities: int
+
+class CategoryFrequency(Frequency):
+    category: set
 
 class DistributionResponse(BaseModel):
     mistake_frequencies: list[CategoryFrequency]

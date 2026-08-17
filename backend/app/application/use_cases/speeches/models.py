@@ -23,7 +23,7 @@ class SpeechAnalysis(BaseModel):
     feedback: str
 
 class SpeechResponse(BaseModel):
-    speech_id: UUID
+    id: UUID
     transcript: str
     analysis: SpeechAnalysis
     created_at: datetime

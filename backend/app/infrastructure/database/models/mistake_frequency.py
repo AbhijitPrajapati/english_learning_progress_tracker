@@ -5,7 +5,7 @@ from sqlalchemy import Enum, ForeignKey, Integer, PrimaryKeyConstraint
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.domain.speech import MistakeCategory
+from app.domain.analysis import MistakeCategory
 
 from .base import Base
 

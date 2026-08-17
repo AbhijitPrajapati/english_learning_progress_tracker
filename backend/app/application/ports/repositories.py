@@ -9,7 +9,8 @@ from app.application.use_cases.analytics.models import (
     Timeframe,
     TimeSeriesResponse,
 )
-from app.domain.speech import Analysis, MistakeCategory, Speech
+from app.domain.analysis import Analysis, MistakeCategory
+from app.domain.speech import Speech
 from app.domain.user import User
 
 

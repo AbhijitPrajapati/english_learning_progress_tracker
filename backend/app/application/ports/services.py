@@ -1,7 +1,7 @@
 from typing import BinaryIO, Protocol
 from uuid import UUID
 
-from app.domain.speech import Analysis
+from app.domain.analysis import Analysis
 
 
 class PasswordHasher(Protocol):

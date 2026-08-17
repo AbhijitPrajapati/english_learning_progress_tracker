@@ -7,9 +7,7 @@ from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.domain.speech import Analysis
-from app.infrastructure.database.types.value_object_analysis import (
-    ValueObjectAnalysisType,
-)
+from app.infrastructure.database.types import ValueObjectAnalysisType
 
 from .base import Base
 

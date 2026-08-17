@@ -14,13 +14,10 @@ class Mistake(DomainObject):
     explanation: str
 
 
-class Frequency(DomainObject):
+class CategoryFrequency(DomainObject):
+    category: MistakeCategory
     occurances: int
     opportunities: int
-
-
-class CategoryFrequency(Frequency):
-    category: MistakeCategory
 
 
 class Analysis(DomainObject):

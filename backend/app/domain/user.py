@@ -3,9 +3,7 @@ from uuid import UUID
 
 from pydantic import EmailStr
 
-from app.domain.base import DomainObject
-
-# from .value_objects import Email, UserId
+from .base import DomainObject
 
 
 class User(DomainObject):

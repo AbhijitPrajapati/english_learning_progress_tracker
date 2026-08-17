@@ -8,7 +8,7 @@ from app.application.ports.services import (
 from app.application.ports.unit_of_work import UnitOfWork
 from app.domain.speech import Analysis, Speech
 
-from .models import SpeechAnalysis, SpeechResponse
+from .models import SpeechResponse
 
 
 class ProcessSpeech:
@@ -31,4 +31,4 @@ class ProcessSpeech:
         speech: Speech = await self.uow.speeches.create(user_id, transcript, analysis)
         await self.uow.analytics_projector.add_analysis(speech.id, analysis)
         await self.uow.commit()
-        return SpeechResponse(speech_id=speech.id, transcript=speech.transcript, analysis=SpeechAnalysis.model_validate(speech.analysis), created_at=speech.created_at)
+        return SpeechResponse.model_validate(speech)

@@ -1,7 +1,7 @@
 import logging
 
 from app.application.ports.services import GrammarAnalysisAdapter
-from app.domain.speech import Analysis, CategoryFrequency, Mistake, MistakeCategory
+from app.domain.analysis import Analysis, CategoryFrequency, Mistake, MistakeCategory
 
 from .config import LLMConfig
 
