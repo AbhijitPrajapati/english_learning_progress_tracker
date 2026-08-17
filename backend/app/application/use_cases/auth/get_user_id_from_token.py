@@ -15,4 +15,4 @@ class GetUserIdFromToken:
         user_id = self.token_service.verify(token)
         if user_id is None:
             raise InvalidToken()
-        return user_id.value
+        return user_id

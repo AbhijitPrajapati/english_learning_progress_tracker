@@ -1,14 +1,12 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
+from uuid import UUID
 
+from pydantic import EmailStr
 from sqlalchemy import DateTime, String, func, text
+from sqlalchemy.dialects.postgresql import CITEXT
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from app.domain.user import Email, UserId
-from app.infrastructure.database.types import ValueObjectUUIDType
-from app.infrastructure.database.types.value_object_email import (
-    ValueObjectEmailType,
-)
 
 from .base import Base
 
@@ -19,13 +17,13 @@ if TYPE_CHECKING:
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[UserId] = mapped_column(
-        ValueObjectUUIDType(UserId),
+    id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True),
         primary_key=True,
         server_default=text("gen_random_uuid()"),
     )
-    email: Mapped[Email] = mapped_column(
-        ValueObjectEmailType, unique=True, nullable=False, index=True
+    email: Mapped[EmailStr] = mapped_column(
+        CITEXT(320), unique=True, nullable=False, index=True
     )
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(

@@ -1,9 +1,10 @@
+from uuid import UUID
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.ports.repositories import SpeechRepository
-from app.domain.speech import Analysis, Speech, SpeechId
-from app.domain.user import UserId
+from app.domain.speech import Analysis, Speech
 from app.infrastructure.database.models import Speech as ORMSpeech
 
 
@@ -11,7 +12,7 @@ class SQLAlchemySpeechRepository(SpeechRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create(self, user_id: UserId, transcript: str, analysis: Analysis) -> Speech:
+    async def create(self, user_id: UUID, transcript: str, analysis: Analysis) -> Speech:
         orm_speech = ORMSpeech(
             user_id=user_id,
             transcript=transcript,
@@ -27,7 +28,7 @@ class SQLAlchemySpeechRepository(SpeechRepository):
             analysis=orm_speech.analysis,
         )
 
-    async def get(self, speech_id: SpeechId) -> Speech | None:
+    async def get(self, speech_id: UUID) -> Speech | None:
         orm_speech = await self.session.get(ORMSpeech, speech_id)
         if orm_speech is None:
             return None
@@ -39,12 +40,12 @@ class SQLAlchemySpeechRepository(SpeechRepository):
             analysis=orm_speech.analysis,
         )
 
-    async def delete(self, speech_id: SpeechId) -> None:
+    async def delete(self, speech_id: UUID) -> None:
         speech = await self.session.get(ORMSpeech, speech_id)
         await self.session.delete(speech)
         await self.session.flush()
 
-    async def list(self, user_id: UserId, limit: int, offset: int) -> list[Speech]:
+    async def list(self, user_id: UUID, limit: int, offset: int) -> list[Speech]:
         stmt = (
             (
                 select(ORMSpeech)

@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy import Select, and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -5,13 +7,12 @@ from app.application.ports.repositories import AnalyticsProjector
 from app.application.use_cases.analytics.models import (
     CategoryFrequency,
     DistributionResponse,
-    TimeSeriesResponse,
     TimeBucket,
     Timeframe,
     TimeSeriesPoint,
+    TimeSeriesResponse,
 )
-from app.domain.speech import Analysis, MistakeCategory, SpeechId
-from app.domain.user import UserId
+from app.domain.speech import Analysis, MistakeCategory
 from app.infrastructure.database.models import MistakeFrequency as FrequencyORM
 from app.infrastructure.database.models import Speech
 
@@ -22,7 +23,7 @@ class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
 
     @staticmethod
     def filter_by_user_id_and_timeframe(
-        stmt: Select, user_id: UserId, timeframe: Timeframe
+        stmt: Select, user_id: UUID, timeframe: Timeframe
     ) -> Select:
         filters = [Speech.user_id == user_id]
         if timeframe.start is not None:
@@ -31,7 +32,7 @@ class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
             filters.append(Speech.created_at <= timeframe.end)
         return stmt.join(FrequencyORM.speech).where(and_(*filters))
 
-    async def distribution(self, user_id: UserId, timeframe: Timeframe) -> DistributionResponse:
+    async def distribution(self, user_id: UUID, timeframe: Timeframe) -> DistributionResponse:
         stmt_total_speeches = self.filter_by_user_id_and_timeframe(
             select(func.count()), user_id, timeframe
         )
@@ -64,7 +65,7 @@ class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
 
     async def time_series(
         self,
-        user_id: UserId,
+        user_id: UUID,
         timeframe: Timeframe,
         mistake_category: MistakeCategory,
         bucket: TimeBucket,
@@ -96,7 +97,7 @@ class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
         ]
         return TimeSeriesResponse(points=points)
 
-    async def add_analysis(self, speech_id: SpeechId, analysis: Analysis) -> None:
+    async def add_analysis(self, speech_id: UUID, analysis: Analysis) -> None:
         orm_freqs = [
             FrequencyORM(speech_id=speech_id, **freq.model_dump())
             for freq in analysis.frequencies

@@ -1,16 +1,16 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class UserCredentials(BaseModel):
-    email: str
+    email: EmailStr
     password: str
 
 class RegisterUserResponse(BaseModel):
     id: UUID
-    email: str
+    email: EmailStr
     created_at: datetime
 
 class TokenResponse(BaseModel):

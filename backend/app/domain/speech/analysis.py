@@ -1,7 +1,11 @@
+from enum import StrEnum
+
 from app.domain.base import DomainObject
 
-from .value_objects import MistakeCategory
 
+class MistakeCategory(StrEnum):
+    ABC = "test_abc_error"
+    DEF = "test_def_error"
 
 class Mistake(DomainObject):
     category: MistakeCategory

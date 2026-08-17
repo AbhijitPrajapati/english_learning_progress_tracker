@@ -2,7 +2,6 @@ from uuid import UUID
 
 from app.application.ports.unit_of_work import UnitOfWork
 from app.domain.speech import MistakeCategory
-from app.domain.user import UserId
 
 from .models import TimeBucket, TimeSeriesRequest, TimeSeriesResponse
 
@@ -16,5 +15,5 @@ class RetrieveTimeSeries:
     ) -> TimeSeriesResponse:
         time_bucket = TimeBucket.from_timeframe(request.timeframe)
         return await self.uow.analytics_projector.time_series(
-            UserId(value=user_id), request.timeframe, MistakeCategory(value=request.mistake_category), time_bucket
+            user_id, request.timeframe, MistakeCategory(value=request.mistake_category), time_bucket
         )

@@ -1,6 +1,5 @@
-from .analysis import Analysis, CategoryFrequency, Frequency, Mistake
+from .analysis import Analysis, CategoryFrequency, Frequency, Mistake, MistakeCategory
 from .speech import Speech
-from .value_objects import MistakeCategory, SpeechId
 
 __all__ = [
     "Analysis",
@@ -8,6 +7,5 @@ __all__ = [
     "Frequency",
     "Mistake",
     "MistakeCategory",
-    "Speech",
-    "SpeechId",
+    "Speech"
 ]

@@ -1,7 +1,7 @@
 from typing import BinaryIO, Protocol
+from uuid import UUID
 
 from app.domain.speech import Analysis
-from app.domain.user import UserId
 
 
 class PasswordHasher(Protocol):
@@ -10,8 +10,8 @@ class PasswordHasher(Protocol):
 
 
 class TokenService(Protocol):
-    def issue(self, user_id: UserId) -> str: ...
-    def verify(self, token: str) -> UserId | None: ...
+    def issue(self, user_id: UUID) -> str: ...
+    def verify(self, token: str) -> UUID | None: ...
 
 
 class GrammarAnalysisAdapter(Protocol):

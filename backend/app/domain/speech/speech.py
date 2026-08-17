@@ -1,15 +1,14 @@
 from datetime import datetime
+from uuid import UUID
 
 from app.domain.base import DomainObject
-from app.domain.user import UserId
 
 from .analysis import Analysis
-from .value_objects import SpeechId
 
 
 class Speech(DomainObject):
-    id: SpeechId
-    user_id: UserId
+    id: UUID
+    user_id: UUID
     transcript: str
     analysis: Analysis
     created_at: datetime
