@@ -1,9 +1,11 @@
-from app.application.ports.repositories import NewUser
+
+
 from app.application.ports.services import PasswordHasher
 from app.application.ports.unit_of_work import UnitOfWork
-from app.domain.user import Email, User
+from app.domain.user import Email
 
 from .exceptions import EmailAlreadyRegistered
+from .models import RegisterUserResponse, UserCredentials
 
 
 class RegisterUser:
@@ -11,13 +13,13 @@ class RegisterUser:
         self.uow = uow
         self.password_hasher = password_hasher
 
-    async def execute(self, email: Email, password: str) -> User:
-        existing = await self.uow.users.get_by_email(email)
+    async def execute(self, request: UserCredentials) -> RegisterUserResponse:
+        domain_email = Email(value=request.email)
+        existing = await self.uow.users.get_by_email(domain_email)
         if existing is not None:
             raise EmailAlreadyRegistered()
 
-        hashed_password = self.password_hasher.hash(password)
-        new_user = NewUser(email=email, password_hash=hashed_password)
-        user = await self.uow.users.create(new_user)
+        hashed_password = self.password_hasher.hash(request.password)
+        user = await self.uow.users.create(domain_email, hashed_password)
         await self.uow.commit()
-        return user
+        return RegisterUserResponse(id=user.id.value, email=user.email.value, created_at=user.created_at)

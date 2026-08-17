@@ -1,8 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.application.ports.repositories import NewSpeech, SpeechRepository
-from app.domain.speech import Speech, SpeechId
+from app.application.ports.repositories import SpeechRepository
+from app.domain.speech import Analysis, Speech, SpeechId
 from app.domain.user import UserId
 from app.infrastructure.database.models import Speech as ORMSpeech
 
@@ -11,11 +11,11 @@ class SQLAlchemySpeechRepository(SpeechRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create(self, speech: NewSpeech) -> Speech:
+    async def create(self, user_id: UserId, transcript: str, analysis: Analysis) -> Speech:
         orm_speech = ORMSpeech(
-            user_id=speech.user_id,
-            transcript=speech.transcript,
-            analysis=speech.analysis,
+            user_id=user_id,
+            transcript=transcript,
+            analysis=analysis,
         )
         self.session.add(orm_speech)
         await self.session.flush()

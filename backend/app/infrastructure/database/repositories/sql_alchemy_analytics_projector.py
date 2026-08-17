@@ -4,8 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.application.ports.repositories import AnalyticsProjector
 from app.application.use_cases.analytics.models import (
     CategoryFrequency,
-    Distribution,
-    MistakeTimeSeries,
+    DistributionResponse,
+    TimeSeriesResponse,
     TimeBucket,
     Timeframe,
     TimeSeriesPoint,
@@ -31,7 +31,7 @@ class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
             filters.append(Speech.created_at <= timeframe.end)
         return stmt.join(FrequencyORM.speech).where(and_(*filters))
 
-    async def distribution(self, user_id: UserId, timeframe: Timeframe) -> Distribution:
+    async def distribution(self, user_id: UserId, timeframe: Timeframe) -> DistributionResponse:
         stmt_total_speeches = self.filter_by_user_id_and_timeframe(
             select(func.count()), user_id, timeframe
         )
@@ -58,7 +58,7 @@ class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
             for row in rows
         ]
 
-        return Distribution(
+        return DistributionResponse(
             mistake_frequencies=mistake_frequencies, total_speeches=total_speeches
         )
 
@@ -68,7 +68,7 @@ class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
         timeframe: Timeframe,
         mistake_category: MistakeCategory,
         bucket: TimeBucket,
-    ) -> MistakeTimeSeries:
+    ) -> TimeSeriesResponse:
         time_expr = func.date_trunc(bucket.value, Speech.created_at).label("time")
 
         stmt = (
@@ -94,7 +94,7 @@ class SQLAlchemyAnalyticsProjector(AnalyticsProjector):
             )
             for row in rows
         ]
-        return MistakeTimeSeries(points=points)
+        return TimeSeriesResponse(points=points)
 
     async def add_analysis(self, speech_id: SpeechId, analysis: Analysis) -> None:
         orm_freqs = [

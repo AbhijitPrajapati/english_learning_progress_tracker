@@ -8,36 +8,28 @@ from app.api.dependencies.application import (
     get_issue_token,
     get_register_user,
 )
-from app.api.schemas.auth import (
-    LoginRequest,
-    LoginResponse,
-    RegisterRequest,
-    RegisterResponse,
+from app.application.use_cases.auth.models import (
+    RegisterUserResponse,
+    TokenResponse,
+    UserCredentials,
 )
-from app.domain.user import Email
 
 router = APIRouter(prefix="/auth")
 
 
-@router.post("/login", response_model=LoginResponse)
+@router.post("/login", response_model=TokenResponse)
 async def login(
-    request: LoginRequest,
+    request: UserCredentials,
     authenticate_user: AuthenticateUser = Depends(get_authenticate_user),
     issue_token: IssueToken = Depends(get_issue_token),
-) -> LoginResponse:
-    user = await authenticate_user.execute(
-        Email(value=request.email), password=request.password
-    )
-    token = await issue_token.execute(user.id)
-    return LoginResponse(access_token=token, user_id=user.id.value)
+) -> TokenResponse:
+    user_id = await authenticate_user.execute(request)
+    return await issue_token.execute(user_id)
 
 
-@router.post("/register", response_model=RegisterResponse)
+@router.post("/register", response_model=RegisterUserResponse)
 async def register(
-    request: RegisterRequest, register_user: RegisterUser = Depends(get_register_user)
-) -> RegisterResponse:
-    user = await register_user.execute(Email(value=request.email), request.password)
-    return RegisterResponse(
-        id=user.id.value, email=user.email.value, created_at=user.created_at
-    )
+    request: UserCredentials, register_user: RegisterUser = Depends(get_register_user)
+) -> RegisterUserResponse:
+    return await register_user.execute(request)
 

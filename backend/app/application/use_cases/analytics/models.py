@@ -16,17 +16,22 @@ class Timeframe(BaseModel):
             return None
         return self.start - self.end
 
+class DistributionRequest(BaseModel):
+    timeframe: Timeframe
 
-class Distribution(BaseModel):
+class DistributionResponse(BaseModel):
     mistake_frequencies: list[CategoryFrequency]
     total_speeches: int
 
+class TimeSeriesRequest(BaseModel):
+    timeframe: Timeframe
+    mistake_category: str
 
 class TimeSeriesPoint(Frequency):
     time: datetime
 
 
-class MistakeTimeSeries(BaseModel):
+class TimeSeriesResponse(BaseModel):
     points: list[TimeSeriesPoint]
 
 

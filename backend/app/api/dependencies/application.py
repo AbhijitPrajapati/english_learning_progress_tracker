@@ -1,3 +1,6 @@
+from backend.app.application.use_cases.auth.get_user_id_from_token import (
+    GetUserIdFromToken,
+)
 from fastapi import Depends
 
 from app.application.ports.services import (
@@ -7,13 +10,12 @@ from app.application.ports.services import (
     TranscriptionAdapter,
 )
 from app.application.ports.unit_of_work import UnitOfWork
+from app.application.use_cases.account.delete_user import DeleteUser
 from app.application.use_cases.analytics.retrieve_distribution import (
     RetrieveDistribution,
 )
 from app.application.use_cases.analytics.retrieve_time_series import RetrieveTimeSeries
 from app.application.use_cases.auth.authenticate_user import AuthenticateUser
-from app.application.use_cases.auth.delete_user import DeleteUser
-from app.application.use_cases.auth.get_user_from_token import GetUserFromToken
 from app.application.use_cases.auth.issue_token import IssueToken
 from app.application.use_cases.auth.register_user import RegisterUser
 from app.application.use_cases.speeches.delete_speech import DeleteSpeech
@@ -71,11 +73,11 @@ async def get_register_user(
 async def get_delete_user(uow: UnitOfWork = Depends(get_uow)) -> DeleteUser:
     return DeleteUser(uow)
 
-async def get_user_from_token(
+async def get_user_id_from_token(
     uow: UnitOfWork = Depends(get_uow),
     token_service: TokenService = Depends(get_token_service),
-) -> GetUserFromToken:
-    return GetUserFromToken(token_service, uow)
+) -> GetUserIdFromToken:
+    return GetUserIdFromToken(token_service, uow)
 
 
 async def get_retrieve_distribution(
