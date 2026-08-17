@@ -8,11 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 from app.infrastructure.composition import DatabaseSettings
 from app.infrastructure.database.models.base import Base
-from app.infrastructure.database.types import (
-    ValueObjectAnalysisType,
-    ValueObjectEmailType,
-    ValueObjectUUIDType,
-)
+from app.infrastructure.database.types import ValueObjectAnalysisType
 
 settings = DatabaseSettings()  # type: ignore
 
@@ -42,11 +38,6 @@ target_metadata = Base.metadata
 def render_item(type_, obj, autogen_context):
     if type_ != "type":
         return False
-    if isinstance(obj, ValueObjectUUIDType):
-        return "sa.UUID()"
-    if isinstance(obj, ValueObjectEmailType):
-        autogen_context.imports.add("from sqlalchemy.dialects import postgresql")
-        return "postgresql.CITEXT(320)"
     if isinstance(obj, ValueObjectAnalysisType):
         autogen_context.imports.add("from sqlalchemy.dialects import postgresql")
         return "postgresql.JSONB()"

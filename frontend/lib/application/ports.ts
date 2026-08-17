@@ -23,9 +23,11 @@ export interface AnalyticsGateway {
 export interface AuthGateway {
   login(credentials: AuthCredentials): Promise<AuthSession>;
   register(credentials: AuthCredentials): Promise<User>;
-  delete(accessToken: string | null): Promise<void>;
 }
 
+export interface AccountGateway {
+  delete(accessToken: string | null): Promise<void>;
+}
 export interface SpeechGateway {
   upload(file: File, accessToken: string | null): Promise<Speech>;
   delete(speech_id: string, accessToken: string | null): Promise<void>;

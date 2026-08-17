@@ -1,4 +1,5 @@
 import {
+  AccountGateway,
   AnalyticsGateway,
   AuthGateway,
   SessionStore,
@@ -19,6 +20,7 @@ export default class ApplicationUseCases {
   constructor(
     private readonly sessionStore: SessionStore,
     private readonly authGateway: AuthGateway,
+    private readonly accountGateway: AccountGateway,
     private readonly analyticsGateway: AnalyticsGateway,
     private readonly speechGateway: SpeechGateway,
   ) {}
@@ -53,7 +55,7 @@ export default class ApplicationUseCases {
   }
 
   async delete_account(): Promise<void> {
-    return this.authGateway.delete(this.getToken());
+    return this.accountGateway.delete(this.getToken());
   }
 
   logout(): void {

@@ -8,7 +8,6 @@ import { components } from "../openapi-schema";
 import AuthenticatedApiClient from "../api/authenticated-client";
 
 type DistributionResponse = components["schemas"]["DistributionResponse"];
-type MistakeFrequencyResponse = components["schemas"]["MistakeFrequency"];
 type TimeSeriesResponse = components["schemas"]["TimeSeriesResponse"];
 export default class HttpAnalyticsGateway implements AnalyticsGateway {
   constructor(private readonly client: AuthenticatedApiClient) {}
@@ -30,13 +29,7 @@ export default class HttpAnalyticsGateway implements AnalyticsGateway {
     );
     return {
       totalSamples: payload.total_samples,
-      mistakeFrequencies: payload.mistake_frequencies.map(
-        (freq: MistakeFrequencyResponse) => ({
-          category: freq.category,
-          opportunities: freq.opportunities,
-          occurances: freq.occurances,
-        }),
-      ),
+      mistakeFrequencies: payload.mistake_frequencies,
     };
   }
 

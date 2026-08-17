@@ -1,4 +1,4 @@
-from backend.app.application.use_cases.auth.get_user_id_from_token import (
+from app.application.use_cases.auth.get_user_id_from_token import (
     GetUserIdFromToken,
 )
 from fastapi import Depends

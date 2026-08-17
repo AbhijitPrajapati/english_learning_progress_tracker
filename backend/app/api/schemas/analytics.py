@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from .analysis import CategoryFrequency, MistakeFrequency
+from .analysis import CategoryFrequency, MistakeCategory, MistakeFrequency
 
 
 class Timeframe(BaseModel):
@@ -20,7 +20,7 @@ class DistributionResponse(BaseModel):
 
 class TimeSeriesRequest(BaseModel):
     timeframe: Timeframe
-    mistake_category: str
+    mistake_category: MistakeCategory
 
 
 class TimeSeriesPoint(MistakeFrequency):

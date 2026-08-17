@@ -1,8 +1,14 @@
+from enum import StrEnum
+
 from pydantic import BaseModel
 
 
+class MistakeCategory(StrEnum):
+    ABC = "test_abc_error"
+    DEF = "test_def_error"
+
 class DetectedMistake(BaseModel):
-    category: str
+    category: MistakeCategory
     original_text: str
     correction: str
     explanation: str
@@ -13,7 +19,7 @@ class MistakeFrequency(BaseModel):
     occurances: int
 
 class CategoryFrequency(MistakeFrequency):
-    category: str
+    category: MistakeCategory
 
 class SpeechAnalysis(BaseModel):
     frequencies: list[CategoryFrequency]

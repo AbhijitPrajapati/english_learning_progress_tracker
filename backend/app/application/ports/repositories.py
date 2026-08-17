@@ -4,10 +4,10 @@ from uuid import UUID
 from pydantic import EmailStr
 
 from app.application.use_cases.analytics.models import (
-    DistributionResponse,
+    Distribution,
     TimeBucket,
     Timeframe,
-    TimeSeriesResponse,
+    TimeSeries,
 )
 from app.domain.analysis import Analysis, MistakeCategory
 from app.domain.speech import Speech
@@ -32,12 +32,12 @@ class SpeechRepository(Protocol):
 class AnalyticsProjector(Protocol):
     async def distribution(
         self, user_id: UUID, timeframe: Timeframe
-    ) -> DistributionResponse: ...
+    ) -> Distribution: ...
     async def time_series(
         self,
         user_id: UUID,
         timeframe: Timeframe,
         mistake_category: MistakeCategory,
         bucket: TimeBucket,
-    ) -> TimeSeriesResponse: ...
+    ) -> TimeSeries: ...
     async def add_analysis(self, speech_id: UUID, analysis: Analysis) -> None: ...
