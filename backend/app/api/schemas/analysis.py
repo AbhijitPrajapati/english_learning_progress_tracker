@@ -1,22 +1,21 @@
-# from pydantic import BaseModel
-
-# from app.domain.speech import MistakeCategory
+from pydantic import BaseModel
 
 
-# class DetectedMistake(BaseModel):
-#     category: MistakeCategory
-#     original_text: str
-#     correction: str
-#     explanation: str
+class DetectedMistake(BaseModel):
+    category: str
+    original_text: str
+    correction: str
+    explanation: str
 
 
-# class MistakeFrequency(BaseModel):
-#     category: MistakeCategory
-#     opportunities: int
-#     occurances: int
+class MistakeFrequency(BaseModel):
+    opportunities: int
+    occurances: int
 
+class CategoryFrequency(MistakeFrequency):
+    category: str
 
-# class SpeechAnalysis(BaseModel):
-#     frequencies: list[MistakeFrequency]
-#     mistakes: list[DetectedMistake]
-#     feedback: str
+class SpeechAnalysis(BaseModel):
+    frequencies: list[CategoryFrequency]
+    mistakes: list[DetectedMistake]
+    feedback: str

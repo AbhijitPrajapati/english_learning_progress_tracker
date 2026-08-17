@@ -1,10 +1,11 @@
 from uuid import UUID
 
+from pydantic import EmailStr
+
 from app.application.ports.services import PasswordHasher
 from app.application.ports.unit_of_work import UnitOfWork
 
 from .exceptions import InvalidCredentials
-from .models import UserCredentials
 
 
 class AuthenticateUser:
@@ -12,11 +13,11 @@ class AuthenticateUser:
         self.uow = uow
         self.password_hasher = password_hasher
 
-    async def execute(self, request: UserCredentials) -> UUID:
-        user = await self.uow.users.get_by_email(request.email)
+    async def execute(self, email: EmailStr, password: str) -> UUID:
+        user = await self.uow.users.get_by_email(email)
 
         if user is None or not self.password_hasher.verify(
-            request.password, user.password_hash
+            password, user.password_hash
         ):
             raise InvalidCredentials()
 

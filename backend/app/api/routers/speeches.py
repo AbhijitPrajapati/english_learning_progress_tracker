@@ -11,7 +11,7 @@ from app.api.dependencies.application import (
     get_process_speech,
 )
 from app.api.dependencies.current_user import get_current_user
-from app.application.use_cases.speeches.models import (
+from app.api.schemas.speeches import (
     SpeechListRequest,
     SpeechListResponse,
     SpeechResponse,
@@ -27,7 +27,8 @@ async def upload_speech(
     process_speech: ProcessSpeech = Depends(get_process_speech),
     current_user: User = Depends(get_current_user),
 ) -> SpeechResponse:
-    return await process_speech.execute(current_user.id, file.file)
+    result = await process_speech.execute(current_user.id, file.file)
+    return SpeechResponse.model_validate(result)
 
 @router.delete("/{speech_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_speech(speech_id: UUID = Path(...), delete_speech: DeleteSpeech = Depends(get_delete_speech), user_id: UUID = Depends(get_current_user)) -> None:
@@ -35,4 +36,5 @@ async def delete_speech(speech_id: UUID = Path(...), delete_speech: DeleteSpeech
 
 @router.get("/", response_model=SpeechListResponse)
 async def list_speeches(request: SpeechListRequest, list_speeches: ListSpeeches = Depends(get_list_speeches), user_id: UUID = Depends(get_current_user)) -> SpeechListResponse:
-    return await list_speeches.execute(user_id, request)
+    speeches = await list_speeches.execute(user_id, request.limit, request.offset)
+    return SpeechListResponse.model_validate({"speeches": speeches})

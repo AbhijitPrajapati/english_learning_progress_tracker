@@ -22,16 +22,8 @@ class SpeechAnalysis(BaseModel):
     mistakes: list[DetectedMistake]
     feedback: str
 
-class SpeechResponse(BaseModel):
+class SpeechResult(BaseModel):
     id: UUID
     transcript: str
     analysis: SpeechAnalysis
     created_at: datetime
-
-
-class SpeechListRequest(BaseModel):
-    limit: int
-    offset: int
-
-class SpeechListResponse(BaseModel):
-    speeches: list[SpeechResponse]

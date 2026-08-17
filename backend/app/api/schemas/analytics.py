@@ -1,36 +1,31 @@
-# from datetime import datetime
+from datetime import datetime
 
-# from pydantic import BaseModel
+from pydantic import BaseModel
 
-# from app.domain.speech import MistakeCategory
-
-# from .analysis import MistakeFrequency
+from .analysis import CategoryFrequency, MistakeFrequency
 
 
-# class Timeframe(BaseModel):
-#     start: datetime
-#     end: datetime
+class Timeframe(BaseModel):
+    start: datetime
+    end: datetime
+
+class DistributionRequest(BaseModel):
+    timeframe: Timeframe
 
 
-# class DistributionRequest(BaseModel):
-#     timeframe: Timeframe
+class DistributionResponse(BaseModel):
+    total_samples: int
+    mistake_frequencies: list[CategoryFrequency]
 
 
-# class DistributionResponse(BaseModel):
-#     total_samples: int
-#     mistake_frequencies: list[MistakeFrequency]
+class TimeSeriesRequest(BaseModel):
+    timeframe: Timeframe
+    mistake_category: str
 
 
-# class TimeSeriesRequest(BaseModel):
-#     timeframe: Timeframe
-#     mistake_category: MistakeCategory
+class TimeSeriesPoint(MistakeFrequency):
+    time: datetime
 
 
-# class TimeSeriesPoint(BaseModel):
-#     time: datetime
-#     opportunities: int
-#     occurances: int
-
-
-# class TimeSeriesResponse(BaseModel):
-#     points: list[TimeSeriesPoint]
+class TimeSeriesResponse(BaseModel):
+    points: list[TimeSeriesPoint]

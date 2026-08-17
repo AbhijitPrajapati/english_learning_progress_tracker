@@ -1,20 +1,26 @@
-# from uuid import UUID
+from datetime import datetime
+from uuid import UUID
 
-# from pydantic import BaseModel
-
-
-# class LoginResponse(BaseModel):
-#     access_token: str
-#     token_type: str = "bearer"
-#     user_id: UUID
+from pydantic import BaseModel, EmailStr
 
 
-# class RegisterRequest(BaseModel):
-#     email: EmailStr
-#     password: str
+class UserCredentials(BaseModel):
+    email: EmailStr
+    password: str
+
+class LoginRequest(UserCredentials):
+    pass
 
 
-# class RegisterResponse(BaseModel):
-#     id: UUID
-#     email: EmailStr
-#     created_at: datetime
+class RegisterRequest(UserCredentials):
+    pass
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user_id: UUID
+
+class RegisterResponse(BaseModel):
+    id: UUID
+    email: EmailStr
+    created_at: datetime

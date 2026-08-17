@@ -8,7 +8,7 @@ from app.application.ports.services import (
 from app.application.ports.unit_of_work import UnitOfWork
 from app.domain.speech import Analysis, Speech
 
-from .models import SpeechResponse
+from .models import SpeechResult
 
 
 class ProcessSpeech:
@@ -24,11 +24,11 @@ class ProcessSpeech:
 
     async def execute(
         self, user_id: UUID, file_stream: BinaryIO
-    ) -> SpeechResponse:
+    ) -> SpeechResult:
         transcript: str = self.transcriber.transcribe(file_stream)
         analysis: Analysis = self.grammar_analyzer.analyze(transcript)
 
         speech: Speech = await self.uow.speeches.create(user_id, transcript, analysis)
         await self.uow.analytics_projector.add_analysis(speech.id, analysis)
         await self.uow.commit()
-        return SpeechResponse.model_validate(speech)
+        return SpeechResult.model_validate(speech)
