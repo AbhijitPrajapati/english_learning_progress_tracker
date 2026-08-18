@@ -1,71 +1,47 @@
-import httpx
-from pydantic import BaseModel, ConfigDict
-
-from app.application.ports.services import GrammarAnalyzer
-from app.domain.analysis import (
+from backend.app.domain.analysis import (
     Analysis,
     CategoryFrequency,
     Mistake,
     MistakeCategory,
 )
+from openai import OpenAI
+from pydantic import BaseModel
+
+from app.application.ports.services import GrammarAnalyzer
 
 from .config import LLMConfig
 
 
-class ProviderPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-
-class MistakePayload(ProviderPayload):
+class MistakePayload(BaseModel):
     category: MistakeCategory
     original_text: str
     correction: str
     explanation: str
 
 
-class FrequencyPayload(ProviderPayload):
+class FrequencyPayload(BaseModel):
     category: MistakeCategory
     occurrences: int
     opportunities: int
 
 
-class AnalysisPayload(ProviderPayload):
+class AnalysisPayload(BaseModel):
     mistakes: list[MistakePayload]
     frequencies: list[FrequencyPayload]
     feedback: str
 
 
-class MessagePayload(BaseModel):
-    content: str
-
-
-class ChoicePayload(BaseModel):
-    message: MessagePayload
-
-
-class ChatCompletionPayload(BaseModel):
-    choices: list[ChoicePayload]
-
-
 class OpenAIGrammarAnalysisAdapter(GrammarAnalyzer):
-    """Grammar analysis through an OpenAI-compatible chat-completions API."""
-
-    def __init__(
-        self,
-        config: LLMConfig,
-        *,
-        transport: httpx.AsyncBaseTransport | None = None,
-    ) -> None:
+    def __init__(self, config: LLMConfig) -> None:
         self.url = f"{str(config.base_url).rstrip('/')}/chat/completions"
-        self.api_key = config.api_key.get_secret_value()
         self.model = config.model
-        self.timeout = config.timeout_seconds
-        self.transport = transport
+        api_key = config.api_key.get_secret_value()
+        self.client = OpenAI(api_key=api_key)
 
     async def analyze(self, text: str) -> Analysis:
-        request = {
-            "model": self.model,
-            "messages": [
+        response = self.client.responses.parse(
+            model=self.model,
+            input=[
                 {
                     "role": "system",
                     "content": (
@@ -77,29 +53,11 @@ class OpenAIGrammarAnalysisAdapter(GrammarAnalyzer):
                 },
                 {"role": "user", "content": text},
             ],
-            "response_format": {
-                "type": "json_schema",
-                "json_schema": {
-                    "name": "grammar_analysis",
-                    "strict": True,
-                    "schema": AnalysisPayload.model_json_schema(),
-                },
-            },
-        }
-        headers = {"Authorization": f"Bearer {self.api_key}"}
-        async with httpx.AsyncClient(
-            timeout=self.timeout,
-            transport=self.transport,
-        ) as client:
-            response = await client.post(self.url, headers=headers, json=request)
-            response.raise_for_status()
-
-        completion = ChatCompletionPayload.model_validate(response.json())
-        if not completion.choices:
-            raise ValueError("Grammar provider returned no choices")
-        payload = AnalysisPayload.model_validate_json(
-            completion.choices[0].message.content
+            text_format=AnalysisPayload,
         )
+        payload = response.output_parsed
+        if payload is None:
+            raise ValueError("LLM output does not adhere to analysis schema.")
         return Analysis(
             mistakes=tuple(
                 Mistake(
