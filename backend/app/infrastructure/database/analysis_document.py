@@ -38,7 +38,7 @@ def analysis_from_document(document: dict[str, Any]) -> Analysis:
         frequencies.append(
             CategoryFrequency(
                 category=MistakeCategory(str(item["category"])),
-                occurrences=int(item["occurences"]),
+                occurrences=int(item["occurrences"]),
                 opportunities=int(item["opportunities"]),
             )
         )

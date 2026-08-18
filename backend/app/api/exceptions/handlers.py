@@ -9,7 +9,10 @@ from app.application.use_cases.auth.exceptions import (
     InvalidCredentials,
     InvalidToken,
 )
-from app.application.use_cases.speeches.exceptions import SpeechNotFound
+from app.application.use_cases.speeches.exceptions import (
+    AnalysisQuotaReached,
+    SpeechNotFound,
+)
 
 from .model import ErrorBody, ErrorCode
 from .util import log_exception
@@ -109,5 +112,18 @@ def register_exception_handlers(app: FastAPI) -> None:
             content=ErrorBody(
                 detail="Request validation failed.",
                 code=ErrorCode.VALIDATION_ERROR,
+            ).model_dump(mode="json"),
+        )
+
+    @app.exception_handler(AnalysisQuotaReached)
+    async def analysis_quota_reached(
+        request: Request, exc: RequestValidationError
+    ) -> JSONResponse:
+        log_exception("Analysis quota reached", exc, request)
+        return JSONResponse(
+            status_code=429,
+            content=ErrorBody(
+                detail="Analysis quota reached.",
+                code=ErrorCode.QUOTA_REACHED,
             ).model_dump(mode="json"),
         )

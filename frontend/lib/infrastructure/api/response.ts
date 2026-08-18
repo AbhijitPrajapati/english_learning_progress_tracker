@@ -5,6 +5,7 @@ import {
   InvalidCredentials,
   InvalidCurrentPassword,
   InvalidToken,
+  QuotaReached,
   RequestRejected,
   SpeechNotFound,
 } from "@/lib/application/errors";
@@ -31,6 +32,8 @@ function translateApiError(error: unknown): never {
       throw new SpeechNotFound();
     case "INVALID_AUDIO":
       throw new InvalidAudio(error.detail);
+    case "QUOTA_REACHED":
+      throw new QuotaReached();
     case "VALIDATION_ERROR":
     case "UNEXPECTED":
       throw new RequestRejected(error.detail, { cause: error });

@@ -18,4 +18,4 @@ class WhisperModel(StrEnum):
 
 class WhisperConfig(BaseModel):
     model: WhisperModel
-    device: str
+    device: str = "cpu"

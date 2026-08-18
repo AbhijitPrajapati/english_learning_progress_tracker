@@ -1,7 +1,5 @@
-import asyncio
 import logging
 from io import BytesIO
-from threading import Lock
 
 from faster_whisper import WhisperModel
 
@@ -19,29 +17,9 @@ class WhisperTranscriptionAdapter(Transcriber):
     """
 
     def __init__(self, config: WhisperConfig) -> None:
-        self.config = config
-        self.model: WhisperModel | None = None
-        self.model_lock = Lock()
-        self.transcription_lock = asyncio.Lock()
-
-    def _get_model(self) -> WhisperModel:
-        with self.model_lock:
-            if self.model is None:
-                self.model = WhisperModel(
-                    self.config.model,
-                    self.config.device,
-                )
-                logger.info(
-                    "Loaded %s Whisper model on %s",
-                    self.config.model,
-                    self.config.device,
-                )
-            return self.model
+        self.model = WhisperModel(config.model, config.device)
+        logger.info("Loaded %s Whisper model on %s", config.model, config.device)
 
     async def transcribe(self, audio: AudioSample) -> str:
-        def run_transcription() -> str:
-            segments, _ = self._get_model().transcribe(BytesIO(audio.content))
-            return "".join(segment.text for segment in segments)
-
-        async with self.transcription_lock:
-            return await asyncio.to_thread(run_transcription)
+        segments, _ = self.model.transcribe(BytesIO(audio.content))
+        return "".join(segment.text for segment in segments)

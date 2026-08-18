@@ -14,6 +14,11 @@ export interface Frequency {
   opportunities: number;
 }
 
+export function errorRate(frequency: Frequency): number {
+  if (frequency.opportunities === 0) return 0;
+  return frequency.occurrences / frequency.opportunities;
+}
+
 export interface CategoryFrequency extends Frequency {
   category: MistakeCategoryId;
 }

@@ -53,3 +53,10 @@ export class RequestRejected extends ApplicationError {
     this.name = "RequestRejected";
   }
 }
+
+export class QuotaReached extends ApplicationError {
+  constructor() {
+    super("Analysis quota reached.");
+    this.name = "QuotaReached";
+  }
+}

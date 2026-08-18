@@ -1,13 +1,13 @@
-from backend.app.domain.analysis import (
+from openai import OpenAI, RateLimitError
+from pydantic import BaseModel
+
+from app.application.ports.services import AnalysisQuotaExhausted, GrammarAnalyzer
+from app.domain.analysis import (
     Analysis,
     CategoryFrequency,
     Mistake,
     MistakeCategory,
 )
-from openai import OpenAI
-from pydantic import BaseModel
-
-from app.application.ports.services import GrammarAnalyzer
 
 from .config import LLMConfig
 
@@ -39,22 +39,25 @@ class OpenAIGrammarAnalysisAdapter(GrammarAnalyzer):
         self.client = OpenAI(api_key=api_key)
 
     async def analyze(self, text: str) -> Analysis:
-        response = self.client.responses.parse(
-            model=self.model,
-            input=[
-                {
-                    "role": "system",
-                    "content": (
-                        "Analyze the learner's English grammar. Use only the "
-                        "categories in the supplied JSON schema. Count an "
-                        "opportunity whenever the category could be evaluated; "
-                        "occurrences must not exceed opportunities. Return JSON only."
-                    ),
-                },
-                {"role": "user", "content": text},
-            ],
-            text_format=AnalysisPayload,
-        )
+        try:
+            response = self.client.responses.parse(
+                model=self.model,
+                input=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "Analyze the learner's English grammar. Use only the "
+                            "categories in the supplied JSON schema. Count an "
+                            "opportunity whenever the category could be evaluated; "
+                            "occurrences must not exceed opportunities. Return JSON only."
+                        ),
+                    },
+                    {"role": "user", "content": text},
+                ],
+                text_format=AnalysisPayload,
+            )
+        except RateLimitError as e:
+            raise AnalysisQuotaExhausted() from e
         payload = response.output_parsed
         if payload is None:
             raise ValueError("LLM output does not adhere to analysis schema.")

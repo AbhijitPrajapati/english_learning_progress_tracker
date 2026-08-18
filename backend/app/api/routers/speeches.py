@@ -17,7 +17,7 @@ router = APIRouter(prefix="/speeches", tags=["speeches"])
     response_model=SpeechResponse,
     status_code=status.HTTP_201_CREATED,
     operation_id="uploadSpeech",
-    responses=error_responses(400, 401, 422, 500),
+    responses=error_responses(400, 401, 422, 429, 500),
 )
 async def upload_speech(
     container: ContainerDependency,

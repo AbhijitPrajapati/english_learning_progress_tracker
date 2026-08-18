@@ -1,9 +1,15 @@
 from uuid import UUID
 
 from app.application.contracts.audio import AudioSample
-from app.application.ports.services import GrammarAnalyzer, Transcriber
+from app.application.ports.services import (
+    AnalysisQuotaExhausted,
+    GrammarAnalyzer,
+    Transcriber,
+)
 from app.application.ports.unit_of_work import UnitOfWorkFactory
 from app.domain.speech import Speech
+
+from .exceptions import AnalysisQuotaReached
 
 
 class ProcessSpeech:
@@ -19,7 +25,10 @@ class ProcessSpeech:
 
     async def execute(self, user_id: UUID, audio: AudioSample) -> Speech:
         transcript = await self.transcriber.transcribe(audio)
-        analysis = await self.grammar_analyzer.analyze(transcript)
+        try:
+            analysis = await self.grammar_analyzer.analyze(transcript)
+        except AnalysisQuotaExhausted as e:
+            raise AnalysisQuotaReached() from e
 
         async with self.uow_factory() as uow:
             speech = await uow.speeches.create(user_id, transcript, analysis)

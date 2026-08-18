@@ -177,7 +177,8 @@
           "ALREADY_REGISTERED",
           "SPEECH_NOT_FOUND",
           "INVALID_AUDIO",
-          "VALIDATION_ERROR"
+          "VALIDATION_ERROR",
+          "QUOTA_REACHED"
         ],
         "title": "ErrorCode",
         "type": "string"
@@ -985,6 +986,16 @@
               }
             },
             "description": "Request validation failed"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too many requests"
           },
           "500": {
             "content": {

@@ -232,7 +232,7 @@ export interface components {
          * ErrorCode
          * @enum {string}
          */
-        ErrorCode: "UNEXPECTED" | "INVALID_CREDENTIALS" | "INVALID_CURRENT_PASSWORD" | "INVALID_TOKEN" | "ALREADY_REGISTERED" | "SPEECH_NOT_FOUND" | "INVALID_AUDIO" | "VALIDATION_ERROR";
+        ErrorCode: "UNEXPECTED" | "INVALID_CREDENTIALS" | "INVALID_CURRENT_PASSWORD" | "INVALID_TOKEN" | "ALREADY_REGISTERED" | "SPEECH_NOT_FOUND" | "INVALID_AUDIO" | "VALIDATION_ERROR" | "QUOTA_REACHED";
         /** LoginRequest */
         LoginRequest: {
             /**
@@ -800,6 +800,15 @@ export interface operations {
             };
             /** @description Request validation failed */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };

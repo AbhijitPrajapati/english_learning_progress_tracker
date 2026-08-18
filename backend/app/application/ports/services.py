@@ -5,6 +5,10 @@ from app.application.contracts.audio import AudioSample
 from app.domain.analysis import Analysis
 
 
+class AnalysisQuotaExhausted(Exception):
+    """Raised by the grammar analyzer when quota is reached"""
+
+
 class PasswordHasher(Protocol):
     def hash(self, password: str) -> str: ...
     def verify(self, password: str, password_hash: str) -> bool: ...

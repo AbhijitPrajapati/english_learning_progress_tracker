@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { Speech } from "@/lib/domain/speech";
+import { QuotaReached } from "@/lib/application/errors";
 
 export default function HomePage() {
   const application = useApplication();
@@ -40,8 +41,12 @@ export default function HomePage() {
         mediaType: file.type || "audio/mpeg",
       });
       setResult(response);
-    } catch {
-      setError("Upload failed");
+    } catch (error) {
+      if (error instanceof QuotaReached) {
+        setError("Analysis quota reached");
+      } else {
+        setError("Upload failed");
+      }
     } finally {
       setIsUploading(false);
     }

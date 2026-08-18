@@ -133,7 +133,7 @@ export default function AnalyticsPage() {
             <CardHeader>
               <CardTitle>Distribution</CardTitle>
               <CardDescription>
-                Overview for {selectedDateRangeLabel}
+                Error rate by category for {selectedDateRangeLabel}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -151,7 +151,7 @@ export default function AnalyticsPage() {
             <CardHeader>
               <CardTitle>Time series</CardTitle>
               <CardDescription>
-                Trend for {selectedCategoryLabel}
+                Error-rate trend for {selectedCategoryLabel}
               </CardDescription>
             </CardHeader>
             <CardContent>

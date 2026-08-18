@@ -37,6 +37,7 @@ const ERROR_CODES = {
   SPEECH_NOT_FOUND: true,
   INVALID_AUDIO: true,
   VALIDATION_ERROR: true,
+  QUOTA_REACHED: true
 } satisfies Record<ErrorCode, true>;
 
 function isApiErrorBody(value: unknown): value is ApiErrorBody {
