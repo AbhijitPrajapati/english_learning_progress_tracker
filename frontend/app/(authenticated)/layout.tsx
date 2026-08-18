@@ -34,7 +34,7 @@ export default function AuthenticatedLayout({
       <header className="border-b bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4">
           <Link href="/" className="font-semibold tracking-tight">
-            English learning tracker
+            Grammar Tracker
           </Link>
           <nav
             className="flex flex-wrap items-center gap-2"

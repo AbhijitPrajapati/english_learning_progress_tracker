@@ -3,7 +3,7 @@ import "./globals.css";
 import { ApplicationProvider, AuthProvider } from "./providers";
 
 export const metadata: Metadata = {
-  title: "English Learning Progress Tracker",
+  title: "Grammar Tracker",
   description: "Upload speech samples and review grammar analytics",
 };
 
