@@ -41,7 +41,6 @@ class ApplicationContainer:
         self.list_speeches = ListSpeeches(self.infrastructure.uow_factory)
         self.process_speech = ProcessSpeech(
             self.infrastructure.uow_factory,
-            self.infrastructure.transcriber,
             self.infrastructure.grammar_analyzer,
         )
 
