@@ -1,4 +1,4 @@
 from .adapter import OpenAIGrammarAnalysisAdapter
-from .config import LLMConfig
+from .config import OpenAIConfig
 
-__all__ = ["LLMConfig", "OpenAIGrammarAnalysisAdapter"]
+__all__ = ["OpenAIConfig", "OpenAIGrammarAnalysisAdapter"]

@@ -1,6 +1,7 @@
 from openai import OpenAI, RateLimitError
 from pydantic import BaseModel
 
+from app.application.contracts.audio import AudioSample
 from app.application.ports.services import AnalysisQuotaExhausted, GrammarAnalyzer
 from app.domain.analysis import (
     Analysis,
@@ -9,7 +10,7 @@ from app.domain.analysis import (
     MistakeCategory,
 )
 
-from .config import LLMConfig
+from .config import OpenAIConfig
 
 
 class MistakePayload(BaseModel):
@@ -32,16 +33,19 @@ class AnalysisPayload(BaseModel):
 
 
 class OpenAIGrammarAnalysisAdapter(GrammarAnalyzer):
-    def __init__(self, config: LLMConfig) -> None:
-        self.url = f"{str(config.base_url).rstrip('/')}/chat/completions"
-        self.model = config.model
+    def __init__(self, config: OpenAIConfig) -> None:
+        self.text_model = config.text_model
+        self.transcription_model = config.transcription_model
         api_key = config.api_key.get_secret_value()
         self.client = OpenAI(api_key=api_key)
 
-    async def analyze(self, text: str) -> Analysis:
+    async def analyze(self, audio: AudioSample) -> tuple[str, Analysis]:
         try:
+            transcription = self.client.audio.transcriptions.create(
+                model=self.transcription_model, file=audio.content
+            )
             response = self.client.responses.parse(
-                model=self.model,
+                model=self.text_model,
                 input=[
                     {
                         "role": "system",
@@ -52,7 +56,7 @@ class OpenAIGrammarAnalysisAdapter(GrammarAnalyzer):
                             "occurrences must not exceed opportunities. Return JSON only."
                         ),
                     },
-                    {"role": "user", "content": text},
+                    {"role": "user", "content": transcription.text},
                 ],
                 text_format=AnalysisPayload,
             )
@@ -61,7 +65,7 @@ class OpenAIGrammarAnalysisAdapter(GrammarAnalyzer):
         payload = response.output_parsed
         if payload is None:
             raise ValueError("LLM output does not adhere to analysis schema.")
-        return Analysis(
+        analysis = Analysis(
             mistakes=tuple(
                 Mistake(
                     category=item.category,
@@ -81,3 +85,4 @@ class OpenAIGrammarAnalysisAdapter(GrammarAnalyzer):
             ),
             feedback=payload.feedback,
         )
+        return transcription.text, analysis

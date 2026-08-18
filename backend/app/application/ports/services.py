@@ -20,8 +20,4 @@ class TokenService(Protocol):
 
 
 class GrammarAnalyzer(Protocol):
-    async def analyze(self, text: str) -> Analysis: ...
-
-
-class Transcriber(Protocol):
-    async def transcribe(self, audio: AudioSample) -> str: ...
+    async def analyze(self, audio: AudioSample) -> tuple[str, Analysis]: ...
