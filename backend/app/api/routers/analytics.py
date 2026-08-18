@@ -1,43 +1,57 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends
 
-from app.api.dependencies.application import (
-    RetrieveDistribution,
-    RetrieveTimeSeries,
-    get_retrieve_distribution,
-    get_retrieve_time_series,
+from app.api.dependencies.application import ContainerDependency
+from app.api.dependencies.current_user import get_current_user
+from app.api.mappers import (
+    to_date_range,
+    to_distribution_response,
+    to_domain_mistake_category,
+    to_time_series_response,
 )
-from app.api.dependencies.auth import get_current_user
+from app.api.responses import error_responses
 from app.api.schemas.analytics import (
     DistributionRequest,
     DistributionResponse,
     TimeSeriesRequest,
     TimeSeriesResponse,
 )
-from backend.app.application.use_cases.analytics.models import Timeframe
-from app.domain.user import User
 
-router = APIRouter(prefix="/analytics")
+router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 
-@router.post("/distribution", response_model=DistributionResponse)
+@router.post(
+    "/distribution",
+    response_model=DistributionResponse,
+    operation_id="getDistribution",
+    responses=error_responses(401, 422, 500),
+)
 async def get_distribution(
     request: DistributionRequest,
-    retrieve_distribution: RetrieveDistribution = Depends(get_retrieve_distribution),
-    current_user: User = Depends(get_current_user),
+    container: ContainerDependency,
+    user_id: UUID = Depends(get_current_user),
 ) -> DistributionResponse:
-    timeframe = Timeframe.model_validate(request.timeframe)
-    distribution = await retrieve_distribution.execute(current_user.id, timeframe)
-    return DistributionResponse.model_validate(distribution)
+    distribution = await container.retrieve_distribution.execute(
+        user_id, to_date_range(request.date_range)
+    )
+    return to_distribution_response(distribution)
 
 
-@router.post("/time-series", response_model=TimeSeriesResponse)
+@router.post(
+    "/time-series",
+    response_model=TimeSeriesResponse,
+    operation_id="getTimeSeries",
+    responses=error_responses(401, 422, 500),
+)
 async def get_time_series(
     request: TimeSeriesRequest,
-    retrieve_time_series: RetrieveTimeSeries = Depends(get_retrieve_time_series),
-    current_user: User = Depends(get_current_user),
+    container: ContainerDependency,
+    user_id: UUID = Depends(get_current_user),
 ) -> TimeSeriesResponse:
-    timeframe = Timeframe.model_validate(request.timeframe)
-    time_series = await retrieve_time_series.execute(
-        current_user.id, timeframe, request.mistake_category
+    time_series = await container.retrieve_time_series.execute(
+        user_id,
+        to_date_range(request.date_range),
+        to_domain_mistake_category(request.mistake_category),
     )
-    return TimeSeriesResponse.model_validate(time_series)
+    return to_time_series_response(time_series)

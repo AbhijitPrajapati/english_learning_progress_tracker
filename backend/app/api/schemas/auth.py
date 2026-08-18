@@ -1,23 +1,40 @@
 from datetime import datetime
+from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, StringConstraints
+
+from app.domain.user import NewPassword
+
+Password = Annotated[
+    str,
+    StringConstraints(
+        min_length=NewPassword.MIN_LENGTH,
+        max_length=NewPassword.MAX_LENGTH,
+    ),
+]
 
 
-class LoginRequest(BaseModel):
+class UserCredentials(BaseModel):
     email: EmailStr
-    password: str
+    password: Password
+
+
+class LoginRequest(UserCredentials):
+    pass
+
+
+class RegisterRequest(UserCredentials):
+    pass
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: Password
+    new_password: Password
 
 
 class LoginResponse(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
     user_id: UUID
-
-
-class RegisterRequest(BaseModel):
-    email: EmailStr
-    password: str
 
 
 class RegisterResponse(BaseModel):

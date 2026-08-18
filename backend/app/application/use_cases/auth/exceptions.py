@@ -5,9 +5,9 @@ class InvalidCredentials(ApplicationError):
     pass
 
 
-class UserNotFound(ApplicationError):
+class EmailAlreadyRegistered(ApplicationError):
     pass
 
 
-class EmailAlreadyRegistered(ApplicationError):
+class InvalidToken(ApplicationError):
     pass

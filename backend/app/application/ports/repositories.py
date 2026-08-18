@@ -1,56 +1,49 @@
 from typing import Protocol
+from uuid import UUID
 
-from pydantic import BaseModel
-
-from backend.app.application.use_cases.analytics.models import (
+from app.application.contracts.analytics import (
+    DateRange,
     Distribution,
-    MistakeTimeSeries,
     TimeBucket,
-    Timeframe,
+    TimeSeries,
 )
-from app.domain.speech import Analysis, MistakeCategory, Speech, SpeechId
-from app.domain.user import Email, User, UserId
+from app.domain.analysis import Analysis, MistakeCategory
+from app.domain.speech import Speech
+from app.domain.user import EmailAddress, User
 
 
-class NewUser(BaseModel):
-    email: Email
-    password_hash: str
-
-
-class UpdateUser(BaseModel):
-    email: Email
-
-
-class NewSpeech(BaseModel):
-    user_id: UserId
-    transcript: str
-    analysis: Analysis
+class EmailConflictError(Exception):
+    """Raised by a user repository when a normalized email already exists."""
 
 
 class UserRepository(Protocol):
-    async def create(self, user: NewUser) -> User: ...
-    async def get(self, user_id: UserId) -> User | None: ...
-    async def get_by_email(self, email: Email) -> User | None: ...
-    async def delete(self, user_id: UserId) -> bool: ...
-    async def update(self, user_id: UserId, update_user: UpdateUser) -> User | None: ...
+    async def create(self, email: EmailAddress, password_hash: str) -> User: ...
+    async def get(self, user_id: UUID) -> User | None: ...
+    async def get_by_email(self, email: EmailAddress) -> User | None: ...
+    async def delete(self, user_id: UUID) -> bool: ...
+    async def update_password(self, user_id: UUID, password_hash: str) -> User | None: ...
 
 
 class SpeechRepository(Protocol):
-    async def create(self, speech: NewSpeech) -> Speech: ...
-    async def get(self, speech_id: SpeechId) -> Speech | None: ...
-    async def delete(self, speech_id: SpeechId) -> bool: ...
-    async def list(self, user_id: UserId, limit: int, offset: int) -> list[Speech]: ...
+    async def create(self, user_id: UUID, transcript: str, analysis: Analysis) -> Speech: ...
+    async def get(self, speech_id: UUID) -> Speech | None: ...
+    async def delete(self, speech_id: UUID) -> bool: ...
+    async def list(self, user_id: UUID, limit: int, offset: int) -> list[Speech]: ...
 
 
-class AnalyticsProjector(Protocol):
+class AnalyticsReader(Protocol):
     async def distribution(
-        self, user_id: UserId, timeframe: Timeframe
+        self, user_id: UUID, date_range: DateRange
     ) -> Distribution: ...
+
     async def time_series(
         self,
-        user_id: UserId,
-        timeframe: Timeframe,
+        user_id: UUID,
+        date_range: DateRange,
         mistake_category: MistakeCategory,
         bucket: TimeBucket,
-    ) -> MistakeTimeSeries: ...
-    async def add_analysis(self, speech_id: SpeechId, analysis: Analysis) -> None: ...
+    ) -> TimeSeries: ...
+
+
+class AnalysisProjectionWriter(Protocol):
+    async def add(self, speech_id: UUID, analysis: Analysis) -> None: ...

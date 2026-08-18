@@ -1,21 +1,13 @@
-import logging
+from uuid import UUID
 
-from app.application.exceptions import ApplicationError, InfrastructureError
-from app.application.ports.unit_of_work import UnitOfWork
-from app.domain.user import UserId
-
-from .models import Distribution, Timeframe
-
-logger = logging.getLogger(__name__)
+from app.application.contracts.analytics import DateRange, Distribution
+from app.application.ports.unit_of_work import UnitOfWorkFactory
 
 
 class RetrieveDistribution:
-    def __init__(self, uow: UnitOfWork) -> None:
-        self.uow = uow
+    def __init__(self, uow_factory: UnitOfWorkFactory) -> None:
+        self.uow_factory = uow_factory
 
-    async def execute(self, user_id: UserId, timeframe: Timeframe) -> Distribution:
-        try:
-            return await self.uow.analytics_projector.distribution(user_id, timeframe)
-        except InfrastructureError as e:
-            logger.exception("Failed to retrieve error distribution")
-            raise ApplicationError() from e
+    async def execute(self, user_id: UUID, date_range: DateRange) -> Distribution:
+        async with self.uow_factory() as uow:
+            return await uow.analytics.distribution(user_id, date_range)

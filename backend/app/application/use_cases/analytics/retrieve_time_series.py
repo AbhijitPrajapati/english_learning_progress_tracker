@@ -1,27 +1,22 @@
-import logging
+from uuid import UUID
 
-from app.application.exceptions import ApplicationError, InfrastructureError
-from app.application.ports.unit_of_work import UnitOfWork
-from app.domain.speech import MistakeCategory
-from app.domain.user import UserId
-
-from .models import MistakeTimeSeries, TimeBucket, Timeframe
-
-logger = logging.getLogger(__name__)
+from app.application.contracts.analytics import DateRange, TimeBucket, TimeSeries
+from app.application.ports.unit_of_work import UnitOfWorkFactory
+from app.domain.analysis import MistakeCategory
 
 
 class RetrieveTimeSeries:
-    def __init__(self, uow: UnitOfWork) -> None:
-        self.uow = uow
+    def __init__(self, uow_factory: UnitOfWorkFactory) -> None:
+        self.uow_factory = uow_factory
 
     async def execute(
-        self, user_id: UserId, timeframe: Timeframe, mistake_category: MistakeCategory
-    ) -> MistakeTimeSeries:
-        try:
-            time_bucket = TimeBucket.from_timeframe(timeframe)
-            return await self.uow.analytics_projector.time_series(
-                user_id, timeframe, mistake_category, time_bucket
+        self,
+        user_id: UUID,
+        date_range: DateRange,
+        mistake_category: MistakeCategory,
+    ) -> TimeSeries:
+        time_bucket = TimeBucket.from_date_range(date_range)
+        async with self.uow_factory() as uow:
+            return await uow.analytics.time_series(
+                user_id, date_range, mistake_category, time_bucket
             )
-        except InfrastructureError as e:
-            logger.exception("Failed to retrieve time series")
-            raise ApplicationError() from e

@@ -1,6 +1,15 @@
-from pydantic import BaseModel
+from enum import StrEnum
 
-from app.domain.speech import MistakeCategory
+from pydantic import BaseModel, Field
+
+
+class MistakeCategory(StrEnum):
+    SUBJECT_VERB_AGREEMENT = "subject_verb_agreement"
+    VERB_TENSE = "verb_tense"
+    ARTICLE_USAGE = "article_usage"
+    PREPOSITION_USAGE = "preposition_usage"
+    WORD_ORDER = "word_order"
+    PLURALITY = "plurality"
 
 
 class DetectedMistake(BaseModel):
@@ -10,13 +19,13 @@ class DetectedMistake(BaseModel):
     explanation: str
 
 
-class MistakeFrequency(BaseModel):
+class CategoryFrequency(BaseModel):
     category: MistakeCategory
-    opportunities: int
-    occurances: int
+    occurrences: int = Field(ge=0)
+    opportunities: int = Field(ge=0)
 
 
-class SampleAnalysis(BaseModel):
-    frequencies: list[MistakeFrequency]
+class SpeechAnalysis(BaseModel):
+    frequencies: list[CategoryFrequency]
     mistakes: list[DetectedMistake]
     feedback: str

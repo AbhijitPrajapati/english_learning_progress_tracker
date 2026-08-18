@@ -4,8 +4,12 @@ version = "0.1.0"
 description = "Backend for English learning progress tracker"
 requires-python = ">=3.14"
 dependencies = [
+    "alembic>=1.19.0",
+    "asyncpg>=0.31.0",
     "fastapi[standard]>=0.140.7",
     "faster-whisper>=1.2.1",
+    "httpx>=0.28.1",
+    "openai>=3.2.0",
     "psycopg>=3.3.4",
     "pwdlib[argon2]>=0.3.0",
     "pyjwt>=2.13.0",
@@ -13,4 +17,4 @@ dependencies = [
 ]
 
 [tool.ruff.lint.flake8-bugbear]
-extend-immutable-calls = ["fastapi.Depends", "fastapi.File"]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.File", "fastapi.Path"]

@@ -1,58 +1,37 @@
-import logging
-from datetime import datetime
-from typing import BinaryIO
+from uuid import UUID
 
-from pydantic import BaseModel
-
-from app.application.exceptions import ApplicationError, InfrastructureError
-from app.application.ports.repositories import NewSpeech
+from app.application.contracts.audio import AudioSample
 from app.application.ports.services import (
-    GrammarAnalysisAdapter,
-    TranscriptionAdapter,
+    AnalysisQuotaExhausted,
+    GrammarAnalyzer,
+    Transcriber,
 )
-from app.application.ports.unit_of_work import UnitOfWork
-from app.domain.speech import Analysis, Speech, SpeechId
-from app.domain.user import UserId
+from app.application.ports.unit_of_work import UnitOfWorkFactory
+from app.domain.speech import Speech
 
-logger = logging.getLogger(__name__)
-
-
-class ProcessSpeechResult(BaseModel):
-    speech_id: SpeechId
-    created_at: datetime
-    transcript: str
-    analysis: Analysis
+from .exceptions import AnalysisQuotaReached
 
 
 class ProcessSpeech:
     def __init__(
         self,
-        uow: UnitOfWork,
-        transcriber: TranscriptionAdapter,
-        grammar_analyzer: GrammarAnalysisAdapter,
+        uow_factory: UnitOfWorkFactory,
+        transcriber: Transcriber,
+        grammar_analyzer: GrammarAnalyzer,
     ) -> None:
-        self.uow = uow
+        self.uow_factory = uow_factory
         self.transcriber = transcriber
         self.grammar_analyzer = grammar_analyzer
 
-    async def execute(
-        self, user_id: UserId, file_stream: BinaryIO
-    ) -> ProcessSpeechResult:
+    async def execute(self, user_id: UUID, audio: AudioSample) -> Speech:
+        transcript = await self.transcriber.transcribe(audio)
         try:
-            transcript: str = self.transcriber.transcribe(file_stream)
-            analysis: Analysis = self.grammar_analyzer.analyze(transcript)
+            analysis = await self.grammar_analyzer.analyze(transcript)
+        except AnalysisQuotaExhausted as e:
+            raise AnalysisQuotaReached() from e
 
-            speech: Speech = await self.uow.speeches.create(
-                NewSpeech(user_id=user_id, transcript=transcript, analysis=analysis)
-            )
-            await self.uow.analytics_projector.add_analysis(speech.id, analysis)
-            await self.uow.commit()
-            return ProcessSpeechResult(
-                speech_id=speech.id,
-                created_at=speech.created_at,
-                transcript=transcript,
-                analysis=analysis,
-            )
-        except InfrastructureError as e:
-            logger.exception("Speech procesing failed")
-            raise ApplicationError() from e
+        async with self.uow_factory() as uow:
+            speech = await uow.speeches.create(user_id, transcript, analysis)
+            await uow.analysis_projection.add(speech.id, analysis)
+            await uow.commit()
+        return speech
