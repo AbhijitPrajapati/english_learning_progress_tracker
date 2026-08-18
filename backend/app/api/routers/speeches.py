@@ -29,7 +29,7 @@ async def upload_speech(
         user_id,
         AudioSample(
             content=content,
-            filename=file.filename or "speech",
+            filename=file.filename,
             media_type=file.content_type,
         ),
     )

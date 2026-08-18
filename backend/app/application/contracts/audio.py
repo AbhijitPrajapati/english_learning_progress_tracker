@@ -9,7 +9,7 @@ class AudioSample:
     MAX_CONTENT_BYTES: ClassVar[int] = 25 * 1024 * 1024
 
     content: bytes
-    filename: str
+    filename: str | None
     media_type: str | None
 
     def __post_init__(self) -> None:
@@ -19,5 +19,5 @@ class AudioSample:
             raise InvalidAudio("Audio must be no larger than 25 MiB")
         if self.media_type is None or not self.media_type.startswith("audio/"):
             raise InvalidAudio("An audio content type is required")
-        if not self.filename.strip():
+        if not self.filename:
             raise InvalidAudio("An audio filename is required")

@@ -42,7 +42,7 @@ class OpenAIGrammarAnalysisAdapter(GrammarAnalyzer):
     async def analyze(self, audio: AudioSample) -> tuple[str, Analysis]:
         try:
             transcription = self.client.audio.transcriptions.create(
-                model=self.transcription_model, file=audio.content
+                model=self.transcription_model, file=(audio.filename, audio.content)
             )
             response = self.client.responses.parse(
                 model=self.text_model,
